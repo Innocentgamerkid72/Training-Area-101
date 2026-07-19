@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaction Time — Training Area 101</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- PAGE NAV (hidden during game/results) -->
+<nav class="page-nav" id="page-nav">
+    <button class="back-btn" onclick="navBack()">Back</button>
+    <span class="page-title">Reaction Time</span>
+</nav>
+
+<!-- WIZARD CONTAINER -->
+<div class="wizard" id="wizard">
+
+    <!-- STEP 1: Theme -->
+    <div class="step active" id="step-theme">
+        <div class="step-head">
+            <h2>Select Theme</h2>
+            <p>Choose how you want to train your reaction time</p>
+        </div>
+        <div class="mode-grid mode-grid-2">
+            <div class="mode-card" data-theme="redgreen" onclick="pickTheme(this)">
+                <h3>Red Light</h3>
+                <p>Wait for the screen to turn green, then react as fast as you can</p>
+            </div>
+            <div class="mode-card" data-theme="standoff" onclick="pickTheme(this)">
+                <h3>Standoff</h3>
+                <p>Face off against the clock — react the instant it says SHOOT!</p>
+            </div>
+        </div>
+        <div class="step-foot">
+            <div></div>
+            <button class="btn btn-primary" id="btn-theme-next" disabled onclick="fromTheme()">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 2: Reaction Key -->
+    <div class="step" id="step-key">
+        <div class="step-head">
+            <h2>Set Your Reaction Key</h2>
+            <p>Click the box below, then press the key you'll use to react</p>
+        </div>
+        <div class="key-capture" id="key-display" onclick="startKeyCapture()">Click to set key</div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('theme')">Back</button>
+            <button class="btn btn-primary" id="btn-key-next" disabled onclick="fromKey()">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 3: Signal Text Size (standoff only) -->
+    <div class="step" id="step-textsize">
+        <div class="step-head">
+            <h2>Signal Text Size</h2>
+            <p>Adjust how large the "SHOOT!" signal appears</p>
+        </div>
+        <div class="form-group">
+            <label>Text Size: <span class="val-label" id="size-val">80px</span></label>
+            <input type="range" id="inp-textsize" min="40" max="160" step="4" value="80" oninput="onTextSizeChange(this.value)">
+        </div>
+        <div class="size-preview" id="size-preview" style="font-size:80px;">SHOOT!</div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('key')">Back</button>
+            <button class="btn btn-primary" onclick="fromTextSize()">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 4: Confirm -->
+    <div class="step" id="step-confirm">
+        <div class="step-head">
+            <h2>Ready to Train</h2>
+            <p>Review your settings then start when ready</p>
+        </div>
+        <div class="summary-card">
+            <div class="summary-row"><span class="s-key">Theme</span><span class="s-val" id="s-theme">—</span></div>
+            <div class="summary-row"><span class="s-key">Reaction Key</span><span class="s-val" id="s-rkey">—</span></div>
+            <div class="summary-row" id="s-size-row"><span class="s-key">Text Size</span><span class="s-val" id="s-size">—</span></div>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show(cfg.theme === 'standoff' ? 'textsize' : 'key')">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTheme()">Start Training</button>
+        </div>
+    </div>
+
+</div><!-- /wizard -->
+
+<!-- RED LIGHT SCREEN -->
+<div id="screen-redgreen">
+    <div class="rg-msg" id="rg-msg">Get ready…</div>
+    <div class="rg-flash" id="rg-flash"></div>
+</div>
+
+<!-- STANDOFF SCREEN -->
+<div id="screen-standoff">
+    <div class="standoff-text" id="standoff-text">Wait...</div>
+    <div class="standoff-flash" id="standoff-flash"></div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="screen-results">
+    <div class="res-title" id="r-tier">—</div>
+    <div class="res-subtitle">Your reaction time</div>
+    <div class="res-stats">
+        <div class="res-stat"><div class="res-val" id="r-ms">0ms</div><div class="res-lbl">Reaction Time</div></div>
+    </div>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+</div>
+
+<script>
+// ─── SETTINGS STATE ─────────────────────────────────────────────
+const cfg = {
+    theme: null,
+    key: null,
+    keyLabel: null,
+    textSize: 80
+};
+
+let inputMode = 'idle'; // idle | capture | redgreen | standoff
+const rt = { gen: 0, state: null, timer: null, goTime: 0 };
+
+// ─── STEP NAVIGATION ────────────────────────────────────────────
+function show(stepId) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + stepId).classList.add('active');
+}
+
+function navBack() {
+    const active = document.querySelector('.step.active');
+    if (!active) { location.href = 'index.html'; return; }
+    const id = active.id.replace('step-', '');
+    if (id === 'theme') { location.href = 'index.html'; return; }
+    if (id === 'key') { show('theme'); return; }
+    if (id === 'textsize') { show('key'); return; }
+    if (id === 'confirm') { show(cfg.theme === 'standoff' ? 'textsize' : 'key'); return; }
+}
+
+function pickTheme(card) {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('sel'));
+    card.classList.add('sel');
+    cfg.theme = card.dataset.theme;
+    document.getElementById('btn-theme-next').disabled = false;
+}
+
+function fromTheme() {
+    if (!cfg.theme) return;
+    cfg.key = null;
+    cfg.keyLabel = null;
+    const el = document.getElementById('key-display');
+    el.textContent = 'Click to set key';
+    el.classList.remove('capturing');
+    document.getElementById('btn-key-next').disabled = true;
+    show('key');
+}
+
+function fromKey() {
+    if (!cfg.key) return;
+    if (cfg.theme === 'standoff') {
+        show('textsize');
+    } else {
+        fillSummary();
+        show('confirm');
+    }
+}
+
+function fromTextSize() {
+    fillSummary();
+    show('confirm');
+}
+
+function fillSummary() {
+    const themeLabel = { redgreen: 'Red Light', standoff: 'Standoff' }[cfg.theme];
+    document.getElementById('s-theme').textContent = themeLabel;
+    document.getElementById('s-rkey').textContent = cfg.keyLabel;
+    const sizeRow = document.getElementById('s-size-row');
+    if (cfg.theme === 'standoff') {
+        sizeRow.style.display = '';
+        document.getElementById('s-size').textContent = cfg.textSize + 'px';
+    } else {
+        sizeRow.style.display = 'none';
+    }
+}
+
+// ─── KEY CAPTURE ────────────────────────────────────────────────
+function startKeyCapture() {
+    inputMode = 'capture';
+    const el = document.getElementById('key-display');
+    el.textContent = 'Press any key…';
+    el.classList.add('capturing');
+}
+
+function handleKeyCapture(e) {
+    if (e.repeat) return;
+    e.preventDefault();
+    cfg.key = e.code;
+    cfg.keyLabel = keyLabelFor(e);
+    inputMode = 'idle';
+    const el = document.getElementById('key-display');
+    el.textContent = cfg.keyLabel;
+    el.classList.remove('capturing');
+    document.getElementById('btn-key-next').disabled = false;
+}
+
+function keyLabelFor(e) {
+    if (e.code === 'Space') return 'Space';
+    return e.key.length === 1 ? e.key.toUpperCase() : e.key;
+}
+
+// ─── TEXT SIZE ──────────────────────────────────────────────────
+function onTextSizeChange(val) {
+    cfg.textSize = parseInt(val);
+    document.getElementById('size-val').textContent = val + 'px';
+    document.getElementById('size-preview').style.fontSize = val + 'px';
+}
+
+// ─── GAME START ─────────────────────────────────────────────────
+function beginTheme() {
+    document.getElementById('page-nav').style.display = 'none';
+    document.getElementById('wizard').style.display = 'none';
+    if (cfg.theme === 'standoff') startStandoff();
+    else startRedGreen();
+}
+
+// ─── RED LIGHT THEME ────────────────────────────────────────────
+function startRedGreen() {
+    rt.gen++;
+    const myGen = rt.gen;
+    const screen = document.getElementById('screen-redgreen');
+    screen.classList.add('on');
+    screen.classList.remove('go');
+    document.getElementById('rg-msg').textContent = `Wait for green, then press ${cfg.keyLabel}`;
+    document.getElementById('rg-flash').textContent = '';
+    rt.state = 'waiting';
+    inputMode = 'redgreen';
+
+    const delay = 1500 + Math.random() * 3000; // 1.5s - 4.5s
+    rt.timer = setTimeout(() => {
+        if (myGen !== rt.gen) return;
+        rt.state = 'go';
+        rt.goTime = performance.now();
+        screen.classList.add('go');
+        document.getElementById('rg-msg').textContent = 'GO!';
+    }, delay);
+}
+
+function handleRedGreenKey(e) {
+    if (e.repeat || e.code !== cfg.key) return;
+    e.preventDefault();
+    if (rt.state === 'waiting') {
+        clearTimeout(rt.timer);
+        rt.gen++;
+        inputMode = 'idle';
+        document.getElementById('rg-flash').textContent = 'Too early! Restarting…';
+        setTimeout(startRedGreen, 1200);
+    } else if (rt.state === 'go') {
+        const reaction = performance.now() - rt.goTime;
+        inputMode = 'idle';
+        document.getElementById('screen-redgreen').classList.remove('on', 'go');
+        showResults(reaction);
+    }
+}
+
+// ─── STANDOFF THEME ─────────────────────────────────────────────
+function startStandoff() {
+    rt.gen++;
+    const myGen = rt.gen;
+    const screen = document.getElementById('screen-standoff');
+    const textEl = document.getElementById('standoff-text');
+    screen.classList.add('on');
+    textEl.style.fontSize = cfg.textSize + 'px';
+    textEl.textContent = 'Wait...';
+    textEl.classList.remove('shoot');
+    document.getElementById('standoff-flash').textContent = '';
+    rt.state = 'waiting';
+    inputMode = 'standoff';
+
+    const delay = 1000 + Math.random() * 2000; // 1s - 3s, per spec
+    rt.timer = setTimeout(() => {
+        if (myGen !== rt.gen) return;
+        rt.state = 'go';
+        rt.goTime = performance.now();
+        textEl.textContent = 'SHOOT!';
+        textEl.classList.add('shoot');
+    }, delay);
+}
+
+function handleStandoffKey(e) {
+    if (e.repeat || e.code !== cfg.key) return;
+    e.preventDefault();
+    if (rt.state === 'waiting') {
+        clearTimeout(rt.timer);
+        rt.gen++;
+        inputMode = 'idle';
+        document.getElementById('standoff-flash').textContent = 'Too early! Restarting…';
+        setTimeout(startStandoff, 1200);
+    } else if (rt.state === 'go') {
+        const reaction = performance.now() - rt.goTime;
+        inputMode = 'idle';
+        document.getElementById('screen-standoff').classList.remove('on');
+        showResults(reaction);
+    }
+}
+
+// ─── RESULTS ────────────────────────────────────────────────────
+function showResults(ms) {
+    const rounded = Math.round(ms);
+    document.getElementById('r-ms').textContent = rounded + 'ms';
+    document.getElementById('r-tier').textContent = tierFor(rounded);
+    document.getElementById('screen-results').classList.add('on');
+}
+
+function tierFor(ms) {
+    if (ms < 180) return 'Lightning Fast';
+    if (ms < 250) return 'Excellent';
+    if (ms < 320) return 'Good';
+    if (ms < 400) return 'Average';
+    return 'Keep Practicing';
+}
+
+// ─── GLOBAL INPUT ROUTER ────────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (inputMode === 'capture') handleKeyCapture(e);
+    else if (inputMode === 'redgreen') handleRedGreenKey(e);
+    else if (inputMode === 'standoff') handleStandoffKey(e);
+});
+</script>
+</body>
+</html>

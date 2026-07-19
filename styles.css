@@ -196,6 +196,7 @@ body {
     gap: 14px;
     margin-bottom: 28px;
 }
+.mode-grid-2 { grid-template-columns: repeat(2, 1fr); }
 
 .mode-card {
     background: var(--surface);
@@ -552,6 +553,69 @@ input[type="range"] {
 }
 .speed-target:active,
 .speed-target.hit { transform: scale(0.92); background: #000; }
+
+/* KEY CAPTURE */
+.key-capture {
+    background: var(--surface);
+    border: 2px dashed var(--border2);
+    border-radius: var(--r);
+    padding: 40px;
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--bright);
+    cursor: pointer;
+    margin-bottom: 24px;
+    transition: border-color var(--t), color var(--t);
+}
+.key-capture:hover { border-color: var(--blue); }
+.key-capture.capturing { border-color: var(--orange); border-style: solid; color: var(--orange); }
+
+/* SIGNAL SIZE PREVIEW */
+.size-preview {
+    text-align: center;
+    font-weight: 800;
+    color: var(--red);
+    padding: 30px;
+    background: var(--surface2);
+    border-radius: var(--r);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+}
+
+/* RED LIGHT SCREEN */
+#screen-redgreen {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    height: 100vh;
+    background: #7a1010;
+    text-align: center;
+    padding: 24px;
+}
+#screen-redgreen.on { display: flex; }
+#screen-redgreen.go { background: #0a7a2e; }
+.rg-msg   { font-size: 1.6rem; font-weight: 700; color: #fff; }
+.rg-flash { font-size: 1.1rem; font-weight: 600; color: #fff; min-height: 1.4em; }
+
+/* STANDOFF SCREEN */
+#screen-standoff {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    height: 100vh;
+    background: var(--bg);
+    text-align: center;
+    padding: 24px;
+}
+#screen-standoff.on { display: flex; }
+.standoff-text        { font-weight: 800; color: var(--text); }
+.standoff-text.shoot  { color: var(--red); }
+.standoff-flash       { font-size: 1.1rem; font-weight: 600; color: var(--dim); min-height: 1.4em; }
 
 /* GRID OVERLAY */
 .grid-overlay {

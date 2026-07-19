@@ -96,8 +96,20 @@
 
 <!-- STANDOFF SCREEN -->
 <div id="screen-standoff">
+    <div class="tumbleweed"></div>
+
+    <div class="duelist duelist-left" id="duelist-player">
+        <div class="duelist-figure">🤠</div>
+        <div class="duelist-gun">🔫</div>
+    </div>
+
     <div class="standoff-text" id="standoff-text">Wait...</div>
     <div class="standoff-flash" id="standoff-flash"></div>
+
+    <div class="duelist duelist-right" id="duelist-ai">
+        <div class="duelist-figure">🤠</div>
+        <div class="duelist-gun">🔫</div>
+    </div>
 </div>
 
 <!-- RESULTS SCREEN -->
@@ -188,15 +200,14 @@ function fillSummary() {
 function startKeyCapture() {
     inputMode = 'capture';
     const el = document.getElementById('key-display');
-    el.textContent = 'Press any key…';
+    el.textContent = 'Press a key or mouse button…';
     el.classList.add('capturing');
 }
 
-function handleKeyCapture(e) {
-    if (e.repeat) return;
+function handleCapture(code, e) {
     e.preventDefault();
-    cfg.key = e.code;
-    cfg.keyLabel = keyLabelFor(e);
+    cfg.key = code;
+    cfg.keyLabel = labelForCode(code, e);
     inputMode = 'idle';
     const el = document.getElementById('key-display');
     el.textContent = cfg.keyLabel;
@@ -204,8 +215,11 @@ function handleKeyCapture(e) {
     document.getElementById('btn-key-next').disabled = false;
 }
 
-function keyLabelFor(e) {
-    if (e.code === 'Space') return 'Space';
+const MOUSE_LABELS = { Mouse0: 'Left Click', Mouse1: 'Middle Click', Mouse2: 'Right Click', Mouse3: 'Mouse Back', Mouse4: 'Mouse Forward' };
+
+function labelForCode(code, e) {
+    if (MOUSE_LABELS[code]) return MOUSE_LABELS[code];
+    if (code === 'Space') return 'Space';
     return e.key.length === 1 ? e.key.toUpperCase() : e.key;
 }
 
@@ -246,23 +260,6 @@ function startRedGreen() {
     }, delay);
 }
 
-function handleRedGreenKey(e) {
-    if (e.repeat || e.code !== cfg.key) return;
-    e.preventDefault();
-    if (rt.state === 'waiting') {
-        clearTimeout(rt.timer);
-        rt.gen++;
-        inputMode = 'idle';
-        document.getElementById('rg-flash').textContent = 'Too early! Restarting…';
-        setTimeout(startRedGreen, 1200);
-    } else if (rt.state === 'go') {
-        const reaction = performance.now() - rt.goTime;
-        inputMode = 'idle';
-        document.getElementById('screen-redgreen').classList.remove('on', 'go');
-        showResults(reaction);
-    }
-}
-
 // ─── STANDOFF THEME ─────────────────────────────────────────────
 function startStandoff() {
     rt.gen++;
@@ -274,6 +271,8 @@ function startStandoff() {
     textEl.textContent = 'Wait...';
     textEl.classList.remove('shoot');
     document.getElementById('standoff-flash').textContent = '';
+    document.getElementById('duelist-player').classList.remove('draw');
+    document.getElementById('duelist-ai').classList.remove('draw');
     rt.state = 'waiting';
     inputMode = 'standoff';
 
@@ -284,22 +283,32 @@ function startStandoff() {
         rt.goTime = performance.now();
         textEl.textContent = 'SHOOT!';
         textEl.classList.add('shoot');
+        document.getElementById('duelist-player').classList.add('draw');
+        document.getElementById('duelist-ai').classList.add('draw');
     }, delay);
 }
 
-function handleStandoffKey(e) {
-    if (e.repeat || e.code !== cfg.key) return;
+// ─── GAME INPUT (shared by both themes) ──────────────────────────
+function handleGameInput(code, e) {
+    if (inputMode !== 'redgreen' && inputMode !== 'standoff') return;
+    if (code !== cfg.key) return;
     e.preventDefault();
+
+    const theme    = inputMode;
+    const screenId = theme === 'redgreen' ? 'screen-redgreen' : 'screen-standoff';
+    const flashId  = theme === 'redgreen' ? 'rg-flash' : 'standoff-flash';
+    const startFn  = theme === 'redgreen' ? startRedGreen : startStandoff;
+
     if (rt.state === 'waiting') {
         clearTimeout(rt.timer);
         rt.gen++;
         inputMode = 'idle';
-        document.getElementById('standoff-flash').textContent = 'Too early! Restarting…';
-        setTimeout(startStandoff, 1200);
+        document.getElementById(flashId).textContent = 'Too early! Restarting…';
+        setTimeout(startFn, 1200);
     } else if (rt.state === 'go') {
         const reaction = performance.now() - rt.goTime;
         inputMode = 'idle';
-        document.getElementById('screen-standoff').classList.remove('on');
+        document.getElementById(screenId).classList.remove('on', 'go');
         showResults(reaction);
     }
 }
@@ -321,10 +330,22 @@ function tierFor(ms) {
 }
 
 // ─── GLOBAL INPUT ROUTER ────────────────────────────────────────
+function routeInput(code, e) {
+    if (inputMode === 'capture') handleCapture(code, e);
+    else handleGameInput(code, e);
+}
+
 document.addEventListener('keydown', e => {
-    if (inputMode === 'capture') handleKeyCapture(e);
-    else if (inputMode === 'redgreen') handleRedGreenKey(e);
-    else if (inputMode === 'standoff') handleStandoffKey(e);
+    if (e.repeat) return;
+    routeInput(e.code, e);
+});
+
+document.addEventListener('mousedown', e => {
+    routeInput('Mouse' + e.button, e);
+});
+
+document.addEventListener('contextmenu', e => {
+    if (inputMode !== 'idle') e.preventDefault();
 });
 </script>
 </body>

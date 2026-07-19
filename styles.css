@@ -19,6 +19,8 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
 body {
     background: var(--bg);
     color: var(--text);
@@ -26,11 +28,25 @@ body {
     font-size: 15px;
     line-height: 1.5;
     min-height: 100vh;
+    overscroll-behavior-y: contain;
+}
+
+/* Comfortable tap targets, no 300ms delay / double-tap-zoom on interactive controls */
+.btn, .mode-card, .category-card, .preset, .variant-item, .back-btn,
+.key-capture, .speed-target, .target {
+    touch-action: manipulation;
+}
+
+/* Elements the JS drags directly: hand full control of the gesture to JS,
+   otherwise the browser tries to scroll/zoom the page mid-drag on touch */
+.shape-svg, .zone-canvas, .zone-box, .zone-handle {
+    touch-action: none;
 }
 
 /* HOME PAGE */
 .home-page {
     min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -72,12 +88,6 @@ body {
     transition: transform var(--t), border-color var(--t), box-shadow var(--t);
     cursor: pointer;
     user-select: none;
-}
-
-.category-card:not(.disabled):hover {
-    transform: translateY(-3px);
-    border-color: var(--card-color);
-    box-shadow: 0 0 28px -6px var(--card-color);
 }
 
 .category-card.accuracy  { --card-color: var(--blue); }
@@ -134,8 +144,6 @@ body {
     font-size: 0.875rem;
     transition: border-color var(--t);
 }
-.back-btn:hover { border-color: var(--dim); }
-
 .page-title { font-size: 1rem; font-weight: 600; color: var(--bright); }
 
 /* WIZARD */
@@ -180,7 +188,6 @@ body {
     transition: opacity var(--t), transform var(--t), filter var(--t);
     line-height: 1.2;
 }
-.btn:hover   { filter: brightness(1.12); transform: translateY(-1px); }
 .btn:active  { transform: translateY(0); }
 .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; filter: none; }
 
@@ -208,7 +215,6 @@ body {
     transition: border-color var(--t), box-shadow var(--t);
     text-align: center;
 }
-.mode-card:hover   { border-color: var(--border2); }
 .mode-card.sel     { border-color: var(--blue); box-shadow: 0 0 18px -4px var(--blue); }
 .mode-card h3      { font-size: 1.05rem; font-weight: 600; color: var(--bright); margin-bottom: 5px; }
 .mode-card p       { font-size: 0.82rem; color: var(--dim); }
@@ -260,7 +266,7 @@ input[type="range"] {
     font-size: 0.82rem;
     transition: all var(--t);
 }
-.preset:hover, .preset.sel { border-color: var(--blue); color: var(--blue); }
+.preset.sel { border-color: var(--blue); color: var(--blue); }
 
 /* TARGET CONFIG LAYOUT */
 .target-layout {
@@ -316,7 +322,6 @@ input[type="range"] {
     cursor: pointer;
     transition: border-color var(--t);
 }
-.variant-item:hover  { border-color: var(--border2); }
 .variant-item.active { border-color: var(--blue); }
 .variant-item.ds.active { border-color: var(--red); }
 
@@ -437,6 +442,7 @@ input[type="range"] {
     display: none;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 }
 #screen-game.on { display: flex; }
@@ -502,6 +508,7 @@ input[type="range"] {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    min-height: 100dvh;
     gap: 28px;
     padding: 40px 24px;
     text-align: center;
@@ -527,6 +534,7 @@ input[type="range"] {
     align-items: center;
     justify-content: center;
     height: 100vh;
+    height: 100dvh;
     background: var(--bg);
 }
 #screen-countdown.on { display: flex; }
@@ -569,7 +577,6 @@ input[type="range"] {
     margin-bottom: 24px;
     transition: border-color var(--t), color var(--t);
 }
-.key-capture:hover { border-color: var(--blue); }
 .key-capture.capturing { border-color: var(--orange); border-style: solid; color: var(--orange); }
 
 /* SIGNAL SIZE PREVIEW */
@@ -582,6 +589,8 @@ input[type="range"] {
     border-radius: var(--r);
     border: 1px solid var(--border);
     margin-top: 8px;
+    max-width: 100%;
+    overflow-wrap: break-word;
 }
 
 /* RED LIGHT SCREEN */
@@ -592,6 +601,7 @@ input[type="range"] {
     flex-direction: column;
     gap: 14px;
     height: 100vh;
+    height: 100dvh;
     background: #7a1010;
     text-align: center;
     padding: 24px;
@@ -609,12 +619,13 @@ input[type="range"] {
     flex-direction: column;
     gap: 14px;
     height: 100vh;
+    height: 100dvh;
     background: var(--bg);
     text-align: center;
     padding: 24px;
 }
 #screen-standoff.on { display: flex; }
-.standoff-text        { font-weight: 800; color: var(--text); }
+.standoff-text        { font-weight: 800; color: var(--text); max-width: 100%; overflow-wrap: break-word; text-align: center; }
 .standoff-text.shoot  { color: var(--red); }
 .standoff-flash       { font-size: 1.1rem; font-weight: 600; color: var(--dim); min-height: 1.4em; }
 
@@ -678,11 +689,13 @@ input[type="range"] {
     display: none;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 }
 #screen-typing.on { display: flex; }
 
 .typing-area {
+    position: relative;
     flex: 1;
     display: flex;
     align-items: center;
@@ -730,4 +743,101 @@ input[type="range"] {
     position: absolute;
     pointer-events: none;
     inset: 0;
+}
+
+/* TYPING INPUT (drives the mobile keyboard; kept out of sight but focusable) */
+.typing-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    border: none;
+    padding: 0;
+    font-size: 16px; /* prevents iOS Safari from auto-zooming on focus */
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MOBILE / TOUCHSCREEN
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    body { font-size: 14px; }
+
+    .home-page { padding: 32px 16px; gap: 36px; }
+    .home-header h1 { font-size: 2rem; }
+    .home-header p  { font-size: 0.95rem; }
+
+    .category-grid {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+        gap: 14px;
+    }
+    .category-card { padding: 22px 20px; }
+
+    .wizard { padding: 24px 16px 40px; }
+    .step-head { margin-bottom: 22px; }
+    .step-head h2 { font-size: 1.35rem; }
+
+    .mode-grid, .mode-grid-2 { grid-template-columns: 1fr; }
+    .mode-card { padding: 18px 16px; }
+
+    .form-row { flex-direction: column; gap: 0; }
+
+    .target-layout { grid-template-columns: 1fr; }
+
+    .zone-canvas { height: 240px; }
+    .zone-handle { width: 22px; height: 22px; margin: -11px; }
+
+    .duelist { font-size: 34px; bottom: 12%; }
+    .duelist-gun { font-size: 18px; }
+    .tumbleweed { width: 26px; height: 26px; }
+
+    .typing-passage {
+        font-size: 1rem;
+        line-height: 1.7;
+        padding: 18px 16px;
+        max-height: 45vh;
+    }
+
+    .game-hud { padding: 8px 10px; gap: 4px; }
+    .hud-val  { font-size: 1.25rem; }
+    .hud-lbl  { font-size: 0.62rem; }
+
+    .speed-target { width: 120px; height: 120px; }
+
+    .countdown-num { font-size: 6rem; }
+
+    .res-title { font-size: 2rem; }
+    .res-stat  { padding: 16px 20px; min-width: 110px; }
+    .res-val   { font-size: 1.7rem; }
+
+    .step-foot { gap: 12px; }
+    .btn:not(.btn-sm) { padding: 12px 20px; min-height: 44px; }
+    .btn-sm { padding: 8px 14px; min-height: 36px; }
+
+    .preset { padding: 8px 16px; }
+    .back-btn { padding: 8px 16px; min-height: 36px; }
+
+    .key-capture { padding: 28px 16px; font-size: 1.1rem; }
+
+    .variant-list { max-height: 45vh; }
+}
+
+/* Only apply hover effects on devices that actually support hover with a
+   precise pointer -- otherwise touch taps leave buttons stuck in a "hovered"
+   look until the user taps elsewhere. */
+@media (hover: hover) and (pointer: fine) {
+    .category-card:not(.disabled):hover {
+        transform: translateY(-3px);
+        border-color: var(--card-color);
+        box-shadow: 0 0 28px -6px var(--card-color);
+    }
+    .back-btn:hover      { border-color: var(--dim); }
+    .btn:hover            { filter: brightness(1.12); transform: translateY(-1px); }
+    .mode-card:hover      { border-color: var(--border2); }
+    .preset:hover         { border-color: var(--blue); color: var(--blue); }
+    .variant-item:hover   { border-color: var(--border2); }
+    .key-capture:hover    { border-color: var(--blue); }
 }

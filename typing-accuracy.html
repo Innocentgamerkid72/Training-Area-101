@@ -100,8 +100,11 @@
         <div class="hud-stat"><div class="hud-val" id="hud-wpm">0</div><div class="hud-lbl">WPM</div></div>
         <div class="hud-stat"><div class="hud-val" id="hud-acc">—</div><div class="hud-lbl">Accuracy</div></div>
     </div>
-    <div class="typing-area">
+    <div class="typing-area" id="typing-area">
         <div class="typing-passage" id="typing-passage"></div>
+        <input type="text" id="typing-input" class="typing-input"
+               autocomplete="off" autocapitalize="off" autocorrect="off"
+               spellcheck="false" inputmode="text" onpaste="return false">
     </div>
 </div>
 
@@ -122,7 +125,6 @@
 <script>
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = { duration: 30, theme: null };
-let inputMode = 'idle'; // idle | typing
 
 // ─── STEP NAVIGATION ────────────────────────────────────────────
 function show(stepId) {
@@ -238,21 +240,28 @@ let gs = {};
 let lastCursorSpan = null;
 
 function startTyping() {
+    const passage = buildPassage(cfg.theme, cfg.duration);
     gs = {
-        passage: buildPassage(cfg.theme, cfg.duration),
+        passage,
         cursor: 0,
         state: [],
         hadError: [],
         timeLeft: cfg.duration,
-        countdown: null
+        countdown: null,
+        active: true
     };
     lastCursorSpan = null;
 
     renderPassage();
     setCursorHighlight(0);
     document.getElementById('screen-typing').classList.add('on');
-    inputMode = 'typing';
     updateHUD();
+
+    const input = document.getElementById('typing-input');
+    input.value = '';
+    input.maxLength = passage.length;
+    input.disabled = false;
+    input.focus();
 
     gs.countdown = setInterval(() => {
         gs.timeLeft--;
@@ -294,30 +303,27 @@ function setCursorHighlight(i) {
     }
 }
 
-function handleTypingInput(e) {
-    if (e.key === 'Backspace') {
-        e.preventDefault();
-        if (gs.cursor > 0) {
-            gs.cursor--;
-            gs.state[gs.cursor] = 'pending';
-            updateSpan(gs.cursor);
-            setCursorHighlight(gs.cursor);
-            updateHUD();
-        }
-        return;
-    }
-    if (e.key.length !== 1 || gs.cursor >= gs.passage.length) return;
-    e.preventDefault();
+function handleTypingInput() {
+    if (!gs.active) return;
+    const val = document.getElementById('typing-input').value;
+    const len = Math.min(val.length, gs.passage.length);
+    const prevCursor = gs.cursor;
 
-    const expected = gs.passage[gs.cursor];
-    if (e.key === expected) {
-        gs.state[gs.cursor] = gs.hadError[gs.cursor] ? 'corrected' : 'correct';
-    } else {
-        gs.state[gs.cursor] = 'wrong';
-        gs.hadError[gs.cursor] = true;
+    for (let i = 0; i < len; i++) {
+        if (val[i] === gs.passage[i]) {
+            gs.state[i] = gs.hadError[i] ? 'corrected' : 'correct';
+        } else {
+            gs.state[i] = 'wrong';
+            gs.hadError[i] = true;
+        }
+        updateSpan(i);
     }
-    updateSpan(gs.cursor);
-    gs.cursor++;
+    for (let i = len; i < prevCursor; i++) {
+        gs.state[i] = 'pending';
+        updateSpan(i);
+    }
+
+    gs.cursor = len;
     setCursorHighlight(gs.cursor);
     updateHUD();
 }
@@ -343,7 +349,10 @@ function updateHUD() {
 
 function endTyping() {
     clearInterval(gs.countdown);
-    inputMode = 'idle';
+    gs.active = false;
+    const input = document.getElementById('typing-input');
+    input.disabled = true;
+    input.blur();
     document.getElementById('screen-typing').classList.remove('on');
 
     const { correct, corrected, wrong, typed } = tallyStats();
@@ -362,8 +371,12 @@ function endTyping() {
 }
 
 // ─── GLOBAL INPUT ROUTER ────────────────────────────────────────
-document.addEventListener('keydown', e => {
-    if (inputMode === 'typing') handleTypingInput(e);
+document.getElementById('typing-input').addEventListener('input', handleTypingInput);
+
+// Tapping the passage (or anywhere the keyboard might have been dismissed
+// from) refocuses the input so the on-screen keyboard reappears on mobile.
+document.getElementById('typing-area').addEventListener('pointerdown', () => {
+    if (gs.active) document.getElementById('typing-input').focus();
 });
 </script>
 </body>

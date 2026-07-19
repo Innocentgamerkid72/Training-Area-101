@@ -313,10 +313,10 @@ class ShapeEditor {
         this.sel = null;
         this.drag = false;
         this.render();
-        this.svg.addEventListener('mousedown',  e => this.down(e));
-        this.svg.addEventListener('mousemove',  e => this.move(e));
-        this.svg.addEventListener('mouseup',    () => { this.drag = false; });
-        this.svg.addEventListener('mouseleave', () => { this.drag = false; });
+        this.svg.addEventListener('pointerdown', e => this.down(e));
+        this.svg.addEventListener('pointermove', e => this.move(e));
+        this.svg.addEventListener('pointerup',   e => this.up(e));
+        this.svg.addEventListener('pointercancel', () => { this.drag = false; });
     }
 
     svgXY(e) {
@@ -337,16 +337,28 @@ class ShapeEditor {
 
     down(e) {
         const pos = this.svgXY(e);
-        const hit = this.nearest(pos, 16);
-        if (hit !== null) { this.sel = hit; this.drag = true; this.render(); }
+        const thresh = e.pointerType === 'touch' ? 26 : 16;
+        const hit = this.nearest(pos, thresh);
+        if (hit !== null) {
+            this.sel = hit;
+            this.drag = true;
+            this.svg.setPointerCapture(e.pointerId);
+            this.render();
+        }
     }
 
     move(e) {
         if (!this.drag || this.sel === null) return;
+        e.preventDefault();
         const pos = this.svgXY(e);
         this.pts[this.sel] = { x: Math.max(3,Math.min(297,pos.x)), y: Math.max(3,Math.min(297,pos.y)) };
         this.render();
         this.syncVariant();
+    }
+
+    up(e) {
+        this.drag = false;
+        if (this.svg.hasPointerCapture(e.pointerId)) this.svg.releasePointerCapture(e.pointerId);
     }
 
     render() {
@@ -525,9 +537,10 @@ class ZonePlacer {
             popup: document.getElementById('zone-popup')
         };
         this.drag = null;
-        canvas.addEventListener('mousedown', e => this.down(e));
-        document.addEventListener('mousemove', e => this.move(e));
-        document.addEventListener('mouseup', () => { this.drag = null; });
+        canvas.addEventListener('pointerdown', e => this.down(e));
+        canvas.addEventListener('pointermove', e => this.move(e));
+        canvas.addEventListener('pointerup', e => this.up(e));
+        canvas.addEventListener('pointercancel', e => this.up(e));
         this.render();
     }
 
@@ -544,11 +557,18 @@ class ZonePlacer {
             orig: { ...cfg[box.dataset.zone + 'Zone'] },
             rect: this.canvas.getBoundingClientRect()
         };
+        this.canvas.setPointerCapture(e.pointerId);
         e.preventDefault();
+    }
+
+    up(e) {
+        this.drag = null;
+        if (this.canvas.hasPointerCapture(e.pointerId)) this.canvas.releasePointerCapture(e.pointerId);
     }
 
     move(e) {
         if (!this.drag) return;
+        e.preventDefault();
         const { key, mode, corner, startX, startY, orig, rect } = this.drag;
         const dxPct = (e.clientX - startX) / rect.width * 100;
         const dyPct = (e.clientY - startY) / rect.height * 100;

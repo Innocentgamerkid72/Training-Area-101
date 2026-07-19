@@ -15,3 +15,5 @@ If the user selects the Clicker Accuracy training category, they will first be s
 # Clicking Speed
 If the user selects the Clicker Speed training category, the user will be sent to a selection page. The selection page will ask for how long will the test last. The user can set it from 5 seconds all the way to 5 minutes. After confirming the time, the clicker test is set up and a 3 second countdown begins. After that, the clicker test begins and the User must clicker on a black square to gain clicks. After the time is up, the website will calculate the clicks per minute the user did and then shows the result. After that, you can go back to the home page.
 
+# Reaction Time
+If the User chose the Reaction Time training category

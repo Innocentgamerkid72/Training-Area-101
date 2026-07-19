@@ -519,6 +519,40 @@ input[type="range"] {
 .res-val { font-size: 2.2rem; font-weight: 700; color: var(--bright); }
 .res-lbl { font-size: 0.8rem; color: var(--dim); margin-top: 3px; }
 
+/* COUNTDOWN */
+#screen-countdown {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: var(--bg);
+}
+#screen-countdown.on { display: flex; }
+.countdown-num {
+    font-size: 10rem;
+    font-weight: 700;
+    color: var(--orange);
+    animation: countPulse 1s ease-out;
+}
+@keyframes countPulse {
+    from { transform: scale(1.4); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}
+
+/* SPEED TARGET */
+.game-area-center { display: flex; align-items: center; justify-content: center; }
+.speed-target {
+    width: 160px;
+    height: 160px;
+    background: #111;
+    border: 3px solid var(--orange);
+    border-radius: var(--r);
+    cursor: pointer;
+    transition: transform 0.05s ease, background var(--t);
+}
+.speed-target:active,
+.speed-target.hit { transform: scale(0.92); background: #000; }
+
 /* GRID OVERLAY */
 .grid-overlay {
     position: absolute;

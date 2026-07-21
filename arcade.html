@@ -21,7 +21,7 @@
     <div class="step active" id="step-session">
         <div class="step-head">
             <h2>Stroop Rush</h2>
-            <p>A color word appears in a mismatched ink color — answer with the color or the word, depending on which light is lit</p>
+            <p>A leaf drifts down the river — answer with its color or its direction, depending on which light is lit</p>
         </div>
         <div class="form-group">
             <label>Session Duration</label>
@@ -36,7 +36,7 @@
             <input type="range" id="inp-dur" min="10" max="300" step="5" value="30" oninput="onDurChange(this.value)">
         </div>
         <div class="form-group">
-            <label>Time per Word — how long before an unanswered word counts as missed: <span class="val-label" id="ptime-val">2.5s</span></label>
+            <label>Time per Leaf — how long before an unanswered leaf counts as missed: <span class="val-label" id="ptime-val">2.5s</span></label>
             <input type="range" id="inp-ptime" min="0.5" max="5" step="0.1" value="2.5" oninput="onPromptTimeChange(this.value)">
         </div>
         <div class="step-foot">
@@ -53,7 +53,7 @@
         </div>
         <div class="summary-card">
             <div class="summary-row"><span class="s-key">Duration</span><span class="s-val" id="s-dur">—</span></div>
-            <div class="summary-row"><span class="s-key">Time per Word</span><span class="s-val" id="s-ptime">—</span></div>
+            <div class="summary-row"><span class="s-key">Time per Leaf</span><span class="s-val" id="s-ptime">—</span></div>
         </div>
         <div class="step-foot">
             <button class="btn btn-ghost" onclick="show('session')">Back</button>
@@ -69,9 +69,9 @@
         </div>
         <div class="guide-card" style="--guide-color: var(--yellow);">
             <ul class="guide-list">
-                <li>A color word appears, but its ink color is never what the word says.</li>
-                <li>Watch the two lights above the word. When COLOR lights up, answer with the ink color. When TEXT lights up instead, answer with what the word says — ignore the ink.</li>
-                <li>Click, tap, or press 1-5 for your answer before the timer bar runs out, or it counts as a miss.</li>
+                <li>A leaf floats down the river, carrying two properties at once: a color and a direction of drift.</li>
+                <li>Watch the two lights above the river. When COLOR lights up, answer with the leaf's color using the color buttons. When DIRECTION lights up instead, answer with which way it's drifting using the arrow buttons.</li>
+                <li>Click, tap, press 1-5 for colors, or the arrow keys for directions — answer before the timer bar runs out, or it counts as a miss.</li>
                 <li>Correct answers score points and log your reaction time; wrong answers cost points.</li>
             </ul>
         </div>
@@ -104,19 +104,36 @@
                     <span class="stroop-light-dot"></span>
                     <span class="stroop-light-label">Color</span>
                 </div>
-                <div class="stroop-light" id="light-text">
+                <div class="stroop-light" id="light-direction">
                     <span class="stroop-light-dot"></span>
-                    <span class="stroop-light-label">Text</span>
+                    <span class="stroop-light-label">Direction</span>
                 </div>
             </div>
-            <div class="stroop-word" id="stroop-word">RED</div>
+
+            <div class="river-scene">
+                <div class="river-water"></div>
+                <div class="leaf-wrap" id="leaf-wrap">
+                    <div class="leaf" id="leaf"></div>
+                    <div class="leaf-arrow" id="leaf-arrow">→</div>
+                </div>
+            </div>
+
             <div class="stroop-timerbar-track"><div class="stroop-timerbar" id="stroop-timerbar"></div></div>
-            <div class="stroop-buttons" id="stroop-buttons">
-                <button class="stroop-btn" style="--sc:var(--red);    background:rgba(255,51,51,0.14);"  onclick="answer('red')">Red</button>
-                <button class="stroop-btn" style="--sc:var(--blue);   background:rgba(0,200,255,0.14);"  onclick="answer('blue')">Blue</button>
-                <button class="stroop-btn" style="--sc:var(--green);  background:rgba(0,230,118,0.14);"  onclick="answer('green')">Green</button>
-                <button class="stroop-btn" style="--sc:var(--orange); background:rgba(255,119,0,0.14);"  onclick="answer('orange')">Orange</button>
-                <button class="stroop-btn" style="--sc:var(--purple); background:rgba(157,78,221,0.14);" onclick="answer('purple')">Purple</button>
+
+            <div class="stroop-answer-area">
+                <div class="stroop-buttons" id="color-buttons">
+                    <button class="stroop-btn" style="--sc:var(--red);    background:rgba(255,51,51,0.14);"  onclick="answer('red')">Red</button>
+                    <button class="stroop-btn" style="--sc:var(--blue);   background:rgba(0,200,255,0.14);"  onclick="answer('blue')">Blue</button>
+                    <button class="stroop-btn" style="--sc:var(--green);  background:rgba(0,230,118,0.14);"  onclick="answer('green')">Green</button>
+                    <button class="stroop-btn" style="--sc:var(--orange); background:rgba(255,119,0,0.14);"  onclick="answer('orange')">Orange</button>
+                    <button class="stroop-btn" style="--sc:var(--purple); background:rgba(157,78,221,0.14);" onclick="answer('purple')">Purple</button>
+                </div>
+                <div class="dir-buttons" id="dir-buttons">
+                    <button class="dir-btn dir-up"    onclick="answer('up')">↑</button>
+                    <button class="dir-btn dir-left"  onclick="answer('left')">←</button>
+                    <button class="dir-btn dir-right" onclick="answer('right')">→</button>
+                    <button class="dir-btn dir-down"  onclick="answer('down')">↓</button>
+                </div>
             </div>
         </div>
     </div>
@@ -147,6 +164,13 @@ const COLORS = [
     { key: 'green',  name: 'Green',  css: 'var(--green)' },
     { key: 'orange', name: 'Orange', css: 'var(--orange)' },
     { key: 'purple', name: 'Purple', css: 'var(--purple)' }
+];
+
+const DIRECTIONS = [
+    { key: 'up',    arrow: '↑' },
+    { key: 'down',  arrow: '↓' },
+    { key: 'left',  arrow: '←' },
+    { key: 'right', arrow: '→' }
 ];
 
 // ─── STEP NAVIGATION ────────────────────────────────────────────
@@ -232,7 +256,7 @@ function startGame() {
         promptTimer: null, promptStart: 0,
         reactionTimes: [],
         countdown: null,
-        wordColorIdx: -1, inkColorIdx: -1, mode: 'color'
+        leafColorIdx: -1, leafDirIdx: -1, mode: 'color'
     };
 
     document.getElementById('screen-game').classList.add('on');
@@ -249,18 +273,15 @@ function startGame() {
 function nextPrompt() {
     clearTimeout(gs.promptTimer);
 
-    const wordIdx = Math.floor(Math.random() * COLORS.length);
-    let inkIdx;
-    do { inkIdx = Math.floor(Math.random() * COLORS.length); } while (inkIdx === wordIdx);
-    gs.wordColorIdx = wordIdx;
-    gs.inkColorIdx = inkIdx;
-    gs.mode = Math.random() < 0.5 ? 'color' : 'text';
+    gs.leafColorIdx = Math.floor(Math.random() * COLORS.length);
+    gs.leafDirIdx = Math.floor(Math.random() * DIRECTIONS.length);
+    gs.mode = Math.random() < 0.5 ? 'color' : 'direction';
 
-    const wordEl = document.getElementById('stroop-word');
-    wordEl.textContent = COLORS[wordIdx].name.toUpperCase();
-    wordEl.style.color = COLORS[inkIdx].css;
+    document.getElementById('leaf').style.background = COLORS[gs.leafColorIdx].css;
+    document.getElementById('leaf-arrow').textContent = DIRECTIONS[gs.leafDirIdx].arrow;
 
     updateModeLights();
+    updateAnswerUI();
 
     gs.promptStart = performance.now();
     animateTimerBar();
@@ -269,7 +290,13 @@ function nextPrompt() {
 
 function updateModeLights() {
     document.getElementById('light-color').classList.toggle('on', gs.mode === 'color');
-    document.getElementById('light-text').classList.toggle('on', gs.mode === 'text');
+    document.getElementById('light-direction').classList.toggle('on', gs.mode === 'direction');
+}
+
+function updateAnswerUI() {
+    const showColor = gs.mode === 'color';
+    document.getElementById('color-buttons').style.display = showColor ? '' : 'none';
+    document.getElementById('dir-buttons').style.display = showColor ? 'none' : '';
 }
 
 function animateTimerBar() {
@@ -290,27 +317,27 @@ function resolvePrompt(chosenKey) {
     if (gs.timeLeft <= 0) return;
     clearTimeout(gs.promptTimer);
 
-    const correctIdx = gs.mode === 'text' ? gs.wordColorIdx : gs.inkColorIdx;
+    const correctKey = gs.mode === 'direction' ? DIRECTIONS[gs.leafDirIdx].key : COLORS[gs.leafColorIdx].key;
 
     if (chosenKey === null) {
         gs.missed++;
-        flashWord('miss');
-    } else if (chosenKey === COLORS[correctIdx].key) {
+        flashLeaf('miss');
+    } else if (chosenKey === correctKey) {
         gs.correct++;
         gs.score += 10;
         gs.reactionTimes.push(performance.now() - gs.promptStart);
-        flashWord('good');
+        flashLeaf('good');
     } else {
         gs.wrong++;
         gs.score = Math.max(0, gs.score - 5);
-        flashWord('bad');
+        flashLeaf('bad');
     }
     updateHUD();
     nextPrompt();
 }
 
-function flashWord(cls) {
-    const el = document.getElementById('stroop-word');
+function flashLeaf(cls) {
+    const el = document.getElementById('leaf-wrap');
     el.classList.add(cls);
     setTimeout(() => el.classList.remove(cls), 180);
 }
@@ -344,11 +371,17 @@ function endGame() {
     document.getElementById('screen-results').classList.add('on');
 }
 
-// ─── KEYBOARD SHORTCUTS (1-5, in addition to clicking/tapping buttons) ───
+// ─── KEYBOARD SHORTCUTS (1-5 for colors, arrow keys for direction) ───
+const ARROW_KEY_MAP = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+
 document.addEventListener('keydown', e => {
     if (!document.getElementById('screen-game').classList.contains('on')) return;
-    const idx = parseInt(e.key, 10) - 1;
-    if (idx >= 0 && idx < COLORS.length) answer(COLORS[idx].key);
+    if (gs.mode === 'direction') {
+        if (ARROW_KEY_MAP[e.key]) answer(ARROW_KEY_MAP[e.key]);
+    } else {
+        const idx = parseInt(e.key, 10) - 1;
+        if (idx >= 0 && idx < COLORS.length) answer(COLORS[idx].key);
+    }
 });
 </script>
 </body>

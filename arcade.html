@@ -21,7 +21,7 @@
     <div class="step active" id="step-session">
         <div class="step-head">
             <h2>Stroop Rush</h2>
-            <p>A color word appears in a mismatched ink color — click the ink color, not the word</p>
+            <p>A color word appears in a mismatched ink color — answer with the color or the word, depending on which light is lit</p>
         </div>
         <div class="form-group">
             <label>Session Duration</label>
@@ -70,8 +70,8 @@
         <div class="guide-card" style="--guide-color: var(--yellow);">
             <ul class="guide-list">
                 <li>A color word appears, but its ink color is never what the word says.</li>
-                <li>Click, tap, or press 1-5 to pick the INK color — ignore the word itself.</li>
-                <li>Answer before the timer bar runs out, or it counts as a miss.</li>
+                <li>Watch the two lights above the word. When COLOR lights up, answer with the ink color. When TEXT lights up instead, answer with what the word says — ignore the ink.</li>
+                <li>Click, tap, or press 1-5 for your answer before the timer bar runs out, or it counts as a miss.</li>
                 <li>Correct answers score points and log your reaction time; wrong answers cost points.</li>
             </ul>
         </div>
@@ -99,6 +99,16 @@
     </div>
     <div class="stroop-area">
         <div class="stroop-panel">
+            <div class="stroop-lights">
+                <div class="stroop-light" id="light-color">
+                    <span class="stroop-light-dot"></span>
+                    <span class="stroop-light-label">Color</span>
+                </div>
+                <div class="stroop-light" id="light-text">
+                    <span class="stroop-light-dot"></span>
+                    <span class="stroop-light-label">Text</span>
+                </div>
+            </div>
             <div class="stroop-word" id="stroop-word">RED</div>
             <div class="stroop-timerbar-track"><div class="stroop-timerbar" id="stroop-timerbar"></div></div>
             <div class="stroop-buttons" id="stroop-buttons">
@@ -222,7 +232,7 @@ function startGame() {
         promptTimer: null, promptStart: 0,
         reactionTimes: [],
         countdown: null,
-        wordColorIdx: -1, inkColorIdx: -1
+        wordColorIdx: -1, inkColorIdx: -1, mode: 'color'
     };
 
     document.getElementById('screen-game').classList.add('on');
@@ -244,14 +254,22 @@ function nextPrompt() {
     do { inkIdx = Math.floor(Math.random() * COLORS.length); } while (inkIdx === wordIdx);
     gs.wordColorIdx = wordIdx;
     gs.inkColorIdx = inkIdx;
+    gs.mode = Math.random() < 0.5 ? 'color' : 'text';
 
     const wordEl = document.getElementById('stroop-word');
     wordEl.textContent = COLORS[wordIdx].name.toUpperCase();
     wordEl.style.color = COLORS[inkIdx].css;
 
+    updateModeLights();
+
     gs.promptStart = performance.now();
     animateTimerBar();
     gs.promptTimer = setTimeout(() => resolvePrompt(null), cfg.promptTime * 1000);
+}
+
+function updateModeLights() {
+    document.getElementById('light-color').classList.toggle('on', gs.mode === 'color');
+    document.getElementById('light-text').classList.toggle('on', gs.mode === 'text');
 }
 
 function animateTimerBar() {
@@ -272,10 +290,12 @@ function resolvePrompt(chosenKey) {
     if (gs.timeLeft <= 0) return;
     clearTimeout(gs.promptTimer);
 
+    const correctIdx = gs.mode === 'text' ? gs.wordColorIdx : gs.inkColorIdx;
+
     if (chosenKey === null) {
         gs.missed++;
         flashWord('miss');
-    } else if (chosenKey === COLORS[gs.inkColorIdx].key) {
+    } else if (chosenKey === COLORS[correctIdx].key) {
         gs.correct++;
         gs.score += 10;
         gs.reactionTimes.push(performance.now() - gs.promptStart);

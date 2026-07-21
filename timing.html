@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timing — Training Area 101</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- PAGE NAV (hidden during game/results) -->
+<nav class="page-nav" id="page-nav">
+    <button class="back-btn" onclick="navBack()">Back</button>
+    <span class="page-title">Timing</span>
+</nav>
+
+<!-- WIZARD CONTAINER -->
+<div class="wizard" id="wizard">
+
+    <!-- STEP 1: Orientation -->
+    <div class="step active" id="step-orientation">
+        <div class="step-head">
+            <h2>Bar Orientation</h2>
+            <p>Choose how the timing bar crosses the screen</p>
+        </div>
+        <div class="mode-grid mode-grid-2">
+            <div class="mode-card" data-orientation="horizontal" onclick="pickOrientation(this)">
+                <h3>Horizontal</h3>
+                <p>The bar runs left to right across the screen</p>
+            </div>
+            <div class="mode-card" data-orientation="vertical" onclick="pickOrientation(this)">
+                <h3>Vertical</h3>
+                <p>The bar runs top to bottom across the screen</p>
+            </div>
+        </div>
+        <div class="step-foot">
+            <div></div>
+            <button class="btn btn-primary" id="btn-orientation-next" disabled onclick="fromOrientation()">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 2: Speed & Duration -->
+    <div class="step" id="step-session">
+        <div class="step-head">
+            <h2>Speed &amp; Duration</h2>
+            <p>Control how fast the square sweeps and how long you'll train</p>
+        </div>
+        <div class="form-group">
+            <label>Sweep Speed — time for one pass across the bar: <span class="val-label" id="speed-val">1.2s</span></label>
+            <input type="range" id="inp-speed" min="0.4" max="3" step="0.1" value="1.2" oninput="onSpeedChange(this.value)">
+        </div>
+        <div class="form-group">
+            <label>Session Duration</label>
+            <div class="presets" id="dur-presets">
+                <div class="preset" onclick="setDurPreset(15,this)">15s</div>
+                <div class="preset sel" onclick="setDurPreset(30,this)">30s</div>
+                <div class="preset" onclick="setDurPreset(60,this)">1m</div>
+                <div class="preset" onclick="setDurPreset(120,this)">2m</div>
+                <div class="preset" onclick="setDurPreset(300,this)">5m</div>
+            </div>
+            <label style="margin-top:10px;">Custom: <span class="val-label" id="dur-val">30s</span></label>
+            <input type="range" id="inp-dur" min="10" max="300" step="5" value="30" oninput="onDurChange(this.value)">
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('orientation')">Back</button>
+            <button class="btn btn-primary" onclick="fromSession()">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 3: Timing Key -->
+    <div class="step" id="step-key">
+        <div class="step-head">
+            <h2>Set Your Timing Key</h2>
+            <p>Tap the box below, then press a key, click, or tap the screen to use for timing</p>
+        </div>
+        <div class="key-capture" id="key-display" onclick="startKeyCapture()">Tap to set key</div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('session')">Back</button>
+            <button class="btn btn-primary" id="btn-key-next" disabled onclick="fromKey()">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 4: Bar & Slot Size -->
+    <div class="step" id="step-sizes">
+        <div class="step-head">
+            <h2>Bar &amp; Slot Size</h2>
+            <p>Set how long the bar is and how wide the timing slot is</p>
+        </div>
+        <div class="form-group">
+            <label>Bar Size: <span class="val-label" id="barsize-val">70%</span></label>
+            <input type="range" id="inp-barsize" min="30" max="95" step="1" value="70" oninput="onBarSizeChange(this.value)">
+        </div>
+        <div class="form-group">
+            <label>Timing Slot Size — smaller is harder: <span class="val-label" id="slotsize-val">14%</span></label>
+            <input type="range" id="inp-slotsize" min="4" max="30" step="1" value="14" oninput="onSlotSizeChange(this.value)">
+        </div>
+        <div class="size-prev-wrap" id="size-prev-wrap">
+            <div class="size-prev-track" id="size-prev-track">
+                <div class="size-prev-slot" id="size-prev-slot"></div>
+            </div>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('key')">Back</button>
+            <button class="btn btn-primary" onclick="fromSizes()">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 5: Confirm -->
+    <div class="step" id="step-confirm">
+        <div class="step-head">
+            <h2>Ready to Train</h2>
+            <p>Review your settings then start when ready</p>
+        </div>
+        <div class="summary-card">
+            <div class="summary-row"><span class="s-key">Orientation</span><span class="s-val" id="s-orient">—</span></div>
+            <div class="summary-row"><span class="s-key">Sweep Speed</span><span class="s-val" id="s-speed">—</span></div>
+            <div class="summary-row"><span class="s-key">Duration</span><span class="s-val" id="s-dur">—</span></div>
+            <div class="summary-row"><span class="s-key">Timing Key</span><span class="s-val" id="s-key">—</span></div>
+            <div class="summary-row"><span class="s-key">Bar Size</span><span class="s-val" id="s-barsize">—</span></div>
+            <div class="summary-row"><span class="s-key">Slot Size</span><span class="s-val" id="s-slotsize">—</span></div>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('sizes')">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Start Training</button>
+        </div>
+    </div>
+
+</div><!-- /wizard -->
+
+<!-- COUNTDOWN SCREEN -->
+<div id="screen-countdown">
+    <div class="countdown-num" id="countdown-num">3</div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="screen-game">
+    <div class="game-hud">
+        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl">Time</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl">Score</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-land">0</div><div class="hud-lbl">Landings</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-fail">0</div><div class="hud-lbl">Fails</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-miss">0</div><div class="hud-lbl">Missed</div></div>
+    </div>
+    <div class="game-area game-area-center" id="game-area">
+        <div class="timing-track" id="timing-track">
+            <div class="timing-slot" id="timing-slot"></div>
+            <div class="timing-square" id="timing-square"></div>
+        </div>
+    </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="screen-results">
+    <div class="res-title">Session Complete!</div>
+    <div class="res-subtitle">Here's how you timed it</div>
+    <div class="res-stats">
+        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl">Score</div></div>
+        <div class="res-stat"><div class="res-val" id="r-land">0</div><div class="res-lbl">Landings</div></div>
+        <div class="res-stat"><div class="res-val" id="r-fail">0</div><div class="res-lbl">Fails</div></div>
+        <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl">Missed</div></div>
+        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl">Accuracy</div></div>
+    </div>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+</div>
+
+<script>
+// ─── SETTINGS STATE ─────────────────────────────────────────────
+const cfg = {
+    orientation: null,
+    speed: 1.2,
+    duration: 30,
+    key: null,
+    keyLabel: null,
+    barSize: 70,
+    slotSize: 14
+};
+
+let inputMode = 'idle'; // idle | capture | timing
+
+// ─── STEP NAVIGATION ────────────────────────────────────────────
+function show(stepId) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + stepId).classList.add('active');
+}
+
+function navBack() {
+    const active = document.querySelector('.step.active');
+    if (!active) { location.href = 'index.html'; return; }
+    const id = active.id.replace('step-', '');
+    if (id === 'orientation') { location.href = 'index.html'; return; }
+    if (id === 'session') { show('orientation'); return; }
+    if (id === 'key') { show('session'); return; }
+    if (id === 'sizes') { show('key'); return; }
+    if (id === 'confirm') { show('sizes'); return; }
+}
+
+function fmtTime(s) {
+    if (s < 60) return s + 's';
+    const m = Math.floor(s / 60), r = s % 60;
+    return m + 'm' + (r ? ' ' + r + 's' : '');
+}
+
+// ─── ORIENTATION STEP ───────────────────────────────────────────
+function pickOrientation(card) {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('sel'));
+    card.classList.add('sel');
+    cfg.orientation = card.dataset.orientation;
+    document.getElementById('btn-orientation-next').disabled = false;
+}
+
+function fromOrientation() {
+    if (!cfg.orientation) return;
+    updateSizePreview();
+    show('session');
+}
+
+// ─── SPEED & DURATION STEP ──────────────────────────────────────
+function onSpeedChange(val) {
+    cfg.speed = parseFloat(val);
+    document.getElementById('speed-val').textContent = cfg.speed.toFixed(1) + 's';
+}
+
+function setDurPreset(val, el) {
+    document.querySelectorAll('#dur-presets .preset').forEach(p => p.classList.remove('sel'));
+    el.classList.add('sel');
+    document.getElementById('inp-dur').value = val;
+    document.getElementById('dur-val').textContent = fmtTime(val);
+}
+
+function onDurChange(val) {
+    document.getElementById('dur-val').textContent = fmtTime(parseInt(val));
+    document.querySelectorAll('#dur-presets .preset').forEach(p => p.classList.remove('sel'));
+}
+
+function fromSession() {
+    cfg.duration = parseInt(document.getElementById('inp-dur').value);
+    show('key');
+}
+
+// ─── KEY CAPTURE ────────────────────────────────────────────────
+function startKeyCapture() {
+    inputMode = 'capture';
+    const el = document.getElementById('key-display');
+    el.textContent = 'Press a key, click, or tap…';
+    el.classList.add('capturing');
+}
+
+function handleCapture(code, e) {
+    e.preventDefault();
+    cfg.key = code;
+    cfg.keyLabel = labelForCode(code, e);
+    inputMode = 'idle';
+    const el = document.getElementById('key-display');
+    el.textContent = cfg.keyLabel;
+    el.classList.remove('capturing');
+    document.getElementById('btn-key-next').disabled = false;
+}
+
+const MOUSE_LABELS = { Mouse0: 'Left Click', Mouse1: 'Middle Click', Mouse2: 'Right Click', Mouse3: 'Mouse Back', Mouse4: 'Mouse Forward' };
+
+function labelForCode(code, e) {
+    if (code === 'Tap') return 'Tap Screen';
+    if (MOUSE_LABELS[code]) return MOUSE_LABELS[code];
+    if (code === 'Space') return 'Space';
+    return e.key.length === 1 ? e.key.toUpperCase() : e.key;
+}
+
+function fromKey() {
+    if (!cfg.key) return;
+    show('sizes');
+}
+
+// ─── SIZES STEP ─────────────────────────────────────────────────
+function onBarSizeChange(val) {
+    cfg.barSize = parseInt(val);
+    document.getElementById('barsize-val').textContent = val + '%';
+    updateSizePreview();
+}
+
+function onSlotSizeChange(val) {
+    cfg.slotSize = parseInt(val);
+    document.getElementById('slotsize-val').textContent = val + '%';
+    updateSizePreview();
+}
+
+function updateSizePreview() {
+    const wrap = document.getElementById('size-prev-wrap');
+    const track = document.getElementById('size-prev-track');
+    const slot = document.getElementById('size-prev-slot');
+    const vertical = cfg.orientation === 'vertical';
+    wrap.classList.toggle('vertical', vertical);
+    if (vertical) {
+        track.style.height = cfg.barSize + '%';
+        track.style.width = '';
+        slot.style.height = cfg.slotSize + '%';
+        slot.style.width = '100%';
+        slot.style.top = '0';
+        slot.style.left = '0';
+    } else {
+        track.style.width = cfg.barSize + '%';
+        track.style.height = '';
+        slot.style.width = cfg.slotSize + '%';
+        slot.style.height = '100%';
+        slot.style.left = '0';
+        slot.style.top = '0';
+    }
+}
+
+function fromSizes() {
+    fillSummary();
+    show('confirm');
+}
+
+function fillSummary() {
+    document.getElementById('s-orient').textContent = cfg.orientation === 'vertical' ? 'Vertical' : 'Horizontal';
+    document.getElementById('s-speed').textContent = cfg.speed.toFixed(1) + 's per pass';
+    document.getElementById('s-dur').textContent = fmtTime(cfg.duration);
+    document.getElementById('s-key').textContent = cfg.keyLabel;
+    document.getElementById('s-barsize').textContent = cfg.barSize + '%';
+    document.getElementById('s-slotsize').textContent = cfg.slotSize + '%';
+}
+
+// ─── COUNTDOWN ──────────────────────────────────────────────────
+function beginTraining() {
+    document.getElementById('page-nav').style.display = 'none';
+    document.getElementById('wizard').style.display = 'none';
+
+    const screen = document.getElementById('screen-countdown');
+    const numEl = document.getElementById('countdown-num');
+    let n = 3;
+    numEl.textContent = n;
+    screen.classList.add('on');
+
+    const iv = setInterval(() => {
+        n--;
+        if (n <= 0) {
+            clearInterval(iv);
+            screen.classList.remove('on');
+            startGame();
+        } else {
+            numEl.textContent = n;
+        }
+    }, 1000);
+}
+
+// ─── GAME ────────────────────────────────────────────────────────
+let gs = {};
+
+function startGame() {
+    gs = {
+        score: 0, landings: 0, fails: 0, misses: 0,
+        timeLeft: cfg.duration,
+        pos: 0, dir: 1,
+        slotStart: randomSlotStart(),
+        wasInSlot: false,
+        countdown: null,
+        raf: null,
+        lastT: null
+    };
+
+    document.getElementById('screen-game').classList.add('on');
+    document.getElementById('timing-track').className = 'timing-track ' + cfg.orientation;
+    buildTrack();
+    renderSlot();
+    renderSquare();
+    updateHUD();
+    inputMode = 'timing';
+
+    gs.lastT = performance.now();
+    gs.raf = requestAnimationFrame(tick);
+
+    gs.countdown = setInterval(() => {
+        gs.timeLeft--;
+        updateHUD();
+        if (gs.timeLeft <= 0) endGame();
+    }, 1000);
+}
+
+function buildTrack() {
+    const area = document.getElementById('game-area');
+    const track = document.getElementById('timing-track');
+    if (cfg.orientation === 'vertical') {
+        track.style.height = (area.offsetHeight * cfg.barSize / 100) + 'px';
+        track.style.width = '';
+    } else {
+        track.style.width = (area.offsetWidth * cfg.barSize / 100) + 'px';
+        track.style.height = '';
+    }
+}
+
+function randomSlotStart() {
+    return Math.random() * (100 - cfg.slotSize);
+}
+
+function tick(t) {
+    const dt = (t - gs.lastT) / 1000;
+    gs.lastT = t;
+    const pctPerSec = 100 / cfg.speed;
+    gs.pos += gs.dir * pctPerSec * dt;
+    if (gs.pos >= 100) { gs.pos = 100; gs.dir = -1; }
+    else if (gs.pos <= 0) { gs.pos = 0; gs.dir = 1; }
+
+    const inSlot = gs.pos >= gs.slotStart && gs.pos <= gs.slotStart + cfg.slotSize;
+    if (gs.wasInSlot && !inSlot) {
+        gs.misses++;
+        newCycle();
+    }
+    gs.wasInSlot = inSlot;
+
+    renderSquare();
+    gs.raf = requestAnimationFrame(tick);
+}
+
+function newCycle() {
+    gs.slotStart = randomSlotStart();
+    gs.wasInSlot = false;
+    renderSlot();
+    updateHUD();
+}
+
+function renderSlot() {
+    const slot = document.getElementById('timing-slot');
+    if (cfg.orientation === 'vertical') {
+        slot.style.top = gs.slotStart + '%';
+        slot.style.left = '0';
+        slot.style.height = cfg.slotSize + '%';
+        slot.style.width = '100%';
+    } else {
+        slot.style.left = gs.slotStart + '%';
+        slot.style.top = '0';
+        slot.style.width = cfg.slotSize + '%';
+        slot.style.height = '100%';
+    }
+}
+
+function renderSquare() {
+    const sq = document.getElementById('timing-square');
+    if (cfg.orientation === 'vertical') {
+        sq.style.top = `calc(${gs.pos}% - 13px)`;
+        sq.style.left = '50%';
+        sq.style.transform = 'translateX(-50%)';
+    } else {
+        sq.style.left = `calc(${gs.pos}% - 13px)`;
+        sq.style.top = '50%';
+        sq.style.transform = 'translateY(-50%)';
+    }
+}
+
+// ─── TIMING INPUT ───────────────────────────────────────────────
+function handleTimingInput(code, e) {
+    if (code !== cfg.key) return;
+    if (gs.timeLeft <= 0) return;
+    e.preventDefault();
+
+    const inSlot = gs.pos >= gs.slotStart && gs.pos <= gs.slotStart + cfg.slotSize;
+    const sq = document.getElementById('timing-square');
+    if (inSlot) {
+        gs.landings++;
+        gs.score += 10;
+        sq.classList.remove('bad'); sq.classList.add('good');
+    } else {
+        gs.fails++;
+        gs.score = Math.max(0, gs.score - 5);
+        sq.classList.remove('good'); sq.classList.add('bad');
+    }
+    setTimeout(() => sq.classList.remove('good', 'bad'), 180);
+
+    newCycle();
+    updateHUD();
+}
+
+function updateHUD() {
+    document.getElementById('hud-time').textContent = gs.timeLeft + 's';
+    document.getElementById('hud-score').textContent = gs.score;
+    document.getElementById('hud-land').textContent = gs.landings;
+    document.getElementById('hud-fail').textContent = gs.fails;
+    document.getElementById('hud-miss').textContent = gs.misses;
+}
+
+function endGame() {
+    cancelAnimationFrame(gs.raf);
+    clearInterval(gs.countdown);
+    inputMode = 'idle';
+    document.getElementById('screen-game').classList.remove('on');
+
+    const total = gs.landings + gs.fails + gs.misses;
+    const acc = total ? Math.round(gs.landings / total * 100) : 0;
+
+    document.getElementById('r-score').textContent = gs.score;
+    document.getElementById('r-land').textContent = gs.landings;
+    document.getElementById('r-fail').textContent = gs.fails;
+    document.getElementById('r-miss').textContent = gs.misses;
+    document.getElementById('r-acc').textContent = acc + '%';
+
+    document.getElementById('screen-results').classList.add('on');
+}
+
+// ─── GLOBAL INPUT ROUTER (keyboard, mouse, touch) ────────────────
+function routeInput(code, e) {
+    if (inputMode === 'capture') handleCapture(code, e);
+    else if (inputMode === 'timing') handleTimingInput(code, e);
+}
+
+document.addEventListener('keydown', e => {
+    if (e.repeat) return;
+    routeInput(e.code, e);
+});
+
+document.addEventListener('mousedown', e => {
+    routeInput('Mouse' + e.button, e);
+});
+
+document.addEventListener('touchstart', e => {
+    if (inputMode === 'idle') return;
+    e.preventDefault();
+    routeInput('Tap', e);
+}, { passive: false });
+
+document.addEventListener('contextmenu', e => {
+    if (inputMode !== 'idle') e.preventDefault();
+});
+</script>
+</body>
+</html>

@@ -759,6 +759,61 @@ input[type="range"] {
     pointer-events: none;
 }
 
+/* TIMING TRACK */
+.timing-track {
+    position: relative;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--rs);
+    touch-action: manipulation;
+}
+.timing-slot {
+    position: absolute;
+    background: rgba(0,230,118,0.25);
+    border: 2px solid var(--green);
+    border-radius: 4px;
+}
+.timing-square {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 0 12px 2px rgba(255,255,255,0.5);
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+.timing-square.good { background: var(--green); box-shadow: 0 0 16px 4px rgba(0,230,118,0.7); }
+.timing-square.bad  { background: var(--red);   box-shadow: 0 0 16px 4px rgba(255,51,51,0.7); }
+
+/* SIZE PREVIEW (Timing settings step) */
+.size-prev-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 140px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    margin-top: 8px;
+}
+.size-prev-track {
+    position: relative;
+    height: 40px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--rs);
+}
+.size-prev-wrap.vertical .size-prev-track {
+    width: 40px;
+    height: 90%;
+}
+.size-prev-slot {
+    position: absolute;
+    background: rgba(0,230,118,0.25);
+    border: 2px solid var(--green);
+    border-radius: 3px;
+}
+
 /* ─────────────────────────────────────────────────────────────
    MOBILE / TOUCHSCREEN
    ───────────────────────────────────────────────────────────── */
@@ -806,6 +861,9 @@ input[type="range"] {
     .hud-lbl  { font-size: 0.62rem; }
 
     .speed-target { width: 120px; height: 120px; }
+
+    .timing-square { width: 22px; height: 22px; }
+    .size-prev-wrap { height: 110px; }
 
     .countdown-num { font-size: 6rem; }
 

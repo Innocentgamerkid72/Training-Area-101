@@ -96,7 +96,7 @@ body {
 .category-card.reaction  { --card-color: var(--green); }
 .category-card.timing    { --card-color: var(--purple); }
 .category-card.typing    { --card-color: var(--red); }
-.category-card.arcade    { --card-color: var(--yellow); }
+.category-card.stroop    { --card-color: var(--yellow); }
 
 .category-card.disabled { opacity: 0.38; cursor: not-allowed; pointer-events: none; }
 
@@ -439,6 +439,35 @@ input[type="range"] {
 .s-key { color: var(--dim); }
 .s-val { color: var(--bright); font-weight: 600; }
 
+/* HOW TO PLAY GUIDE */
+.guide-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 24px 28px;
+    margin-bottom: 8px;
+}
+.guide-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.guide-list li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 0.95rem;
+    color: var(--text);
+    line-height: 1.55;
+}
+.guide-list li::before {
+    content: '▸';
+    color: var(--guide-color, var(--blue));
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
 /* GAME SCREEN */
 #screen-game {
     display: none;
@@ -765,17 +794,28 @@ input[type="range"] {
 .stroop-area {
     flex: 1;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 34px;
     padding: 32px;
     background: #090912;
 }
+.stroop-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 38px;
+    width: min(640px, 100%);
+    padding: 56px 64px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 24px 70px -24px rgba(0,0,0,0.65);
+}
 .stroop-word {
-    font-size: 4.5rem;
+    font-size: 6rem;
     font-weight: 800;
     letter-spacing: 2px;
+    text-shadow: 0 0 34px currentColor;
 }
 .stroop-word.good { animation: stroopGood 0.18s ease; }
 .stroop-word.bad  { animation: stroopBad 0.18s ease; }
@@ -791,7 +831,7 @@ input[type="range"] {
 }
 
 .stroop-timerbar-track {
-    width: min(420px, 80vw);
+    width: min(420px, 100%);
     height: 6px;
     background: var(--surface2);
     border-radius: 3px;
@@ -805,24 +845,24 @@ input[type="range"] {
 
 .stroop-buttons {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
     justify-content: center;
 }
 .stroop-btn {
     --sc: var(--blue);
-    background: var(--surface);
+    background: var(--surface2);
     border: 2px solid var(--sc);
     color: var(--sc);
-    padding: 14px 26px;
-    border-radius: var(--r);
-    font-size: 1rem;
+    padding: 18px 34px;
+    border-radius: 14px;
+    font-size: 1.15rem;
     font-weight: 700;
     cursor: pointer;
     touch-action: manipulation;
-    transition: transform 0.08s ease, background 0.15s ease;
+    transition: transform 0.08s ease, filter 0.15s ease;
 }
-.stroop-btn:active { transform: scale(0.93); background: rgba(255,255,255,0.08); }
+.stroop-btn:active { transform: scale(0.93); filter: brightness(1.3); }
 
 /* TIMING TRACK */
 .timing-track {
@@ -930,8 +970,9 @@ input[type="range"] {
     .timing-square { width: 22px; height: 22px; }
     .size-prev-wrap { height: 110px; }
 
-    .stroop-word { font-size: 2.6rem; }
-    .stroop-btn  { padding: 10px 18px; font-size: 0.9rem; }
+    .stroop-panel { padding: 32px 20px; gap: 26px; border-radius: var(--r); }
+    .stroop-word  { font-size: 3rem; }
+    .stroop-btn   { padding: 12px 20px; font-size: 0.95rem; border-radius: var(--r); }
 
     .countdown-num { font-size: 6rem; }
 
@@ -966,5 +1007,5 @@ input[type="range"] {
     .preset:hover         { border-color: var(--blue); color: var(--blue); }
     .variant-item:hover   { border-color: var(--border2); }
     .key-capture:hover    { border-color: var(--blue); }
-    .stroop-btn:hover      { background: rgba(255,255,255,0.06); }
+    .stroop-btn:hover      { filter: brightness(1.2); transform: translateY(-1px); }
 }

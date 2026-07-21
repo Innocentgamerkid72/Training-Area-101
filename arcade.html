@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade — Stroop Rush — Training Area 101</title>
+    <title>Stroop Rush — Training Area 101</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,7 +11,7 @@
 <!-- PAGE NAV (hidden during game/results) -->
 <nav class="page-nav" id="page-nav">
     <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Arcade · Stroop Rush</span>
+    <span class="page-title">Stroop Rush</span>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -57,7 +57,27 @@
         </div>
         <div class="step-foot">
             <button class="btn btn-ghost" onclick="show('session')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Start Training</button>
+            <button class="btn btn-primary btn-lg" onclick="show('guide')">Start Training</button>
+        </div>
+    </div>
+
+    <!-- STEP 3: How to Play -->
+    <div class="step" id="step-guide">
+        <div class="step-head">
+            <h2>How to Play</h2>
+            <p>Quick rundown before you start</p>
+        </div>
+        <div class="guide-card" style="--guide-color: var(--yellow);">
+            <ul class="guide-list">
+                <li>A color word appears, but its ink color is never what the word says.</li>
+                <li>Click, tap, or press 1-5 to pick the INK color — ignore the word itself.</li>
+                <li>Answer before the timer bar runs out, or it counts as a miss.</li>
+                <li>Correct answers score points and log your reaction time; wrong answers cost points.</li>
+            </ul>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Let's Go!</button>
         </div>
     </div>
 
@@ -78,14 +98,16 @@
         <div class="hud-stat"><div class="hud-val" id="hud-missed">0</div><div class="hud-lbl">Missed</div></div>
     </div>
     <div class="stroop-area">
-        <div class="stroop-word" id="stroop-word">RED</div>
-        <div class="stroop-timerbar-track"><div class="stroop-timerbar" id="stroop-timerbar"></div></div>
-        <div class="stroop-buttons" id="stroop-buttons">
-            <button class="stroop-btn" style="--sc:var(--red)"    onclick="answer('red')">Red</button>
-            <button class="stroop-btn" style="--sc:var(--blue)"   onclick="answer('blue')">Blue</button>
-            <button class="stroop-btn" style="--sc:var(--green)"  onclick="answer('green')">Green</button>
-            <button class="stroop-btn" style="--sc:var(--orange)" onclick="answer('orange')">Orange</button>
-            <button class="stroop-btn" style="--sc:var(--purple)" onclick="answer('purple')">Purple</button>
+        <div class="stroop-panel">
+            <div class="stroop-word" id="stroop-word">RED</div>
+            <div class="stroop-timerbar-track"><div class="stroop-timerbar" id="stroop-timerbar"></div></div>
+            <div class="stroop-buttons" id="stroop-buttons">
+                <button class="stroop-btn" style="--sc:var(--red);    background:rgba(255,51,51,0.14);"  onclick="answer('red')">Red</button>
+                <button class="stroop-btn" style="--sc:var(--blue);   background:rgba(0,200,255,0.14);"  onclick="answer('blue')">Blue</button>
+                <button class="stroop-btn" style="--sc:var(--green);  background:rgba(0,230,118,0.14);"  onclick="answer('green')">Green</button>
+                <button class="stroop-btn" style="--sc:var(--orange); background:rgba(255,119,0,0.14);"  onclick="answer('orange')">Orange</button>
+                <button class="stroop-btn" style="--sc:var(--purple); background:rgba(157,78,221,0.14);" onclick="answer('purple')">Purple</button>
+            </div>
         </div>
     </div>
 </div>
@@ -129,6 +151,7 @@ function navBack() {
     const id = active.id.replace('step-', '');
     if (id === 'session') { location.href = 'index.html'; return; }
     if (id === 'confirm') { show('session'); return; }
+    if (id === 'guide') { show('confirm'); return; }
 }
 
 function fmtTime(s) {

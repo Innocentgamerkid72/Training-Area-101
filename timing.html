@@ -121,7 +121,22 @@
         </div>
         <div class="step-foot">
             <button class="btn btn-ghost" onclick="show('sizes')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Start Training</button>
+            <button class="btn btn-primary btn-lg" onclick="fromConfirm()">Start Training</button>
+        </div>
+    </div>
+
+    <!-- STEP 6: How to Play -->
+    <div class="step" id="step-guide">
+        <div class="step-head">
+            <h2>How to Play</h2>
+            <p>Quick rundown before you start</p>
+        </div>
+        <div class="guide-card" style="--guide-color: var(--purple);">
+            <ul class="guide-list" id="guide-list"></ul>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Let's Go!</button>
         </div>
     </div>
 
@@ -192,6 +207,7 @@ function navBack() {
     if (id === 'key') { show('session'); return; }
     if (id === 'sizes') { show('key'); return; }
     if (id === 'confirm') { show('sizes'); return; }
+    if (id === 'guide') { show('confirm'); return; }
 }
 
 function fmtTime(s) {
@@ -318,6 +334,22 @@ function fillSummary() {
     document.getElementById('s-key').textContent = cfg.keyLabel;
     document.getElementById('s-barsize').textContent = cfg.barSize + '%';
     document.getElementById('s-slotsize').textContent = cfg.slotSize + '%';
+}
+
+function fromConfirm() {
+    fillGuide();
+    show('guide');
+}
+
+function fillGuide() {
+    const list = document.getElementById('guide-list');
+    const dir = cfg.orientation === 'vertical' ? 'top to bottom' : 'left to right';
+    list.innerHTML = [
+        `A white square sweeps back and forth along the bar, running ${dir}.`,
+        `Press, click, or tap ${cfg.keyLabel} the instant the square is inside the highlighted green slot.`,
+        `A good landing scores points. Pressing at the wrong time is a Fail; letting the square pass through untouched is a Miss.`,
+        `Every landing or fail immediately moves the slot to a new spot, so stay ready.`
+    ].map(t => `<li>${t}</li>`).join('');
 }
 
 // ─── COUNTDOWN ──────────────────────────────────────────────────

@@ -82,7 +82,27 @@
         </div>
         <div class="step-foot">
             <button class="btn btn-ghost" onclick="show('theme')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Start Training</button>
+            <button class="btn btn-primary btn-lg" onclick="show('guide')">Start Training</button>
+        </div>
+    </div>
+
+    <!-- STEP 4: How to Play -->
+    <div class="step" id="step-guide">
+        <div class="step-head">
+            <h2>How to Play</h2>
+            <p>Quick rundown before you start</p>
+        </div>
+        <div class="guide-card" style="--guide-color: var(--red);">
+            <ul class="guide-list">
+                <li>Type the passage exactly as shown, character by character.</li>
+                <li>A mistake turns that character red — fix it and it turns yellow instead of green.</li>
+                <li>Correctly typed characters turn green as you go.</li>
+                <li>Your WPM and accuracy are calculated from what you've typed when time runs out.</li>
+            </ul>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Let's Go!</button>
         </div>
     </div>
 
@@ -139,6 +159,7 @@ function navBack() {
     if (id === 'duration') { location.href = 'index.html'; return; }
     if (id === 'theme') { show('duration'); return; }
     if (id === 'confirm') { show('theme'); return; }
+    if (id === 'guide') { show('confirm'); return; }
 }
 
 function fmtTime(s) {

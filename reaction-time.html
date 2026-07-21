@@ -82,7 +82,22 @@
         </div>
         <div class="step-foot">
             <button class="btn btn-ghost" onclick="show(cfg.theme === 'standoff' ? 'textsize' : 'key')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTheme()">Start Training</button>
+            <button class="btn btn-primary btn-lg" onclick="fromConfirm()">Start Training</button>
+        </div>
+    </div>
+
+    <!-- STEP 5: How to Play -->
+    <div class="step" id="step-guide">
+        <div class="step-head">
+            <h2>How to Play</h2>
+            <p>Quick rundown before you start</p>
+        </div>
+        <div class="guide-card" style="--guide-color: var(--green);">
+            <ul class="guide-list" id="guide-list"></ul>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTheme()">Let's Go!</button>
         </div>
     </div>
 
@@ -148,6 +163,7 @@ function navBack() {
     if (id === 'key') { show('theme'); return; }
     if (id === 'textsize') { show('key'); return; }
     if (id === 'confirm') { show(cfg.theme === 'standoff' ? 'textsize' : 'key'); return; }
+    if (id === 'guide') { show('confirm'); return; }
 }
 
 function pickTheme(card) {
@@ -194,6 +210,27 @@ function fillSummary() {
     } else {
         sizeRow.style.display = 'none';
     }
+}
+
+function fromConfirm() {
+    fillGuide();
+    show('guide');
+}
+
+function fillGuide() {
+    const list = document.getElementById('guide-list');
+    const items = cfg.theme === 'standoff'
+        ? [
+            `Watch the big text in the middle — it starts by saying "Wait...".`,
+            `The instant it changes to "SHOOT!", press ${cfg.keyLabel} as fast as you can.`,
+            `Reacting before "SHOOT!" appears forces a restart — stay patient.`
+        ]
+        : [
+            `The screen starts red — wait for it to turn green.`,
+            `The instant it turns green, press ${cfg.keyLabel} as fast as you can.`,
+            `Reacting too early forces a restart — stay patient.`
+        ];
+    list.innerHTML = items.map(t => `<li>${t}</li>`).join('');
 }
 
 // ─── KEY CAPTURE ────────────────────────────────────────────────

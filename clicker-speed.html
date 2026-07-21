@@ -52,7 +52,26 @@
         </div>
         <div class="step-foot">
             <button class="btn btn-ghost" onclick="show('duration')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginCountdown()">Start Training</button>
+            <button class="btn btn-primary btn-lg" onclick="show('guide')">Start Training</button>
+        </div>
+    </div>
+
+    <!-- STEP 3: How to Play -->
+    <div class="step" id="step-guide">
+        <div class="step-head">
+            <h2>How to Play</h2>
+            <p>Quick rundown before you start</p>
+        </div>
+        <div class="guide-card" style="--guide-color: var(--orange);">
+            <ul class="guide-list">
+                <li>Click the black square as many times as you can before time runs out.</li>
+                <li>Every click counts, however fast you can go — there's no penalty for missing.</li>
+                <li>Your result is measured in Clicks Per Minute (CPM), calculated from your total clicks.</li>
+            </ul>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginCountdown()">Let's Go!</button>
         </div>
     </div>
 
@@ -99,6 +118,7 @@ function show(stepId) {
 function navBack() {
     const active = document.querySelector('.step.active');
     if (!active || active.id === 'step-duration') { location.href = 'index.html'; return; }
+    if (active.id === 'step-guide') { show('confirm'); return; }
     show('duration');
 }
 

@@ -589,6 +589,37 @@ function displayRC(r, c) {
     return gs.flipped ? { r: 7 - r, c: 7 - c } : { r, c };
 }
 
+function squareEl(r, c) {
+    const d = displayRC(r, c);
+    return document.getElementById('chess-board').children[d.r * 8 + d.c];
+}
+
+// Captures the on-screen position of every piece a move will relocate
+// (the moving piece itself, plus the rook when castling) BEFORE the board
+// state changes, so playAnimations() can FLIP-animate them sliding in.
+function collectMoveAnimTargets(move) {
+    const targets = [{ fr: move.fr, fc: move.fc, tr: move.tr, tc: move.tc }];
+    if (move.castle === 'K') targets.push({ fr: move.fr, fc: 7, tr: move.fr, tc: 5 });
+    if (move.castle === 'Q') targets.push({ fr: move.fr, fc: 0, tr: move.fr, tc: 3 });
+    return targets.map(t => ({ ...t, fromRect: squareEl(t.fr, t.fc).getBoundingClientRect() }));
+}
+
+function playAnimations(anims) {
+    for (const a of anims) {
+        const destSq = squareEl(a.tr, a.tc);
+        const piece = destSq.querySelector('.chess-piece');
+        if (!piece) continue;
+        const toRect = destSq.getBoundingClientRect();
+        const dx = a.fromRect.left - toRect.left;
+        const dy = a.fromRect.top - toRect.top;
+        piece.style.transition = 'none';
+        piece.style.transform = `translate(${dx}px, ${dy}px)`;
+        void piece.offsetWidth; // force reflow so the transition below starts from the offset position
+        piece.style.transition = 'transform 0.22s ease';
+        piece.style.transform = 'translate(0, 0)';
+    }
+}
+
 function renderBoard() {
     const board = document.getElementById('chess-board');
     for (let r = 0; r < 8; r++) {
@@ -664,8 +695,10 @@ function playMove(move) {
 }
 
 function finishMove(move) {
+    const anims = collectMoveAnimTargets(move);
     gs.state = makeMove(gs.state, move);
     renderBoard();
+    playAnimations(anims);
     updateHUD();
     checkGameEnd();
     if (!gs.gameOver) maybeTriggerBot();

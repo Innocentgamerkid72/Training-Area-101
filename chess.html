@@ -715,17 +715,22 @@ function maybeTriggerBot() {
     if (cfg.mode !== 'bot' || gs.state.turn === gs.humanSide) return;
     gs.locked = true;
     document.getElementById('hud-status').textContent = 'Bot is thinking…';
+    const thinkTime = 2000 + Math.random() * 3000; // 2-5s, so the bot doesn't feel instant/robotic
     setTimeout(() => {
         const result = minimax(gs.state, cfg.depth, -Infinity, Infinity, gs.state.turn);
         gs.locked = false;
         if (result.move) {
             const move = result.move.promotion ? { ...result.move, promoteTo: 'Q' } : result.move;
+            const anims = collectMoveAnimTargets(move);
             gs.state = makeMove(gs.state, move);
+            renderBoard();
+            playAnimations(anims);
+        } else {
+            renderBoard();
         }
-        renderBoard();
         updateHUD();
         checkGameEnd();
-    }, 50);
+    }, thinkTime);
 }
 
 function updateHUD() {

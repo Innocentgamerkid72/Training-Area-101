@@ -150,6 +150,27 @@ body {
 }
 .page-title { font-size: 1rem; font-weight: 600; color: var(--bright); }
 
+.lang-toggle {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text);
+    padding: 5px 14px;
+    border-radius: var(--rs);
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: border-color var(--t);
+    touch-action: manipulation;
+    margin-left: auto;
+}
+.lang-toggle.floating {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 10;
+    margin-left: 0;
+}
+
 /* WIZARD */
 .wizard {
     max-width: 900px;
@@ -545,11 +566,11 @@ input[type="range"] {
     gap: 28px;
     padding: 40px 24px;
     text-align: center;
-    animation: resultsSlideUp 0.5s cubic-bezier(.16,.84,.44,1) both;
+    animation: resultsSlideUp 0.7s cubic-bezier(.16,.84,.44,1) both;
 }
 @keyframes resultsSlideUp {
-    from { transform: translateY(70px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
+    from { transform: translateY(100vh); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
 }
 
 /* CONFETTI */
@@ -1202,6 +1223,7 @@ input[type="range"] {
 
     .preset { padding: 8px 16px; }
     .back-btn { padding: 8px 16px; min-height: 36px; }
+    .lang-toggle { padding: 8px 14px; min-height: 36px; font-size: 0.8rem; }
 
     .key-capture { padding: 28px 16px; font-size: 1.1rem; }
 
@@ -1221,6 +1243,7 @@ input[type="range"] {
         box-shadow: 0 0 28px -6px var(--card-color);
     }
     .back-btn:hover      { border-color: var(--dim); }
+    .lang-toggle:hover   { border-color: var(--dim); }
     .btn:hover            { filter: brightness(1.12); transform: translateY(-1px); }
     .mode-card:hover      { border-color: var(--border2); }
     .preset:hover         { border-color: var(--blue); color: var(--blue); }

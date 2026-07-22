@@ -21,7 +21,7 @@
     <div class="step active" id="step-session">
         <div class="step-head">
             <h2>Stroop Rush</h2>
-            <p>An array of leaves drifts on the river — green leaves point a direction, yellow leaves actually drift one</p>
+            <p>Every leaf in a round shares one color — green means trust the arrow, yellow means the arrow is lying to you</p>
         </div>
         <div class="form-group">
             <label>Session Duration</label>
@@ -69,10 +69,11 @@
         </div>
         <div class="guide-card" style="--guide-color: var(--yellow);">
             <ul class="guide-list">
-                <li>Several leaves appear together on the river. Green leaves show an arrow — answer with the direction it's pointing.</li>
-                <li>Yellow leaves don't show an arrow — watch which way it's actually drifting and answer with that direction instead.</li>
-                <li>Resolve each leaf in turn, left to right, using the arrow keys, WASD, or the on-screen d-pad — before its timer runs out.</li>
-                <li>Correct answers score points and log your reaction time; wrong answers cost points; letting one time out counts as a miss.</li>
+                <li>Every leaf in a round is the same color — either all green or all yellow — and every leaf shows an arrow.</li>
+                <li>Green round: the arrows are honest — answer with the direction each leaf is pointing.</li>
+                <li>Yellow round: the arrows are decoys — ignore them and answer with the direction the leaf is actually drifting instead.</li>
+                <li>Getting one right immediately reshuffles every leaf you haven't answered yet, so don't scout ahead.</li>
+                <li>Resolve each leaf in turn using the arrow keys, WASD, or the on-screen d-pad — before its timer runs out.</li>
             </ul>
         </div>
         <div class="step-foot">
@@ -264,32 +265,39 @@ function startGame() {
     }, 1000);
 }
 
-function spawnArray() {
-    gs.leaves = [];
-    for (let i = 0; i < ARRAY_SIZE; i++) {
-        gs.leaves.push({
-            color: Math.random() < 0.5 ? 'green' : 'yellow',
-            dirIdx: Math.floor(Math.random() * DIRECTIONS.length),
-            resolved: false
-        });
+function makeLeafData(color) {
+    const dirIdx = Math.floor(Math.random() * DIRECTIONS.length);
+    let arrowIdx = dirIdx;
+    if (color === 'yellow') {
+        // decoy arrow: guaranteed to differ from the true drift direction
+        do { arrowIdx = Math.floor(Math.random() * DIRECTIONS.length); } while (arrowIdx === dirIdx);
     }
+    return { color, dirIdx, arrowIdx, resolved: false };
+}
+
+function renderLeaf(i) {
+    const leaf = gs.leaves[i];
+    const item = document.getElementById('leaf-' + i);
+    const arrowEl = document.getElementById('leaf-arrow-' + i);
+    item.className = 'leaf-item ' + leaf.color;
+    item.classList.toggle('done', leaf.resolved);
+    item.style.removeProperty('--dx');
+    item.style.removeProperty('--dy');
+    arrowEl.textContent = DIRECTIONS[leaf.arrowIdx].arrow;
+    if (leaf.color === 'yellow') {
+        const d = DIR_DELTA[DIRECTIONS[leaf.dirIdx].key];
+        item.style.setProperty('--dx', d.dx + 'px');
+        item.style.setProperty('--dy', d.dy + 'px');
+    }
+}
+
+function spawnArray() {
+    const arrayColor = Math.random() < 0.5 ? 'green' : 'yellow';
+    gs.leaves = [];
+    for (let i = 0; i < ARRAY_SIZE; i++) gs.leaves.push(makeLeafData(arrayColor));
     gs.activeIdx = 0;
 
-    gs.leaves.forEach((leaf, i) => {
-        const item = document.getElementById('leaf-' + i);
-        const arrowEl = document.getElementById('leaf-arrow-' + i);
-        item.className = 'leaf-item ' + leaf.color;
-        item.style.removeProperty('--dx');
-        item.style.removeProperty('--dy');
-        if (leaf.color === 'yellow') {
-            const d = DIR_DELTA[DIRECTIONS[leaf.dirIdx].key];
-            item.style.setProperty('--dx', d.dx + 'px');
-            item.style.setProperty('--dy', d.dy + 'px');
-            arrowEl.textContent = '';
-        } else {
-            arrowEl.textContent = DIRECTIONS[leaf.dirIdx].arrow;
-        }
-    });
+    for (let i = 0; i < gs.leaves.length; i++) renderLeaf(i);
 
     startLeafTurn();
 }
@@ -328,6 +336,7 @@ function resolveLeaf(chosenKey) {
     const leaf = gs.leaves[gs.activeIdx];
     const correctKey = DIRECTIONS[leaf.dirIdx].key;
     const itemEl = document.getElementById('leaf-' + gs.activeIdx);
+    let gotItRight = false;
 
     if (chosenKey === null) {
         gs.missed++;
@@ -337,6 +346,7 @@ function resolveLeaf(chosenKey) {
         gs.score += 10;
         gs.reactionTimes.push(performance.now() - gs.promptStart);
         flashLeafItem(itemEl, 'good');
+        gotItRight = true;
     } else {
         gs.wrong++;
         gs.score = Math.max(0, gs.score - 5);
@@ -344,6 +354,14 @@ function resolveLeaf(chosenKey) {
     }
     leaf.resolved = true;
     updateHUD();
+
+    if (gotItRight) {
+        // a correct answer reshuffles every leaf still waiting, so you can't scout ahead
+        for (let i = gs.activeIdx + 1; i < gs.leaves.length; i++) {
+            gs.leaves[i] = makeLeafData(leaf.color);
+            renderLeaf(i);
+        }
+    }
 
     gs.activeIdx++;
     if (gs.activeIdx >= gs.leaves.length) {

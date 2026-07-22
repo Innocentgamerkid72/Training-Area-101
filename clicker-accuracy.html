@@ -10,8 +10,9 @@
 
 <!-- PAGE NAV (hidden during game/results) -->
 <nav class="page-nav" id="page-nav">
-    <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Clicker Accuracy</span>
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Clicker Accuracy</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -20,104 +21,104 @@
     <!-- STEP 1: Mode -->
     <div class="step active" id="step-mode">
         <div class="step-head">
-            <h2>Select Mode</h2>
-            <p>Choose how targets appear during your session</p>
+            <h2 data-i18n="mode_h2">Select Mode</h2>
+            <p data-i18n="mode_p">Choose how targets appear during your session</p>
         </div>
         <div class="mode-grid">
             <div class="mode-card" data-mode="array" onclick="pickMode(this)">
-                <h3>Array</h3>
-                <p>Targets placed in a fixed grid layout that you work through</p>
+                <h3 data-i18n="mode_array_h3">Array</h3>
+                <p data-i18n="mode_array_p">Targets placed in a fixed grid layout that you work through</p>
             </div>
             <div class="mode-card" data-mode="random" onclick="pickMode(this)">
-                <h3>Random Popups</h3>
-                <p>Targets appear at random positions across the screen</p>
+                <h3 data-i18n="mode_random_h3">Random Popups</h3>
+                <p data-i18n="mode_random_p">Targets appear at random positions across the screen</p>
             </div>
             <div class="mode-card" data-mode="both" onclick="pickMode(this)">
-                <h3>Both</h3>
-                <p>Grid layout combined with random popups in separate zones</p>
+                <h3 data-i18n="mode_both_h3">Both</h3>
+                <p data-i18n="mode_both_p">Grid layout combined with random popups in separate zones</p>
             </div>
         </div>
         <div class="step-foot">
             <div></div>
-            <button class="btn btn-primary" id="btn-mode-next" disabled onclick="fromMode()">Next</button>
+            <button class="btn btn-primary" id="btn-mode-next" disabled onclick="fromMode()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 2: Array Config -->
     <div class="step" id="step-array">
         <div class="step-head">
-            <h2>Array Configuration</h2>
-            <p>Define the grid dimensions for your target layout</p>
+            <h2 data-i18n="array_h2">Array Configuration</h2>
+            <p data-i18n="array_p">Define the grid dimensions for your target layout</p>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label for="inp-rows">Rows</label>
+                <label for="inp-rows" data-i18n="rows">Rows</label>
                 <input type="number" id="inp-rows" min="1" max="20" value="4">
             </div>
             <div class="form-group">
-                <label for="inp-cols">Columns</label>
+                <label for="inp-cols" data-i18n="cols">Columns</label>
                 <input type="number" id="inp-cols" min="1" max="20" value="6">
             </div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('mode')">Back</button>
-            <button class="btn btn-primary" onclick="show('target')">Next</button>
+            <button class="btn btn-ghost" onclick="show('mode')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="show('target')" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 3: Target Config -->
     <div class="step" id="step-target">
         <div class="step-head">
-            <h2>Target Settings</h2>
-            <p>Design your target shapes and create variants</p>
+            <h2 data-i18n="target_h2">Target Settings</h2>
+            <p data-i18n="target_p">Design your target shapes and create variants</p>
         </div>
         <div class="target-layout">
             <!-- Shape Editor -->
             <div class="editor-panel">
-                <h3>Shape Editor — drag corners to reshape</h3>
+                <h3 data-i18n="shape_editor_h3">Shape Editor — drag corners to reshape</h3>
                 <div class="form-group" style="margin-bottom:14px;">
-                    <label>Target Size: <span class="val-label" id="size-val">60%</span></label>
+                    <label><span data-i18n="target_size">Target Size:</span> <span class="val-label" id="size-val">60%</span></label>
                     <input type="range" id="inp-size" min="10" max="100" value="60" oninput="onSizeChange(this.value)">
                 </div>
                 <svg id="shape-svg" class="shape-svg" viewBox="0 0 300 300"></svg>
                 <div class="editor-toolbar">
-                    <button class="btn btn-ghost btn-sm" onclick="editor.addCorner()">Add Corner</button>
-                    <button class="btn btn-ghost btn-sm" onclick="editor.removeCorner()">Delete Corner</button>
-                    <button class="btn btn-ghost btn-sm" onclick="editor.reset()">Reset Shape</button>
+                    <button class="btn btn-ghost btn-sm" onclick="editor.addCorner()" data-i18n="add_corner">Add Corner</button>
+                    <button class="btn btn-ghost btn-sm" onclick="editor.removeCorner()" data-i18n="delete_corner">Delete Corner</button>
+                    <button class="btn btn-ghost btn-sm" onclick="editor.reset()" data-i18n="reset_shape">Reset Shape</button>
                 </div>
             </div>
             <!-- Variants -->
             <div class="variants-panel">
-                <h3>Variants</h3>
+                <h3 data-i18n="variants_h3">Variants</h3>
                 <div class="variant-list" id="variant-list"></div>
                 <div class="add-btns">
-                    <button class="btn btn-ghost btn-sm" onclick="addVariant(false)">+ Add Shoot Variant</button>
-                    <button class="btn btn-sm" style="background:rgba(255,50,50,0.12);border:1px solid #cc2222;color:#ff8888;" onclick="addVariant(true)">+ Add Don't Shoot Variant</button>
+                    <button class="btn btn-ghost btn-sm" onclick="addVariant(false)" data-i18n="add_shoot">+ Add Shoot Variant</button>
+                    <button class="btn btn-sm" style="background:rgba(255,50,50,0.12);border:1px solid #cc2222;color:#ff8888;" onclick="addVariant(true)" data-i18n="add_dontshoot">+ Add Don't Shoot Variant</button>
                 </div>
             </div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="toTargetBack()">Back</button>
-            <button class="btn btn-primary" onclick="fromTarget()">Next</button>
+            <button class="btn btn-ghost" onclick="toTargetBack()" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="fromTarget()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 4: Placement (both mode only) -->
     <div class="step" id="step-placement">
         <div class="step-head">
-            <h2>Zone Placement</h2>
-            <p>Drag a zone to move it, drag a corner to resize — just like shaping a target. Zones can overlap.</p>
+            <h2 data-i18n="placement_h2">Zone Placement</h2>
+            <p data-i18n="placement_p">Drag a zone to move it, drag a corner to resize — just like shaping a target. Zones can overlap.</p>
         </div>
         <div class="zone-canvas" id="zone-canvas">
             <div class="zone-box zone-array" id="zone-array" data-zone="array">
-                <span class="zone-label">Array Zone</span>
+                <span class="zone-label" data-i18n="array_zone">Array Zone</span>
                 <div class="zone-handle" data-corner="nw"></div>
                 <div class="zone-handle" data-corner="ne"></div>
                 <div class="zone-handle" data-corner="sw"></div>
                 <div class="zone-handle" data-corner="se"></div>
             </div>
             <div class="zone-box zone-popup" id="zone-popup" data-zone="popup">
-                <span class="zone-label">Random Popup Zone</span>
+                <span class="zone-label" data-i18n="popup_zone">Random Popup Zone</span>
                 <div class="zone-handle" data-corner="nw"></div>
                 <div class="zone-handle" data-corner="ne"></div>
                 <div class="zone-handle" data-corner="sw"></div>
@@ -125,84 +126,84 @@
             </div>
         </div>
         <div class="zone-legend">
-            <span class="zone-leg-item"><i class="zone-dot zone-dot-array"></i>Array zone</span>
-            <span class="zone-leg-item"><i class="zone-dot zone-dot-popup"></i>Popup zone</span>
+            <span class="zone-leg-item"><i class="zone-dot zone-dot-array"></i><span data-i18n="array_zone_short">Array zone</span></span>
+            <span class="zone-leg-item"><i class="zone-dot zone-dot-popup"></i><span data-i18n="popup_zone_short">Popup zone</span></span>
             <span class="zone-leg-item" id="zone-overlap-val">No overlap</span>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('target')">Back</button>
-            <button class="btn btn-primary" onclick="show('timer')">Next</button>
+            <button class="btn btn-ghost" onclick="show('target')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="show('timer')" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 5: Timer Settings -->
     <div class="step" id="step-timer">
         <div class="step-head">
-            <h2>Timer Settings</h2>
-            <p>Control how long the session lasts and how fast targets appear</p>
+            <h2 data-i18n="timer_h2">Timer Settings</h2>
+            <p data-i18n="timer_p">Control how long the session lasts and how fast targets appear</p>
         </div>
         <div class="form-group">
-            <label>Game Duration</label>
+            <label data-i18n="game_duration">Game Duration</label>
             <div class="presets" id="dur-presets">
                 <div class="preset" onclick="setDurPreset(30,this)">30s</div>
                 <div class="preset sel" onclick="setDurPreset(60,this)">60s</div>
                 <div class="preset" onclick="setDurPreset(120,this)">2m</div>
                 <div class="preset" onclick="setDurPreset(300,this)">5m</div>
             </div>
-            <label style="margin-top:10px;">Custom: <span class="val-label" id="dur-val">60s</span></label>
+            <label style="margin-top:10px;"><span data-i18n="custom">Custom:</span> <span class="val-label" id="dur-val">60s</span></label>
             <input type="range" id="inp-dur" min="10" max="600" step="5" value="60" oninput="onDurChange(this.value)">
         </div>
         <div class="form-group">
-            <label>Popup Frequency — how often a target appears: <span class="val-label" id="freq-val">every 1.5s</span></label>
+            <label><span data-i18n="popup_freq">Popup Frequency — how often a target appears:</span> <span class="val-label" id="freq-val">every 1.5s</span></label>
             <input type="range" id="inp-freq" min="0.2" max="10" step="0.1" value="1.5" oninput="onFreqChange(this.value)">
         </div>
         <div class="form-group">
-            <label>Target Duration — how long each target stays: <span class="val-label" id="tdur-val">3.0s</span></label>
+            <label><span data-i18n="target_dur">Target Duration — how long each target stays:</span> <span class="val-label" id="tdur-val">3.0s</span></label>
             <input type="range" id="inp-tdur" min="0.5" max="15" step="0.5" value="3" oninput="onTdurChange(this.value)">
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="toTimerBack()">Back</button>
-            <button class="btn btn-primary" onclick="fromTimer()">Next</button>
+            <button class="btn btn-ghost" onclick="toTimerBack()" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="fromTimer()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 6: Confirm -->
     <div class="step" id="step-confirm">
         <div class="step-head">
-            <h2>Ready to Train</h2>
-            <p>Review your settings then start when ready</p>
+            <h2 data-i18n="ready_h2">Ready to Train</h2>
+            <p data-i18n="ready_p">Review your settings then start when ready</p>
         </div>
         <div class="summary-card">
-            <div class="summary-row"><span class="s-key">Mode</span><span class="s-val" id="s-mode">—</span></div>
-            <div class="summary-row" id="s-grid-row"><span class="s-key">Grid</span><span class="s-val" id="s-grid">—</span></div>
-            <div class="summary-row"><span class="s-key">Target Variants</span><span class="s-val" id="s-vars">—</span></div>
-            <div class="summary-row"><span class="s-key">Game Duration</span><span class="s-val" id="s-dur">—</span></div>
-            <div class="summary-row"><span class="s-key">Popup Frequency</span><span class="s-val" id="s-freq">—</span></div>
-            <div class="summary-row"><span class="s-key">Target Lifespan</span><span class="s-val" id="s-tdur">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_mode">Mode</span><span class="s-val" id="s-mode">—</span></div>
+            <div class="summary-row" id="s-grid-row"><span class="s-key" data-i18n="s_grid">Grid</span><span class="s-val" id="s-grid">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_vars">Target Variants</span><span class="s-val" id="s-vars">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_dur">Game Duration</span><span class="s-val" id="s-dur">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_freq">Popup Frequency</span><span class="s-val" id="s-freq">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_tdur">Target Lifespan</span><span class="s-val" id="s-tdur">—</span></div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('timer')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="show('guide')">Start Training</button>
+            <button class="btn btn-ghost" onclick="show('timer')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="show('guide')" data-i18n="start_training">Start Training</button>
         </div>
     </div>
 
     <!-- STEP 7: How to Play -->
     <div class="step" id="step-guide">
         <div class="step-head">
-            <h2>How to Play</h2>
-            <p>Quick rundown before you start</p>
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
         </div>
         <div class="guide-card">
             <ul class="guide-list">
-                <li>Targets will appear based on your settings — click them quickly and accurately.</li>
-                <li>Watch for Don't Shoot targets (marked with a red X) — hitting one costs you points instead of earning them.</li>
-                <li>Letting a target expire counts as a miss, but won't cost you points the way a wrong click does.</li>
-                <li>Your final score depends on hits, misses, and any penalties from Don't Shoot targets.</li>
+                <li data-i18n="guide_1">Targets will appear based on your settings — click them quickly and accurately.</li>
+                <li data-i18n="guide_2">Watch for Don't Shoot targets (marked with a red X) — hitting one costs you points instead of earning them.</li>
+                <li data-i18n="guide_3">Letting a target expire counts as a miss, but won't cost you points the way a wrong click does.</li>
+                <li data-i18n="guide_4">Your final score depends on hits, misses, and any penalties from Don't Shoot targets.</li>
             </ul>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="startGame()">Let's Go!</button>
+            <button class="btn btn-ghost" onclick="show('confirm')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="startGame()" data-i18n="lets_go">Let's Go!</button>
         </div>
     </div>
 
@@ -211,31 +212,122 @@
 <!-- GAME SCREEN -->
 <div id="screen-game">
     <div class="game-hud">
-        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl">Score</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl">Time</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-hits">0</div><div class="hud-lbl">Hits</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-miss">0</div><div class="hud-lbl">Missed</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-acc">—</div><div class="hud-lbl">Accuracy</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl" data-i18n="hud_time">Time</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-hits">0</div><div class="hud-lbl" data-i18n="hud_hits">Hits</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-miss">0</div><div class="hud-lbl" data-i18n="hud_missed">Missed</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-acc">—</div><div class="hud-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
     </div>
     <div class="game-area" id="game-area"></div>
 </div>
 
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
-    <div class="res-title">Session Complete!</div>
-    <div class="res-subtitle">Here's how you did</div>
+    <div class="res-title" data-i18n="res_title">Session Complete!</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Here's how you did</div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl">Score</div></div>
-        <div class="res-stat"><div class="res-val" id="r-hits">0</div><div class="res-lbl">Targets Hit</div></div>
-        <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl">Missed</div></div>
-        <div class="res-stat"><div class="res-val" id="r-pen">0</div><div class="res-lbl">Penalties</div></div>
-        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl">Accuracy</div></div>
+        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="res-stat"><div class="res-val" id="r-hits">0</div><div class="res-lbl" data-i18n="r_hits">Targets Hit</div></div>
+        <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl" data-i18n="hud_missed">Missed</div></div>
+        <div class="res-stat"><div class="res-val" id="r-pen">0</div><div class="res-lbl" data-i18n="r_pen">Penalties</div></div>
+        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
     </div>
-    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
 <script src="confetti.js"></script>
+<script src="i18n.js"></script>
 <script>
+const I18N = {
+    back:              { en: 'Back', zh: '返回' },
+    page_title:        { en: 'Clicker Accuracy', zh: '点击精准度' },
+    mode_h2:           { en: 'Select Mode', zh: '选择模式' },
+    mode_p:            { en: 'Choose how targets appear during your session', zh: '选择目标在训练中出现的方式' },
+    mode_array_h3:     { en: 'Array', zh: '阵列' },
+    mode_array_p:      { en: 'Targets placed in a fixed grid layout that you work through', zh: '目标以固定网格布局排列，供你逐一击破' },
+    mode_random_h3:    { en: 'Random Popups', zh: '随机弹出' },
+    mode_random_p:     { en: 'Targets appear at random positions across the screen', zh: '目标在屏幕上随机位置出现' },
+    mode_both_h3:      { en: 'Both', zh: '两者结合' },
+    mode_both_p:       { en: 'Grid layout combined with random popups in separate zones', zh: '网格布局与随机弹出区域相结合' },
+    next:              { en: 'Next', zh: '下一步' },
+    array_h2:          { en: 'Array Configuration', zh: '阵列配置' },
+    array_p:           { en: 'Define the grid dimensions for your target layout', zh: '定义目标布局的网格尺寸' },
+    rows:              { en: 'Rows', zh: '行数' },
+    cols:              { en: 'Columns', zh: '列数' },
+    target_h2:         { en: 'Target Settings', zh: '目标设置' },
+    target_p:          { en: 'Design your target shapes and create variants', zh: '设计目标形状并创建变体' },
+    shape_editor_h3:   { en: 'Shape Editor — drag corners to reshape', zh: '形状编辑器 — 拖动角点以调整形状' },
+    target_size:       { en: 'Target Size:', zh: '目标大小：' },
+    add_corner:        { en: 'Add Corner', zh: '添加角点' },
+    delete_corner:     { en: 'Delete Corner', zh: '删除角点' },
+    reset_shape:       { en: 'Reset Shape', zh: '重置形状' },
+    variants_h3:       { en: 'Variants', zh: '变体' },
+    add_shoot:         { en: '+ Add Shoot Variant', zh: '+ 添加射击变体' },
+    add_dontshoot:     { en: "+ Add Don't Shoot Variant", zh: '+ 添加禁止射击变体' },
+    placement_h2:      { en: 'Zone Placement', zh: '区域布局' },
+    placement_p:       { en: 'Drag a zone to move it, drag a corner to resize — just like shaping a target. Zones can overlap.', zh: '拖动区域可移动位置，拖动角点可调整大小 — 就像编辑目标形状一样。区域可以重叠。' },
+    array_zone:        { en: 'Array Zone', zh: '阵列区域' },
+    popup_zone:        { en: 'Random Popup Zone', zh: '随机弹出区域' },
+    array_zone_short:  { en: 'Array zone', zh: '阵列区域' },
+    popup_zone_short:  { en: 'Popup zone', zh: '弹出区域' },
+    timer_h2:          { en: 'Timer Settings', zh: '计时器设置' },
+    timer_p:           { en: 'Control how long the session lasts and how fast targets appear', zh: '控制训练时长以及目标出现的速度' },
+    game_duration:     { en: 'Game Duration', zh: '训练时长' },
+    custom:            { en: 'Custom:', zh: '自定义：' },
+    popup_freq:        { en: 'Popup Frequency — how often a target appears:', zh: '弹出频率 — 目标出现的频率：' },
+    target_dur:        { en: 'Target Duration — how long each target stays:', zh: '目标持续时间 — 每个目标停留的时长：' },
+    ready_h2:          { en: 'Ready to Train', zh: '准备开始训练' },
+    ready_p:           { en: 'Review your settings then start when ready', zh: '查看你的设置，准备好后开始训练' },
+    s_mode:            { en: 'Mode', zh: '模式' },
+    s_grid:            { en: 'Grid', zh: '网格' },
+    s_vars:            { en: 'Target Variants', zh: '目标变体' },
+    s_dur:             { en: 'Game Duration', zh: '训练时长' },
+    s_freq:            { en: 'Popup Frequency', zh: '弹出频率' },
+    s_tdur:            { en: 'Target Lifespan', zh: '目标存续时间' },
+    start_training:    { en: 'Start Training', zh: '开始训练' },
+    guide_h2:          { en: 'How to Play', zh: '玩法说明' },
+    guide_p:           { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    guide_1:           { en: 'Targets will appear based on your settings — click them quickly and accurately.', zh: '目标会根据你的设置出现 — 请快速准确地点击它们。' },
+    guide_2:           { en: "Watch for Don't Shoot targets (marked with a red X) — hitting one costs you points instead of earning them.", zh: '注意禁止射击目标（标有红色 X）— 点击它们会扣分而不是加分。' },
+    guide_3:           { en: "Letting a target expire counts as a miss, but won't cost you points the way a wrong click does.", zh: '让目标消失算作未命中，但不会像误击那样扣分。' },
+    guide_4:           { en: "Your final score depends on hits, misses, and any penalties from Don't Shoot targets.", zh: '你的最终得分取决于命中数、未命中数，以及禁止射击目标带来的扣分。' },
+    lets_go:           { en: "Let's Go!", zh: '开始吧！' },
+    hud_score:         { en: 'Score', zh: '得分' },
+    hud_time:          { en: 'Time', zh: '时间' },
+    hud_hits:          { en: 'Hits', zh: '命中' },
+    hud_missed:        { en: 'Missed', zh: '未命中' },
+    hud_accuracy:      { en: 'Accuracy', zh: '准确率' },
+    res_title:         { en: 'Session Complete!', zh: '训练完成！' },
+    res_subtitle:      { en: "Here's how you did", zh: '以下是你的表现' },
+    r_hits:            { en: 'Targets Hit', zh: '命中目标数' },
+    r_pen:             { en: 'Penalties', zh: '扣分次数' },
+    back_home:         { en: 'Back to Home', zh: '返回首页' },
+    no_overlap:        { en: 'No overlap', zh: '无重叠' },
+    overlap:           { en: 'Overlap', zh: '重叠' },
+    mode_array_val:    { en: 'Array', zh: '阵列' },
+    mode_random_val:   { en: 'Random Popups', zh: '随机弹出' },
+    mode_both_val:     { en: 'Both', zh: '两者结合' },
+    rows_cols:         { en: 'rows_cols', zh: 'rows_cols' },
+    shoot_count:       { en: 'shoot', zh: '个射击' },
+    dontshoot_count:   { en: "don't shoot", zh: '个禁止射击' },
+    badge_shoot:       { en: 'Shoot', zh: '射击' },
+    badge_dontshoot:   { en: "Don't Shoot", zh: '禁止射击' },
+    variant_target:    { en: 'Target', zh: '目标' },
+    variant_dontshoot: { en: "Don't Shoot", zh: '禁止射击' },
+    sec:               { en: 's', zh: '秒' },
+    min:               { en: 'm', zh: '分' },
+    every:             { en: 'every', zh: '每' }
+};
+
+document.getElementById('lang-toggle-page').className = 'lang-toggle';
+
+function onLangChange() {
+    renderVariants();
+    if (document.getElementById('step-confirm').classList.contains('active')) fillSummary();
+    if (zonePlacer) zonePlacer.updateOverlapLabel();
+    if (document.getElementById('screen-game').classList.contains('on')) updateHUD();
+}
+
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = {
     mode: null,
@@ -303,27 +395,31 @@ function fromTimer() {
 }
 
 function fillSummary() {
-    const modeLabel = { array:'Array', random:'Random Popups', both:'Both' }[cfg.mode];
+    const modeLabel = { array: t(I18N,'mode_array_val'), random: t(I18N,'mode_random_val'), both: t(I18N,'mode_both_val') }[cfg.mode];
     document.getElementById('s-mode').textContent = modeLabel;
     const gridRow = document.getElementById('s-grid-row');
     if (cfg.mode !== 'random') {
         gridRow.style.display = '';
-        document.getElementById('s-grid').textContent = `${cfg.rows} rows × ${cfg.cols} columns`;
+        document.getElementById('s-grid').textContent = getLang() === 'zh'
+            ? `${cfg.rows} 行 × ${cfg.cols} 列`
+            : `${cfg.rows} rows × ${cfg.cols} columns`;
     } else {
         gridRow.style.display = 'none';
     }
-    const shoot   = cfg.variants.filter(v => !v.ds).length;
+    const shoot = cfg.variants.filter(v => !v.ds).length;
     const dontShoot = cfg.variants.filter(v => v.ds).length;
-    document.getElementById('s-vars').textContent = `${shoot} shoot, ${dontShoot} don't shoot`;
+    document.getElementById('s-vars').textContent = getLang() === 'zh'
+        ? `${shoot} 个射击, ${dontShoot} 个禁止射击`
+        : `${shoot} shoot, ${dontShoot} don't shoot`;
     document.getElementById('s-dur').textContent  = fmtTime(cfg.duration);
-    document.getElementById('s-freq').textContent = `every ${cfg.freq.toFixed(1)}s`;
-    document.getElementById('s-tdur').textContent = `${cfg.tdur.toFixed(1)}s`;
+    document.getElementById('s-freq').textContent = `${t(I18N,'every')} ${cfg.freq.toFixed(1)}${t(I18N,'sec')}`;
+    document.getElementById('s-tdur').textContent = `${cfg.tdur.toFixed(1)}${t(I18N,'sec')}`;
 }
 
 function fmtTime(s) {
-    if (s < 60) return s + 's';
+    if (s < 60) return s + t(I18N,'sec');
     const m = Math.floor(s / 60), r = s % 60;
-    return m + 'm' + (r ? ' ' + r + 's' : '');
+    return m + t(I18N,'min') + (r ? ' ' + r + t(I18N,'sec') : '');
 }
 
 // ─── SHAPE EDITOR ───────────────────────────────────────────────
@@ -479,7 +575,7 @@ function makeVariant(ds) {
     const count = cfg.variants.filter(v => v.ds === ds).length;
     return {
         id: Date.now() + Math.random(),
-        name: ds ? `Don't Shoot ${count+1}` : `Target ${count+1}`,
+        name: (ds ? t(I18N,'variant_dontshoot') : t(I18N,'variant_target')) + ' ' + (count+1),
         ds,
         pts: [{x:65,y:65},{x:235,y:65},{x:235,y:235},{x:65,y:235}],
         size: 60
@@ -534,8 +630,8 @@ function renderVariants() {
         el.className = 'variant-item' + (v.ds ? ' ds' : '') + (i === activeVI ? ' active' : '');
         el.onclick = () => selectVariant(i);
         const badge = v.ds
-            ? '<span class="v-badge ds">Don\'t Shoot</span>'
-            : '<span class="v-badge shoot">Shoot</span>';
+            ? `<span class="v-badge ds">${t(I18N,'badge_dontshoot')}</span>`
+            : `<span class="v-badge shoot">${t(I18N,'badge_shoot')}</span>`;
         const delBtn = cfg.variants.length > 1
             ? `<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteVariant(${i})">X</button>`
             : '';
@@ -636,8 +732,8 @@ class ZonePlacer {
         const oy = Math.max(0, Math.min(a.y + a.h, p.y + p.h) - Math.max(a.y, p.y));
         const lbl = document.getElementById('zone-overlap-val');
         lbl.textContent = (ox > 0 && oy > 0)
-            ? `Overlap: ${Math.round(ox)}% × ${Math.round(oy)}%`
-            : 'No overlap';
+            ? `${t(I18N,'overlap')}: ${Math.round(ox)}% × ${Math.round(oy)}%`
+            : t(I18N,'no_overlap');
     }
 }
 
@@ -657,11 +753,11 @@ function onDurChange(val) {
 }
 
 function onFreqChange(val) {
-    document.getElementById('freq-val').textContent = `every ${parseFloat(val).toFixed(1)}s`;
+    document.getElementById('freq-val').textContent = `${t(I18N,'every')} ${parseFloat(val).toFixed(1)}${t(I18N,'sec')}`;
 }
 
 function onTdurChange(val) {
-    document.getElementById('tdur-val').textContent = `${parseFloat(val).toFixed(1)}s`;
+    document.getElementById('tdur-val').textContent = `${parseFloat(val).toFixed(1)}${t(I18N,'sec')}`;
 }
 
 // ─── GAME ENGINE ────────────────────────────────────────────────
@@ -900,7 +996,7 @@ function flashAt(el, isDanger) {
 
 function updateHUD() {
     document.getElementById('hud-score').textContent = gs.score;
-    document.getElementById('hud-time').textContent  = gs.timeLeft + 's';
+    document.getElementById('hud-time').textContent  = gs.timeLeft + t(I18N,'sec');
     document.getElementById('hud-hits').textContent  = gs.hits;
     document.getElementById('hud-miss').textContent  = gs.miss;
     const total = gs.hits + gs.miss;
@@ -932,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cfg.variants.push(makeVariant(false));
     renderVariants();
     zonePlacer = new ZonePlacer(document.getElementById('zone-canvas'));
+    initI18n(I18N);
 });
 </script>
 </body>

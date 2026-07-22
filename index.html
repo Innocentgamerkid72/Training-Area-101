@@ -7,55 +7,80 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <button class="lang-toggle floating" id="lang-toggle-home">中文</button>
     <div class="home-page">
         <header class="home-header">
-            <h1>Training Area 101</h1>
-            <p>Select a category to begin training</p>
+            <h1 data-i18n="title">Training Area 101</h1>
+            <p data-i18n="subtitle">Select a category to begin training</p>
         </header>
 
         <nav class="category-grid">
             <a href="clicker-accuracy.html" class="category-card accuracy">
                 <div class="card-dot"></div>
-                <h2>Clicker Accuracy</h2>
-                <p>Train your clicking precision and target recognition</p>
+                <h2 data-i18n="accuracy_name">Clicker Accuracy</h2>
+                <p data-i18n="accuracy_desc">Train your clicking precision and target recognition</p>
             </a>
 
             <a href="clicker-speed.html" class="category-card speed">
                 <div class="card-dot"></div>
-                <h2>Clicking Speed</h2>
-                <p>Maximize your clicks per second</p>
+                <h2 data-i18n="speed_name">Clicking Speed</h2>
+                <p data-i18n="speed_desc">Maximize your clicks per second</p>
             </a>
 
             <a href="reaction-time.html" class="category-card reaction">
                 <div class="card-dot"></div>
-                <h2>Reaction Time</h2>
-                <p>Sharpen your reflexes to the millisecond</p>
+                <h2 data-i18n="reaction_name">Reaction Time</h2>
+                <p data-i18n="reaction_desc">Sharpen your reflexes to the millisecond</p>
             </a>
 
             <a href="timing.html" class="category-card timing">
                 <div class="card-dot"></div>
-                <h2>Timing</h2>
-                <p>Perfect your rhythm and timing accuracy</p>
+                <h2 data-i18n="timing_name">Timing</h2>
+                <p data-i18n="timing_desc">Perfect your rhythm and timing accuracy</p>
             </a>
 
             <a href="typing-accuracy.html" class="category-card typing">
                 <div class="card-dot"></div>
-                <h2>Typing Accuracy</h2>
-                <p>Build speed and precision on the keyboard</p>
+                <h2 data-i18n="typing_name">Typing Accuracy</h2>
+                <p data-i18n="typing_desc">Build speed and precision on the keyboard</p>
             </a>
 
             <a href="arcade.html" class="category-card stroop">
                 <div class="card-dot"></div>
-                <h2>Stroop Rush</h2>
-                <p>Beat the color-word illusion under pressure</p>
+                <h2 data-i18n="stroop_name">Stroop Rush</h2>
+                <p data-i18n="stroop_desc">Beat the color-word illusion under pressure</p>
             </a>
 
             <a href="chess.html" class="category-card chess">
                 <div class="card-dot"></div>
-                <h2>Chess</h2>
-                <p>2 player or against the computer</p>
+                <h2 data-i18n="chess_name">Chess</h2>
+                <p data-i18n="chess_desc">2 player or against the computer</p>
             </a>
         </nav>
     </div>
+
+<script src="i18n.js"></script>
+<script>
+const I18N = {
+    title:          { en: 'Training Area 101', zh: '训练场 101' },
+    subtitle:       { en: 'Select a category to begin training', zh: '选择一个类别开始训练' },
+    accuracy_name:  { en: 'Clicker Accuracy', zh: '点击精准度' },
+    accuracy_desc:  { en: 'Train your clicking precision and target recognition', zh: '训练你的点击精准度和目标识别能力' },
+    speed_name:     { en: 'Clicking Speed', zh: '点击速度' },
+    speed_desc:     { en: 'Maximize your clicks per second', zh: '最大化你的每秒点击数' },
+    reaction_name:  { en: 'Reaction Time', zh: '反应时间' },
+    reaction_desc:  { en: 'Sharpen your reflexes to the millisecond', zh: '将你的反应能力精确到毫秒' },
+    timing_name:    { en: 'Timing', zh: '时机训练' },
+    timing_desc:    { en: 'Perfect your rhythm and timing accuracy', zh: '完善你的节奏感和时机精准度' },
+    typing_name:    { en: 'Typing Accuracy', zh: '打字精准度' },
+    typing_desc:    { en: 'Build speed and precision on the keyboard', zh: '提升你的键盘输入速度和精准度' },
+    stroop_name:    { en: 'Stroop Rush', zh: '斯特鲁普冲刺' },
+    stroop_desc:    { en: 'Beat the color-word illusion under pressure', zh: '在压力下战胜颜色文字错觉' },
+    chess_name:     { en: 'Chess', zh: '国际象棋' },
+    chess_desc:     { en: '2 player or against the computer', zh: '双人对战或人机对战' }
+};
+
+initI18n(I18N);
+</script>
 </body>
 </html>

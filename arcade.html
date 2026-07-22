@@ -21,7 +21,7 @@
     <div class="step active" id="step-session">
         <div class="step-head">
             <h2>Stroop Rush</h2>
-            <p>A leaf drifts down the river — answer with its color or its direction, depending on which light is lit</p>
+            <p>An array of leaves drifts on the river — green leaves point a direction, yellow leaves actually drift one</p>
         </div>
         <div class="form-group">
             <label>Session Duration</label>
@@ -69,10 +69,10 @@
         </div>
         <div class="guide-card" style="--guide-color: var(--yellow);">
             <ul class="guide-list">
-                <li>A leaf floats down the river, carrying two properties at once: a color and a direction of drift.</li>
-                <li>Watch the two lights above the river. When COLOR lights up, answer with the leaf's color using the color buttons. When DIRECTION lights up instead, answer with which way it's drifting using the arrow buttons.</li>
-                <li>Click, tap, press 1-5 for colors, or the arrow keys for directions — answer before the timer bar runs out, or it counts as a miss.</li>
-                <li>Correct answers score points and log your reaction time; wrong answers cost points.</li>
+                <li>Several leaves appear together on the river. Green leaves show an arrow — answer with the direction it's pointing.</li>
+                <li>Yellow leaves don't show an arrow — watch which way it's actually drifting and answer with that direction instead.</li>
+                <li>Resolve each leaf in turn, left to right, using the arrow keys, WASD, or the on-screen d-pad — before its timer runs out.</li>
+                <li>Correct answers score points and log your reaction time; wrong answers cost points; letting one time out counts as a miss.</li>
             </ul>
         </div>
         <div class="step-foot">
@@ -99,35 +99,27 @@
     </div>
     <div class="stroop-area">
         <div class="stroop-panel">
-            <div class="stroop-lights">
-                <div class="stroop-light" id="light-color">
-                    <span class="stroop-light-dot"></span>
-                    <span class="stroop-light-label">Color</span>
-                </div>
-                <div class="stroop-light" id="light-direction">
-                    <span class="stroop-light-dot"></span>
-                    <span class="stroop-light-label">Direction</span>
-                </div>
-            </div>
-
             <div class="river-scene">
                 <div class="river-water"></div>
-                <div class="leaf-wrap" id="leaf-wrap">
-                    <div class="leaf" id="leaf"></div>
-                    <div class="leaf-arrow" id="leaf-arrow">→</div>
+                <div class="leaf-array" id="leaf-array">
+                    <div class="leaf-item" id="leaf-0">
+                        <div class="leaf-inner"></div>
+                        <div class="leaf-arrow" id="leaf-arrow-0"></div>
+                    </div>
+                    <div class="leaf-item" id="leaf-1">
+                        <div class="leaf-inner"></div>
+                        <div class="leaf-arrow" id="leaf-arrow-1"></div>
+                    </div>
+                    <div class="leaf-item" id="leaf-2">
+                        <div class="leaf-inner"></div>
+                        <div class="leaf-arrow" id="leaf-arrow-2"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="stroop-timerbar-track"><div class="stroop-timerbar" id="stroop-timerbar"></div></div>
 
             <div class="stroop-answer-area">
-                <div class="stroop-buttons" id="color-buttons">
-                    <button class="stroop-btn" style="--sc:var(--red);    background:rgba(255,51,51,0.14);"  onclick="answer('red')">Red</button>
-                    <button class="stroop-btn" style="--sc:var(--blue);   background:rgba(0,200,255,0.14);"  onclick="answer('blue')">Blue</button>
-                    <button class="stroop-btn" style="--sc:var(--green);  background:rgba(0,230,118,0.14);"  onclick="answer('green')">Green</button>
-                    <button class="stroop-btn" style="--sc:var(--orange); background:rgba(255,119,0,0.14);"  onclick="answer('orange')">Orange</button>
-                    <button class="stroop-btn" style="--sc:var(--purple); background:rgba(157,78,221,0.14);" onclick="answer('purple')">Purple</button>
-                </div>
                 <div class="dir-buttons" id="dir-buttons">
                     <button class="dir-btn dir-up"    onclick="answer('up')">↑</button>
                     <button class="dir-btn dir-left"  onclick="answer('left')">←</button>
@@ -158,13 +150,7 @@
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = { duration: 30, promptTime: 2.5 };
 
-const COLORS = [
-    { key: 'red',    name: 'Red',    css: 'var(--red)' },
-    { key: 'blue',   name: 'Blue',   css: 'var(--blue)' },
-    { key: 'green',  name: 'Green',  css: 'var(--green)' },
-    { key: 'orange', name: 'Orange', css: 'var(--orange)' },
-    { key: 'purple', name: 'Purple', css: 'var(--purple)' }
-];
+const ARRAY_SIZE = 3;
 
 const DIRECTIONS = [
     { key: 'up',    arrow: '↑' },
@@ -172,6 +158,13 @@ const DIRECTIONS = [
     { key: 'left',  arrow: '←' },
     { key: 'right', arrow: '→' }
 ];
+
+const DIR_DELTA = {
+    up:    { dx: 0,   dy: -34 },
+    down:  { dx: 0,   dy: 34  },
+    left:  { dx: -34, dy: 0   },
+    right: { dx: 34,  dy: 0   }
+};
 
 // ─── STEP NAVIGATION ────────────────────────────────────────────
 function show(stepId) {
@@ -256,12 +249,12 @@ function startGame() {
         promptTimer: null, promptStart: 0,
         reactionTimes: [],
         countdown: null,
-        leafColorIdx: -1, leafDirIdx: -1, mode: 'color'
+        leaves: [], activeIdx: 0
     };
 
     document.getElementById('screen-game').classList.add('on');
     updateHUD();
-    nextPrompt();
+    spawnArray();
 
     gs.countdown = setInterval(() => {
         gs.timeLeft--;
@@ -270,33 +263,47 @@ function startGame() {
     }, 1000);
 }
 
-function nextPrompt() {
+function spawnArray() {
+    gs.leaves = [];
+    for (let i = 0; i < ARRAY_SIZE; i++) {
+        gs.leaves.push({
+            color: Math.random() < 0.5 ? 'green' : 'yellow',
+            dirIdx: Math.floor(Math.random() * DIRECTIONS.length),
+            resolved: false
+        });
+    }
+    gs.activeIdx = 0;
+
+    gs.leaves.forEach((leaf, i) => {
+        const item = document.getElementById('leaf-' + i);
+        const arrowEl = document.getElementById('leaf-arrow-' + i);
+        item.className = 'leaf-item ' + leaf.color;
+        item.style.removeProperty('--dx');
+        item.style.removeProperty('--dy');
+        if (leaf.color === 'yellow') {
+            const d = DIR_DELTA[DIRECTIONS[leaf.dirIdx].key];
+            item.style.setProperty('--dx', d.dx + 'px');
+            item.style.setProperty('--dy', d.dy + 'px');
+            arrowEl.textContent = '';
+        } else {
+            arrowEl.textContent = DIRECTIONS[leaf.dirIdx].arrow;
+        }
+    });
+
+    startLeafTurn();
+}
+
+function startLeafTurn() {
     clearTimeout(gs.promptTimer);
-
-    gs.leafColorIdx = Math.floor(Math.random() * COLORS.length);
-    gs.leafDirIdx = Math.floor(Math.random() * DIRECTIONS.length);
-    gs.mode = Math.random() < 0.5 ? 'color' : 'direction';
-
-    document.getElementById('leaf').style.background = COLORS[gs.leafColorIdx].css;
-    document.getElementById('leaf-arrow').textContent = DIRECTIONS[gs.leafDirIdx].arrow;
-
-    updateModeLights();
-    updateAnswerUI();
+    gs.leaves.forEach((leaf, i) => {
+        const item = document.getElementById('leaf-' + i);
+        item.classList.toggle('active', i === gs.activeIdx && !leaf.resolved);
+        item.classList.toggle('done', leaf.resolved);
+    });
 
     gs.promptStart = performance.now();
     animateTimerBar();
-    gs.promptTimer = setTimeout(() => resolvePrompt(null), cfg.promptTime * 1000);
-}
-
-function updateModeLights() {
-    document.getElementById('light-color').classList.toggle('on', gs.mode === 'color');
-    document.getElementById('light-direction').classList.toggle('on', gs.mode === 'direction');
-}
-
-function updateAnswerUI() {
-    const showColor = gs.mode === 'color';
-    document.getElementById('color-buttons').style.display = showColor ? '' : 'none';
-    document.getElementById('dir-buttons').style.display = showColor ? 'none' : '';
+    gs.promptTimer = setTimeout(() => resolveLeaf(null), cfg.promptTime * 1000);
 }
 
 function animateTimerBar() {
@@ -308,36 +315,44 @@ function animateTimerBar() {
     bar.style.width = '0%';
 }
 
-function answer(colorKey) {
+function answer(dirKey) {
     if (gs.timeLeft <= 0) return;
-    resolvePrompt(colorKey);
+    resolveLeaf(dirKey);
 }
 
-function resolvePrompt(chosenKey) {
+function resolveLeaf(chosenKey) {
     if (gs.timeLeft <= 0) return;
     clearTimeout(gs.promptTimer);
 
-    const correctKey = gs.mode === 'direction' ? DIRECTIONS[gs.leafDirIdx].key : COLORS[gs.leafColorIdx].key;
+    const leaf = gs.leaves[gs.activeIdx];
+    const correctKey = DIRECTIONS[leaf.dirIdx].key;
+    const itemEl = document.getElementById('leaf-' + gs.activeIdx);
 
     if (chosenKey === null) {
         gs.missed++;
-        flashLeaf('miss');
+        flashLeafItem(itemEl, 'miss');
     } else if (chosenKey === correctKey) {
         gs.correct++;
         gs.score += 10;
         gs.reactionTimes.push(performance.now() - gs.promptStart);
-        flashLeaf('good');
+        flashLeafItem(itemEl, 'good');
     } else {
         gs.wrong++;
         gs.score = Math.max(0, gs.score - 5);
-        flashLeaf('bad');
+        flashLeafItem(itemEl, 'bad');
     }
+    leaf.resolved = true;
     updateHUD();
-    nextPrompt();
+
+    gs.activeIdx++;
+    if (gs.activeIdx >= gs.leaves.length) {
+        spawnArray();
+    } else {
+        startLeafTurn();
+    }
 }
 
-function flashLeaf(cls) {
-    const el = document.getElementById('leaf-wrap');
+function flashLeafItem(el, cls) {
     el.classList.add(cls);
     setTimeout(() => el.classList.remove(cls), 180);
 }
@@ -371,17 +386,16 @@ function endGame() {
     document.getElementById('screen-results').classList.add('on');
 }
 
-// ─── KEYBOARD SHORTCUTS (1-5 for colors, arrow keys for direction) ───
-const ARROW_KEY_MAP = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+// ─── KEYBOARD SHORTCUTS (arrow keys or WASD) ─────────────────────
+const DIR_KEY_MAP = {
+    arrowup: 'up', arrowdown: 'down', arrowleft: 'left', arrowright: 'right',
+    w: 'up', s: 'down', a: 'left', d: 'right'
+};
 
 document.addEventListener('keydown', e => {
     if (!document.getElementById('screen-game').classList.contains('on')) return;
-    if (gs.mode === 'direction') {
-        if (ARROW_KEY_MAP[e.key]) answer(ARROW_KEY_MAP[e.key]);
-    } else {
-        const idx = parseInt(e.key, 10) - 1;
-        if (idx >= 0 && idx < COLORS.length) answer(COLORS[idx].key);
-    }
+    const key = DIR_KEY_MAP[e.key.toLowerCase()];
+    if (key) answer(key);
 });
 </script>
 </body>

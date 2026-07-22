@@ -613,10 +613,12 @@ function playAnimations(anims) {
         const dx = a.fromRect.left - toRect.left;
         const dy = a.fromRect.top - toRect.top;
         piece.style.transition = 'none';
-        piece.style.transform = `translate(${dx}px, ${dy}px)`;
+        piece.style.transform = `translate(${dx}px, ${dy}px) scale(1)`;
         void piece.offsetWidth; // force reflow so the transition below starts from the offset position
-        piece.style.transition = 'transform 0.22s ease';
-        piece.style.transform = 'translate(0, 0)';
+        piece.style.transition = 'transform 0.42s cubic-bezier(.2,.7,.3,1)';
+        piece.style.transform = 'translate(0, 0) scale(1)';
+        piece.classList.add('sliding');
+        setTimeout(() => piece.classList.remove('sliding'), 450);
     }
 }
 
@@ -714,11 +716,15 @@ function choosePromotion(piece) {
 function maybeTriggerBot() {
     if (cfg.mode !== 'bot' || gs.state.turn === gs.humanSide) return;
     gs.locked = true;
-    document.getElementById('hud-status').textContent = 'Bot is thinking…';
+    const statusEl = document.getElementById('hud-status');
+    statusEl.textContent = 'Bot is thinking…';
+    statusEl.classList.add('thinking');
     const thinkTime = 2000 + Math.random() * 3000; // 2-5s, so the bot doesn't feel instant/robotic
+    console.log('[chess] bot will move in', Math.round(thinkTime), 'ms');
     setTimeout(() => {
         const result = minimax(gs.state, cfg.depth, -Infinity, Infinity, gs.state.turn);
         gs.locked = false;
+        statusEl.classList.remove('thinking');
         if (result.move) {
             const move = result.move.promotion ? { ...result.move, promoteTo: 'Q' } : result.move;
             const anims = collectMoveAnimTargets(move);
@@ -736,7 +742,9 @@ function maybeTriggerBot() {
 function updateHUD() {
     document.getElementById('hud-turn').textContent = gs.state.turn === 'w' ? 'White' : 'Black';
     const inCheck = isInCheck(gs.state, gs.state.turn);
-    document.getElementById('hud-status').textContent = inCheck ? 'Check!' : '—';
+    const statusEl = document.getElementById('hud-status');
+    statusEl.classList.remove('thinking');
+    statusEl.textContent = inCheck ? 'Check!' : '—';
 }
 
 function checkGameEnd() {

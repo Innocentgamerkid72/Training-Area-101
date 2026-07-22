@@ -144,6 +144,7 @@
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
 </div>
 
+<script src="confetti.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════
 // CHESS ENGINE — pure logic, no DOM. board[row][col]: row 0 = rank 8
@@ -778,6 +779,7 @@ function endGame(title, subtitle) {
     document.getElementById('r-subtitle').textContent = subtitle;
     document.getElementById('r-moves').textContent = gs.state.moveCount;
     document.getElementById('screen-results').classList.add('on');
+    spawnConfetti();
 }
 
 document.querySelectorAll('.promo-btn').forEach(btn => {

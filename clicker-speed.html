@@ -106,6 +106,7 @@
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
 </div>
 
+<script src="confetti.js"></script>
 <script>
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = { duration: 30 };
@@ -218,6 +219,7 @@ function endGame() {
     document.getElementById('r-dur').textContent = fmtTime(cfg.duration);
 
     document.getElementById('screen-results').classList.add('on');
+    spawnConfetti();
 }
 </script>
 </body>

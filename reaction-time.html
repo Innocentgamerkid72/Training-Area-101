@@ -137,6 +137,7 @@
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
 </div>
 
+<script src="confetti.js"></script>
 <script>
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = {
@@ -357,6 +358,7 @@ function showResults(ms) {
     document.getElementById('r-ms').textContent = rounded + 'ms';
     document.getElementById('r-tier').textContent = tierFor(rounded);
     document.getElementById('screen-results').classList.add('on');
+    spawnConfetti();
 }
 
 function tierFor(ms) {

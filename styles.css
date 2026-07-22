@@ -545,6 +545,35 @@ input[type="range"] {
     gap: 28px;
     padding: 40px 24px;
     text-align: center;
+    animation: resultsSlideUp 0.5s cubic-bezier(.16,.84,.44,1) both;
+}
+@keyframes resultsSlideUp {
+    from { transform: translateY(70px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* CONFETTI */
+.confetti-layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 50;
+}
+.confetti-piece {
+    position: absolute;
+    top: -20px;
+    width: 8px;
+    height: 14px;
+    border-radius: 2px;
+    opacity: 0.9;
+    animation-name: confettiFall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+@keyframes confettiFall {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(105vh) translateX(var(--drift)) rotate(var(--rot)); opacity: 0; }
 }
 
 .res-title    { font-size: 2.8rem; font-weight: 700; color: var(--blue); }

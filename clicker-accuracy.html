@@ -234,6 +234,7 @@
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
 </div>
 
+<script src="confetti.js"></script>
 <script>
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = {
@@ -915,6 +916,7 @@ function endGame() {
     document.getElementById('screen-game').classList.remove('on');
     const rs = document.getElementById('screen-results');
     rs.classList.add('on');
+    spawnConfetti();
 
     const total = gs.hits + gs.miss;
     document.getElementById('r-score').textContent = gs.score;

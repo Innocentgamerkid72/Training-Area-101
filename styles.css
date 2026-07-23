@@ -1176,6 +1176,9 @@ input[type="range"] {
     flex-direction: column;
     gap: 14px;
 }
+.auth-google { width: 100%; justify-content: center; }
+.auth-divider { display: flex; align-items: center; gap: 10px; color: var(--dim); font-size: 0.8rem; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border2); }
 .auth-tabs { display: flex; gap: 8px; }
 .auth-tab {
     flex: 1;

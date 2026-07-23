@@ -45,6 +45,8 @@ function buildAuthModal() {
     overlay.className = 'auth-overlay';
     overlay.innerHTML =
         '<div class="auth-card">' +
+            '<button class="btn btn-ghost auth-google" id="btn-google">Continue with Google</button>' +
+            '<div class="auth-divider"><span>or</span></div>' +
             '<div class="auth-tabs">' +
                 '<button class="auth-tab sel" data-tab="login">Log In</button>' +
                 '<button class="auth-tab" data-tab="signup">Sign Up</button>' +
@@ -78,6 +80,12 @@ function buildAuthModal() {
 
     document.getElementById('auth-close').onclick = closeAuthModal;
     overlay.addEventListener('click', e => { if (e.target === overlay) closeAuthModal(); });
+
+    document.getElementById('btn-google').onclick = () => {
+        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
+            .then(() => closeAuthModal())
+            .catch(showAuthError);
+    };
 
     document.getElementById('auth-form-login').addEventListener('submit', e => {
         e.preventDefault();

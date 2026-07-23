@@ -40,7 +40,7 @@
             </div>
             <div class="mode-card" onclick="startOnlineFlow()">
                 <h3 data-i18n="mode_online_h3">⚡ Play Online</h3>
-                <p data-i18n="mode_online_p">Get matched with a real opponent in a fixed 60s ranked round</p>
+                <p data-i18n="mode_online_p">Race a real opponent on a shared board — most hits wins. Vote for Array or Random.</p>
             </div>
         </div>
         <div class="step-foot">
@@ -221,15 +221,33 @@
     <button class="btn btn-ghost" onclick="cancelMatchmaking()" data-i18n="mm_cancel">Cancel</button>
 </div>
 
+<!-- BOARD VOTE SCREEN -->
+<div id="screen-vote">
+    <div class="online-vs-label" id="vote-vs"></div>
+    <h2 data-i18n="vote_h2">Vote for the Board</h2>
+    <div class="mode-grid" style="max-width:480px;">
+        <div class="mode-card" onclick="castVote('array', this)">
+            <h3 data-i18n="vote_array_h3">Array (3×5 Grid)</h3>
+            <p data-i18n="vote_array_p">Targets pop in a fixed 15-slot grid</p>
+        </div>
+        <div class="mode-card" onclick="castVote('random', this)">
+            <h3 data-i18n="vote_random_h3">Random Popups</h3>
+            <p data-i18n="vote_random_p">Targets pop anywhere on the board</p>
+        </div>
+    </div>
+    <div class="mm-status" id="vote-status"></div>
+</div>
+
 <!-- GAME SCREEN -->
 <div id="screen-game">
     <div class="online-vs-label" id="online-vs"></div>
     <div class="game-hud">
-        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="hud-stat" id="hud-score-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl" data-i18n="hud_score">Score</div></div>
         <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl" data-i18n="hud_time">Time</div></div>
         <div class="hud-stat"><div class="hud-val" id="hud-hits">0</div><div class="hud-lbl" data-i18n="hud_hits">Hits</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-miss">0</div><div class="hud-lbl" data-i18n="hud_missed">Missed</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-acc">—</div><div class="hud-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
+        <div class="hud-stat" id="hud-miss-stat"><div class="hud-val" id="hud-miss">0</div><div class="hud-lbl" data-i18n="hud_missed">Missed</div></div>
+        <div class="hud-stat" id="hud-acc-stat"><div class="hud-val" id="hud-acc">—</div><div class="hud-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
+        <div class="hud-stat" id="hud-opp-stat" style="display:none;"><div class="hud-val" id="hud-opp-hits">0</div><div class="hud-lbl" data-i18n="opponent_hits">Opponent's Hits</div></div>
     </div>
     <div class="game-area" id="game-area"></div>
 </div>
@@ -240,12 +258,12 @@
     <div class="res-subtitle" id="r-subtitle" data-i18n="res_subtitle">Here's how you did</div>
     <div class="mm-status" id="online-wait-status" style="display:none;"></div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="res-stat" id="res-score-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
         <div class="res-stat"><div class="res-val" id="r-hits">0</div><div class="res-lbl" data-i18n="r_hits">Targets Hit</div></div>
-        <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl" data-i18n="hud_missed">Missed</div></div>
-        <div class="res-stat"><div class="res-val" id="r-pen">0</div><div class="res-lbl" data-i18n="r_pen">Penalties</div></div>
-        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
-        <div class="res-stat" id="res-opponent-stat" style="display:none;"><div class="res-val" id="r-opp-score">—</div><div class="res-lbl" data-i18n="opponent_score">Opponent's Score</div></div>
+        <div class="res-stat" id="res-miss-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl" data-i18n="hud_missed">Missed</div></div>
+        <div class="res-stat" id="res-pen-stat"><div class="res-val" id="r-pen">0</div><div class="res-lbl" data-i18n="r_pen">Penalties</div></div>
+        <div class="res-stat" id="res-acc-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
+        <div class="res-stat" id="res-opponent-stat" style="display:none;"><div class="res-val" id="r-opp-score">—</div><div class="res-lbl" data-i18n="opponent_hits">Opponent's Hits</div></div>
     </div>
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
@@ -350,7 +368,14 @@ const I18N = {
     online_you_lose:   { en: 'You Lose!', zh: '你输了！' },
     online_draw:       { en: "It's a Draw!", zh: '平局！' },
     online_opponent_left: { en: 'Opponent disconnected — You Win!', zh: '对手已断线 — 你赢了！' },
-    opponent_score:    { en: "Opponent's Score", zh: '对手得分' }
+    opponent_score:    { en: "Opponent's Score", zh: '对手得分' },
+    vote_h2:           { en: 'Vote for the Board', zh: '为棋盘投票' },
+    vote_array_h3:     { en: 'Array (3×5 Grid)', zh: '阵列（3×5 网格）' },
+    vote_array_p:      { en: 'Targets pop in a fixed 15-slot grid', zh: '目标在固定的15格网格中出现' },
+    vote_random_h3:    { en: 'Random Popups', zh: '随机弹出' },
+    vote_random_p:     { en: 'Targets pop anywhere on the board', zh: '目标在棋盘上任意位置出现' },
+    vote_waiting:      { en: "Waiting for opponent's vote…", zh: '等待对手投票…' },
+    opponent_hits:     { en: "Opponent's Hits", zh: '对手命中数' }
 };
 
 document.getElementById('lang-toggle-page').className = 'lang-toggle';
@@ -1059,23 +1084,46 @@ function endGame() {
     spawnConfetti();
 }
 
-// ─── ONLINE 1v1 (synced fixed-duration ranked round) ─────────────
+// ─── ONLINE 1v1: SHARED BOARD RACE ───────────────────────────────
+// Both players see and click the SAME board -- first click on a target
+// wins it (resolved by a Firestore transaction), most hits when time's up
+// wins the round. Board layout (Array 3x5 vs Random) is decided by a
+// 2-player vote right after matching. p1 acts as the spawn/timer
+// authority (the "host") so targets aren't double-spawned or double-timed,
+// but BOTH players can claim any target regardless of who's host.
 let onlineMatch = null;
+const ONLINE_DURATION = 45;
+const ONLINE_FREQ = 1.3;
+const ONLINE_TDUR = 3;
+const ARRAY_ROWS = 3, ARRAY_COLS = 5;
+
+function arraySlotPct(slot) {
+    const r = Math.floor(slot / ARRAY_COLS), c = slot % ARRAY_COLS;
+    return { xPct: (c + 0.5) / ARRAY_COLS * 100, yPct: (r + 0.5) / ARRAY_ROWS * 100 };
+}
 
 function startOnlineFlow() {
     document.getElementById('page-nav').style.display = 'none';
     document.getElementById('wizard').style.display = 'none';
     document.getElementById('screen-matchmaking').classList.add('on');
     document.getElementById('mm-status').textContent = t(I18N,'mm_searching');
-    cfg.mode = 'random';
-    cfg.duration = 60;
-    cfg.freq = 1.5;
-    cfg.tdur = 3;
     syncClock().then(() => {
-        onlineMatch = { queueHandle: null, roomId: null, mySlot: null, unsubRoom: null, stopHeartbeat: null, started: false, finishRequested: false };
+        onlineMatch = {
+            queueHandle: null, roomId: null, mySlot: null, unsubRoom: null, stopHeartbeat: null,
+            isHost: false, gameStarted: false, decided: false, finishRequested: false, voteResolveAttempted: false,
+            spawnTimer: null, countdownTimer: null, timeLeft: ONLINE_DURATION,
+            occupiedSlots: new Set(), targetTimers: {}, targetSlotMap: {}, renderedIds: new Set()
+        };
         onlineMatch.queueHandle = joinQueue('accuracy', {
             buildInitialState() {
-                return { goAtMs: netNow() + 3000 + Math.random() * 2000, p1Score: null, p2Score: null, p1Finished: false, p2Finished: false, winner: null };
+                return {
+                    phase: 'voting',
+                    p1Vote: null, p2Vote: null,
+                    boardMode: null, goAtMs: null,
+                    targets: {},
+                    p1Hits: 0, p2Hits: 0,
+                    winner: null, disconnect: false
+                };
             },
             onMatched(roomId) { enterOnlineRoom(roomId); },
             onError(err) { document.getElementById('mm-status').textContent = (err && err.message) || 'Error finding a match.'; }
@@ -1102,58 +1150,241 @@ function enterOnlineRoom(roomId) {
         onlineMatch.mySlot = mySlot(room, user.uid);
         if (!onlineMatch.mySlot) return;
         if (!onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat = startPresenceHeartbeat(roomId, onlineMatch.mySlot);
+        onlineMatch.isHost = onlineMatch.mySlot === 'p1';
         const oppSlotKey = otherSlot(onlineMatch.mySlot);
-
-        if (!onlineMatch.started) {
-            onlineMatch.started = true;
-            document.getElementById('online-vs').textContent = t(I18N,'vs_label') + room.players[oppSlotKey].username;
-            const delay = Math.max(0, room.state.goAtMs - netNow());
-            setTimeout(() => { if (onlineMatch) startGame(); }, delay);
-        }
 
         if (room.status === 'finished') {
             if (!onlineMatch.decided) { onlineMatch.decided = true; showOnlineResult(room); }
             return;
         }
 
-        const myFinished = room.state[onlineMatch.mySlot + 'Finished'];
-        const oppFinished = room.state[oppSlotKey + 'Finished'];
-        if (myFinished && oppFinished && !onlineMatch.finishRequested) {
+        if (room.state.phase === 'voting') {
+            document.getElementById('screen-vote').classList.add('on');
+            document.getElementById('vote-vs').textContent = t(I18N,'vs_label') + room.players[oppSlotKey].username;
+            const myVote = room.state[onlineMatch.mySlot + 'Vote'];
+            const oppVote = room.state[oppSlotKey + 'Vote'];
+            document.getElementById('vote-status').textContent = (myVote && !oppVote) ? t(I18N,'vote_waiting') : '';
+            if (myVote && oppVote && !onlineMatch.voteResolveAttempted) {
+                onlineMatch.voteResolveAttempted = true;
+                resolveVote(roomId).catch(() => { if (onlineMatch) onlineMatch.voteResolveAttempted = false; });
+            }
+            return;
+        }
+
+        // phase === 'playing'
+        document.getElementById('screen-vote').classList.remove('on');
+
+        if (!onlineMatch.gameStarted) {
+            onlineMatch.gameStarted = true;
+            beginOnlineBoard(room.state.boardMode, room.state.goAtMs);
+        }
+
+        if (onlineMatch.isHost) {
+            Object.keys(onlineMatch.targetTimers).forEach(id => {
+                if (!room.state.targets || !room.state.targets[id]) {
+                    clearTimeout(onlineMatch.targetTimers[id]);
+                    delete onlineMatch.targetTimers[id];
+                    const slot = onlineMatch.targetSlotMap[id];
+                    if (slot !== undefined) { onlineMatch.occupiedSlots.delete(slot); delete onlineMatch.targetSlotMap[id]; }
+                }
+            });
+        }
+        renderSharedTargets(room.state.targets || {});
+        updateOnlineHUD(room);
+
+        if (!onlineMatch.finishRequested && isOpponentStale(room, onlineMatch.mySlot)) {
             onlineMatch.finishRequested = true;
-            const myScore = room.state[onlineMatch.mySlot + 'Score'];
-            const oppScore = room.state[oppSlotKey + 'Score'];
-            const winner = myScore === oppScore ? null : (myScore > oppScore ? onlineMatch.mySlot : oppSlotKey);
-            markRoomFinished(roomId, { winner }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
-        } else if (myFinished && !oppFinished && isOpponentStale(room, onlineMatch.mySlot) && !onlineMatch.finishRequested) {
-            onlineMatch.finishRequested = true;
-            markRoomFinished(roomId, { winner: onlineMatch.mySlot, disconnect: true }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+            stopOnlineTimers();
+            markRoomFinished(roomId, { winner: onlineMatch.mySlot, disconnect: true, targets: {} })
+                .catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
         }
     });
 }
 
-function finishOnlineRound(myScore) {
-    document.getElementById('online-wait-status').style.display = '';
-    document.getElementById('online-wait-status').textContent = t(I18N,'waiting_opponent');
-    updateRoomState(onlineMatch.roomId, { [onlineMatch.mySlot + 'Score']: myScore, [onlineMatch.mySlot + 'Finished']: true }).catch(() => {});
+function resolveVote(roomId) {
+    const ref = db.collection('rooms').doc(roomId);
+    return db.runTransaction(tx => {
+        return tx.get(ref).then(snap => {
+            const st = snap.data().state;
+            if (st.boardMode) return; // already resolved by the other client
+            const mode = st.p1Vote === st.p2Vote ? st.p1Vote : (Math.random() < 0.5 ? st.p1Vote : st.p2Vote);
+            tx.update(ref, {
+                'state.boardMode': mode,
+                'state.goAtMs': netNow() + 3000,
+                'state.phase': 'playing'
+            });
+        });
+    });
+}
+
+function castVote(choice, cardEl) {
+    if (!onlineMatch || !onlineMatch.roomId) return;
+    document.querySelectorAll('#screen-vote .mode-card').forEach(c => c.classList.add('sel-locked'));
+    if (cardEl) cardEl.classList.remove('sel-locked');
+    updateRoomState(onlineMatch.roomId, { [onlineMatch.mySlot + 'Vote']: choice }).catch(() => {});
+}
+
+function beginOnlineBoard(boardMode, goAtMs) {
+    document.getElementById('screen-game').classList.add('on');
+    document.getElementById('game-area').innerHTML = '';
+    document.getElementById('hud-opp-stat').style.display = '';
+    ['hud-score-stat', 'hud-miss-stat', 'hud-acc-stat'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+
+    const delay = Math.max(0, goAtMs - netNow());
+    setTimeout(() => {
+        if (!onlineMatch) return;
+        onlineMatch.timeLeft = ONLINE_DURATION;
+        updateOnlineTimeHUD();
+        onlineMatch.countdownTimer = setInterval(() => {
+            onlineMatch.timeLeft--;
+            updateOnlineTimeHUD();
+            if (onlineMatch.timeLeft <= 0 && onlineMatch.isHost) endSharedRound();
+        }, 1000);
+        if (onlineMatch.isHost) {
+            onlineMatch.spawnTimer = setInterval(() => spawnSharedTarget(boardMode), ONLINE_FREQ * 1000);
+            spawnSharedTarget(boardMode);
+        }
+    }, delay);
+}
+
+function spawnSharedTarget(boardMode) {
+    if (!onlineMatch || !onlineMatch.roomId) return;
+    let xPct, yPct, slot = null;
+    if (boardMode === 'array') {
+        const free = [];
+        for (let i = 0; i < ARRAY_ROWS * ARRAY_COLS; i++) if (!onlineMatch.occupiedSlots.has(i)) free.push(i);
+        if (!free.length) return;
+        slot = free[Math.floor(Math.random() * free.length)];
+        onlineMatch.occupiedSlots.add(slot);
+        ({ xPct, yPct } = arraySlotPct(slot));
+    } else {
+        xPct = 8 + Math.random() * 84;
+        yPct = 8 + Math.random() * 84;
+    }
+    const id = 't' + Date.now() + Math.floor(Math.random() * 100000);
+    if (slot !== null) onlineMatch.targetSlotMap[id] = slot;
+    updateRoomState(onlineMatch.roomId, { ['targets.' + id]: { xPct, yPct } }).catch(() => {});
+    onlineMatch.targetTimers[id] = setTimeout(() => {
+        delete onlineMatch.targetTimers[id];
+        if (slot !== null) { onlineMatch.occupiedSlots.delete(slot); delete onlineMatch.targetSlotMap[id]; }
+        updateRoomState(onlineMatch.roomId, { ['targets.' + id]: firebase.firestore.FieldValue.delete() }).catch(() => {});
+    }, ONLINE_TDUR * 1000);
+}
+
+function renderSharedTargets(targets) {
+    const area = document.getElementById('game-area');
+    const currentIds = new Set(Object.keys(targets));
+
+    onlineMatch.renderedIds.forEach(id => {
+        if (!currentIds.has(id)) {
+            const el = document.getElementById('shared-target-' + id);
+            if (el) el.remove();
+        }
+    });
+
+    const v = cfg.variants[0];
+    const aw = area.offsetWidth || 300, ah = area.offsetHeight || 300;
+    const sz = Math.min(aw, ah) * 0.12;
+
+    currentIds.forEach(id => {
+        if (document.getElementById('shared-target-' + id)) return;
+        const { xPct, yPct } = targets[id];
+        const wrap = document.createElement('div');
+        wrap.className = 'target';
+        wrap.id = 'shared-target-' + id;
+        wrap.style.cssText = `left:${xPct}%;top:${yPct}%;width:${sz}px;height:${sz}px;transform:translate(-50%,-50%);`;
+        const ns = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('viewBox', '0 0 300 300');
+        svg.setAttribute('width', sz);
+        svg.setAttribute('height', sz);
+        const poly = document.createElementNS(ns, 'polygon');
+        poly.setAttribute('points', v.pts.map(p => `${p.x},${p.y}`).join(' '));
+        poly.setAttribute('fill', 'rgba(0,200,255,0.72)');
+        poly.setAttribute('stroke', '#00c8ff');
+        poly.setAttribute('stroke-width', '6');
+        svg.appendChild(poly);
+        wrap.appendChild(svg);
+        wrap.addEventListener('click', e => { e.stopPropagation(); claimTarget(id); });
+        area.appendChild(wrap);
+    });
+
+    onlineMatch.renderedIds = currentIds;
+}
+
+function claimTarget(id) {
+    if (!onlineMatch || !onlineMatch.roomId) return;
+    const ref = db.collection('rooms').doc(onlineMatch.roomId);
+    const mySlotKey = onlineMatch.mySlot;
+    db.runTransaction(tx => {
+        return tx.get(ref).then(snap => {
+            const st = snap.data().state;
+            if (!st.targets || !st.targets[id]) return; // already claimed or expired -- no-op
+            const update = {};
+            update['state.targets.' + id] = firebase.firestore.FieldValue.delete();
+            update['state.' + mySlotKey + 'Hits'] = (st[mySlotKey + 'Hits'] || 0) + 1;
+            tx.update(ref, update);
+        });
+    }).catch(() => {});
+}
+
+function updateOnlineHUD(room) {
+    const mySlotKey = onlineMatch.mySlot;
+    const oppSlotKey = otherSlot(mySlotKey);
+    document.getElementById('hud-hits').textContent = room.state[mySlotKey + 'Hits'] || 0;
+    document.getElementById('hud-opp-hits').textContent = room.state[oppSlotKey + 'Hits'] || 0;
+}
+
+function updateOnlineTimeHUD() {
+    document.getElementById('hud-time').textContent = onlineMatch.timeLeft + t(I18N,'sec');
+}
+
+function stopOnlineTimers() {
+    if (!onlineMatch) return;
+    clearInterval(onlineMatch.countdownTimer);
+    clearInterval(onlineMatch.spawnTimer);
+    Object.values(onlineMatch.targetTimers).forEach(clearTimeout);
+    onlineMatch.targetTimers = {};
+}
+
+function endSharedRound() {
+    if (!onlineMatch || onlineMatch.finishRequested) return;
+    onlineMatch.finishRequested = true;
+    stopOnlineTimers();
+    const roomId = onlineMatch.roomId;
+    db.collection('rooms').doc(roomId).get().then(snap => {
+        const st = snap.data().state;
+        const p1 = st.p1Hits || 0, p2 = st.p2Hits || 0;
+        const winner = p1 === p2 ? null : (p1 > p2 ? 'p1' : 'p2');
+        return markRoomFinished(roomId, { winner, targets: {} });
+    }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
 }
 
 function showOnlineResult(room) {
+    stopOnlineTimers();
     if (onlineMatch.unsubRoom) onlineMatch.unsubRoom();
     if (onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat();
+    document.getElementById('screen-game').classList.remove('on');
+
     const mySlotKey = onlineMatch.mySlot;
     const oppSlotKey = otherSlot(mySlotKey);
-    const oppScore = room.state[oppSlotKey + 'Score'];
+    const myHits = room.state[mySlotKey + 'Hits'] || 0;
+    const oppHits = room.state[oppSlotKey + 'Hits'] || 0;
     const isDraw = room.state.winner === null;
     const iWon = room.state.winner === mySlotKey;
 
-    document.getElementById('online-wait-status').style.display = 'none';
+    ['res-score-stat', 'res-miss-stat', 'res-pen-stat', 'res-acc-stat'].forEach(id => { document.getElementById(id).style.display = 'none'; });
     document.getElementById('r-title').textContent = isDraw ? t(I18N,'online_draw') : (iWon ? t(I18N,'online_you_win') : t(I18N,'online_you_lose'));
     document.getElementById('r-title').style.color = isDraw ? '' : (iWon ? 'var(--green)' : 'var(--red)');
     document.getElementById('r-subtitle').textContent = (room.state.disconnect && iWon)
         ? t(I18N,'online_opponent_left')
         : t(I18N,'vs_label') + room.players[oppSlotKey].username;
-    document.getElementById('r-opp-score').textContent = (oppScore != null) ? oppScore : '—';
+    document.getElementById('r-hits').textContent = myHits;
+    document.getElementById('r-opp-score').textContent = oppHits;
     document.getElementById('res-opponent-stat').style.display = '';
+    document.getElementById('screen-results').classList.add('on');
+
+    submitScore('accuracy', myHits * 10);
     if (iWon) spawnConfetti();
     onlineMatch = null;
 }

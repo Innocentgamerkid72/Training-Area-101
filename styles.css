@@ -1032,6 +1032,22 @@ input[type="range"] {
 /* ONLINE 1v1 (shared across clicker-speed, clicker-accuracy, timing, typing-accuracy, arcade) */
 .online-vs-label { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--dim); padding: 6px 0; }
 
+/* BOARD VOTE (clicker-accuracy shared-board online mode) */
+#screen-vote {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--bg);
+    text-align: center;
+    padding: 24px;
+}
+#screen-vote.on { display: flex; }
+#screen-vote .mode-card.sel-locked { opacity: 0.5; pointer-events: none; }
+
 /* CHESS */
 .chess-vs { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--dim); padding: 6px 0; background: var(--bg); }
 .chess-wrap {

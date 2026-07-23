@@ -25,7 +25,7 @@
             <h2 data-i18n="orient_h2">Bar Orientation</h2>
             <p data-i18n="orient_p">Choose how the timing bar crosses the screen</p>
         </div>
-        <div class="mode-grid mode-grid-2">
+        <div class="mode-grid">
             <div class="mode-card" data-orientation="horizontal" onclick="pickOrientation(this)">
                 <h3 data-i18n="horizontal_h3">Horizontal</h3>
                 <p data-i18n="horizontal_p">The bar runs left to right across the screen</p>
@@ -33,6 +33,10 @@
             <div class="mode-card" data-orientation="vertical" onclick="pickOrientation(this)">
                 <h3 data-i18n="vertical_h3">Vertical</h3>
                 <p data-i18n="vertical_p">The bar runs top to bottom across the screen</p>
+            </div>
+            <div class="mode-card" onclick="startOnlineFlow()">
+                <h3 data-i18n="mode_online_h3">⚡ Play Online</h3>
+                <p data-i18n="mode_online_p">Get matched with a real opponent in a fixed 30s ranked round</p>
             </div>
         </div>
         <div class="step-foot">
@@ -144,8 +148,16 @@
 
 </div><!-- /wizard -->
 
+<!-- MATCHMAKING SCREEN -->
+<div id="screen-matchmaking">
+    <div class="mm-spinner"></div>
+    <div class="mm-status" id="mm-status" data-i18n="mm_searching">Searching for an opponent…</div>
+    <button class="btn btn-ghost" onclick="cancelMatchmaking()" data-i18n="mm_cancel">Cancel</button>
+</div>
+
 <!-- COUNTDOWN SCREEN -->
 <div id="screen-countdown">
+    <div class="online-vs-label" id="online-vs"></div>
     <div class="countdown-num" id="countdown-num">3</div>
 </div>
 
@@ -168,14 +180,16 @@
 
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
-    <div class="res-title" data-i18n="res_title">Session Complete!</div>
-    <div class="res-subtitle" data-i18n="res_subtitle">Here's how you timed it</div>
+    <div class="res-title" id="r-title" data-i18n="res_title">Session Complete!</div>
+    <div class="res-subtitle" id="r-subtitle" data-i18n="res_subtitle">Here's how you timed it</div>
+    <div class="mm-status" id="online-wait-status" style="display:none;"></div>
     <div class="res-stats">
         <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
         <div class="res-stat"><div class="res-val" id="r-land">0</div><div class="res-lbl" data-i18n="hud_land">Landings</div></div>
         <div class="res-stat"><div class="res-val" id="r-fail">0</div><div class="res-lbl" data-i18n="hud_fail">Fails</div></div>
         <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl" data-i18n="hud_missed">Missed</div></div>
         <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
+        <div class="res-stat" id="res-opponent-stat" style="display:none;"><div class="res-val" id="r-opp-score">—</div><div class="res-lbl" data-i18n="opponent_score">Opponent's Score</div></div>
     </div>
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
@@ -186,6 +200,7 @@
 <script src="firebase-config.js"></script>
 <script src="account.js"></script>
 <script src="leaderboard.js"></script>
+<script src="netcode.js"></script>
 <script src="confetti.js"></script>
 <script src="i18n.js"></script>
 <script>
@@ -252,7 +267,18 @@ const I18N = {
     mouse_back:     { en: 'Mouse Back', zh: '鼠标后退键' },
     mouse_forward:  { en: 'Mouse Forward', zh: '鼠标前进键' },
     space:          { en: 'Space', zh: '空格键' },
-    press_key_cap:  { en: 'Press a key, click, or tap…', zh: '请按键、点击或触摸…' }
+    press_key_cap:  { en: 'Press a key, click, or tap…', zh: '请按键、点击或触摸…' },
+    mode_online_h3: { en: '⚡ Play Online', zh: '⚡ 在线对战' },
+    mode_online_p:  { en: 'Get matched with a real opponent in a fixed 30s ranked round', zh: '与真实玩家匹配，进行固定30秒的排位赛' },
+    mm_searching:   { en: 'Searching for an opponent…', zh: '正在寻找对手…' },
+    mm_cancel:      { en: 'Cancel', zh: '取消' },
+    vs_label:       { en: 'vs ', zh: '对战 ' },
+    waiting_opponent: { en: 'Waiting for opponent to finish…', zh: '等待对手完成…' },
+    online_you_win: { en: 'You Win!', zh: '你赢了！' },
+    online_you_lose:{ en: 'You Lose!', zh: '你输了！' },
+    online_draw:    { en: "It's a Draw!", zh: '平局！' },
+    online_opponent_left: { en: 'Opponent disconnected — You Win!', zh: '对手已断线 — 你赢了！' },
+    opponent_score: { en: "Opponent's Score", zh: '对手得分' }
 };
 
 document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
@@ -620,8 +646,113 @@ function endGame() {
     document.getElementById('r-acc').textContent = acc + '%';
 
     document.getElementById('screen-results').classList.add('on');
-    spawnConfetti();
     submitScore('timing', gs.score);
+
+    if (onlineMatch) { finishOnlineRound(gs.score); return; }
+    spawnConfetti();
+}
+
+// ─── ONLINE 1v1 (synced fixed-duration ranked round) ─────────────
+let onlineMatch = null;
+
+function startOnlineFlow() {
+    document.getElementById('page-nav').style.display = 'none';
+    document.getElementById('wizard').style.display = 'none';
+    document.getElementById('screen-matchmaking').classList.add('on');
+    document.getElementById('mm-status').textContent = t(I18N,'mm_searching');
+    cfg.orientation = 'horizontal';
+    cfg.speed = 1.2;
+    cfg.duration = 30;
+    cfg.key = 'Space';
+    cfg.rawKey = ' ';
+    cfg.keyLabel = t(I18N,'space');
+    cfg.barSize = 70;
+    cfg.slotSize = 14;
+    syncClock().then(() => {
+        onlineMatch = { queueHandle: null, roomId: null, mySlot: null, unsubRoom: null, stopHeartbeat: null, started: false, finishRequested: false };
+        onlineMatch.queueHandle = joinQueue('timing', {
+            buildInitialState() {
+                return { goAtMs: netNow() + 3000 + Math.random() * 2000, p1Score: null, p2Score: null, p1Finished: false, p2Finished: false, winner: null };
+            },
+            onMatched(roomId) { enterOnlineRoom(roomId); },
+            onError(err) { document.getElementById('mm-status').textContent = (err && err.message) || 'Error finding a match.'; }
+        });
+    });
+}
+
+function cancelMatchmaking() {
+    if (onlineMatch && onlineMatch.queueHandle) onlineMatch.queueHandle.cancel();
+    onlineMatch = null;
+    document.getElementById('screen-matchmaking').classList.remove('on');
+    document.getElementById('page-nav').style.display = '';
+    document.getElementById('wizard').style.display = '';
+    show('orientation');
+}
+
+function enterOnlineRoom(roomId) {
+    document.getElementById('screen-matchmaking').classList.remove('on');
+    const user = auth.currentUser;
+    onlineMatch.roomId = roomId;
+
+    onlineMatch.unsubRoom = listenRoom(roomId, room => {
+        if (!onlineMatch) return;
+        onlineMatch.mySlot = mySlot(room, user.uid);
+        if (!onlineMatch.mySlot) return;
+        if (!onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat = startPresenceHeartbeat(roomId, onlineMatch.mySlot);
+        const oppSlotKey = otherSlot(onlineMatch.mySlot);
+
+        if (!onlineMatch.started) {
+            onlineMatch.started = true;
+            document.getElementById('online-vs').textContent = t(I18N,'vs_label') + room.players[oppSlotKey].username;
+            const delay = Math.max(0, room.state.goAtMs - netNow());
+            setTimeout(() => { if (onlineMatch) beginTraining(); }, delay);
+        }
+
+        if (room.status === 'finished') {
+            if (!onlineMatch.decided) { onlineMatch.decided = true; showOnlineResult(room); }
+            return;
+        }
+
+        const myFinished = room.state[onlineMatch.mySlot + 'Finished'];
+        const oppFinished = room.state[oppSlotKey + 'Finished'];
+        if (myFinished && oppFinished && !onlineMatch.finishRequested) {
+            onlineMatch.finishRequested = true;
+            const myScore = room.state[onlineMatch.mySlot + 'Score'];
+            const oppScore = room.state[oppSlotKey + 'Score'];
+            const winner = myScore === oppScore ? null : (myScore > oppScore ? onlineMatch.mySlot : oppSlotKey);
+            markRoomFinished(roomId, { winner }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+        } else if (myFinished && !oppFinished && isOpponentStale(room, onlineMatch.mySlot) && !onlineMatch.finishRequested) {
+            onlineMatch.finishRequested = true;
+            markRoomFinished(roomId, { winner: onlineMatch.mySlot, disconnect: true }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+        }
+    });
+}
+
+function finishOnlineRound(myScore) {
+    document.getElementById('online-wait-status').style.display = '';
+    document.getElementById('online-wait-status').textContent = t(I18N,'waiting_opponent');
+    updateRoomState(onlineMatch.roomId, { [onlineMatch.mySlot + 'Score']: myScore, [onlineMatch.mySlot + 'Finished']: true }).catch(() => {});
+}
+
+function showOnlineResult(room) {
+    if (onlineMatch.unsubRoom) onlineMatch.unsubRoom();
+    if (onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat();
+    const mySlotKey = onlineMatch.mySlot;
+    const oppSlotKey = otherSlot(mySlotKey);
+    const oppScore = room.state[oppSlotKey + 'Score'];
+    const isDraw = room.state.winner === null;
+    const iWon = room.state.winner === mySlotKey;
+
+    document.getElementById('online-wait-status').style.display = 'none';
+    document.getElementById('r-title').textContent = isDraw ? t(I18N,'online_draw') : (iWon ? t(I18N,'online_you_win') : t(I18N,'online_you_lose'));
+    document.getElementById('r-title').style.color = isDraw ? '' : (iWon ? 'var(--green)' : 'var(--red)');
+    document.getElementById('r-subtitle').textContent = (room.state.disconnect && iWon)
+        ? t(I18N,'online_opponent_left')
+        : t(I18N,'vs_label') + room.players[oppSlotKey].username;
+    document.getElementById('r-opp-score').textContent = (oppScore != null) ? oppScore : '—';
+    document.getElementById('res-opponent-stat').style.display = '';
+    if (iWon) spawnConfetti();
+    onlineMatch = null;
 }
 
 // ─── GLOBAL INPUT ROUTER (keyboard, mouse, touch) ────────────────

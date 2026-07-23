@@ -702,6 +702,34 @@ input[type="range"] {
 .rg-msg   { font-size: 1.6rem; font-weight: 700; color: #fff; }
 .rg-flash { font-size: 1.1rem; font-weight: 600; color: #fff; min-height: 1.4em; }
 
+/* MATCHMAKING */
+#screen-matchmaking {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 22px;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--bg);
+    text-align: center;
+    padding: 24px;
+}
+#screen-matchmaking.on { display: flex; }
+.mm-spinner {
+    width: 44px;
+    height: 44px;
+    border: 4px solid var(--border2);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: mmSpin 0.8s linear infinite;
+}
+@keyframes mmSpin { to { transform: rotate(360deg); } }
+.mm-status { font-size: 1.1rem; color: var(--dim); }
+
+.standoff-vs { position: absolute; top: 8%; font-size: 0.95rem; font-weight: 600; color: var(--dim); }
+.standoff-leave { position: absolute; bottom: 4%; }
+
 /* STANDOFF SCREEN */
 #screen-standoff {
     display: none;
@@ -1001,7 +1029,11 @@ input[type="range"] {
 .dir-right { grid-column: 3; grid-row: 2; }
 .dir-down  { grid-column: 2; grid-row: 3; }
 
+/* ONLINE 1v1 (shared across clicker-speed, clicker-accuracy, timing, typing-accuracy, arcade) */
+.online-vs-label { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--dim); padding: 6px 0; }
+
 /* CHESS */
+.chess-vs { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--dim); padding: 6px 0; background: var(--bg); }
 .chess-wrap {
     flex: 1;
     display: flex;

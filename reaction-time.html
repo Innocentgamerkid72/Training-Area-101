@@ -25,7 +25,7 @@
             <h2 data-i18n="theme_h2">Select Theme</h2>
             <p data-i18n="theme_p">Choose how you want to train your reaction time</p>
         </div>
-        <div class="mode-grid mode-grid-2">
+        <div class="mode-grid">
             <div class="mode-card" data-theme="redgreen" onclick="pickTheme(this)">
                 <h3 data-i18n="redgreen_h3">Red Light</h3>
                 <p data-i18n="redgreen_p">Wait for the screen to turn green, then react as fast as you can</p>
@@ -33,6 +33,10 @@
             <div class="mode-card" data-theme="standoff" onclick="pickTheme(this)">
                 <h3 data-i18n="standoff_h3">Standoff</h3>
                 <p data-i18n="standoff_p">Face off against the clock — react the instant it says SHOOT!</p>
+            </div>
+            <div class="mode-card" data-theme="standoffonline" onclick="pickTheme(this)">
+                <h3 data-i18n="standoffonline_h3">⚡ Standoff Online</h3>
+                <p data-i18n="standoffonline_p">Face off live against a real opponent — first to react after SHOOT! wins. React early and you forfeit.</p>
             </div>
         </div>
         <div class="step-foot">
@@ -111,9 +115,17 @@
     <div class="rg-flash" id="rg-flash"></div>
 </div>
 
+<!-- MATCHMAKING SCREEN -->
+<div id="screen-matchmaking">
+    <div class="mm-spinner"></div>
+    <div class="mm-status" id="mm-status" data-i18n="mm_searching">Searching for an opponent…</div>
+    <button class="btn btn-ghost" onclick="cancelMatchmaking()" data-i18n="mm_cancel">Cancel</button>
+</div>
+
 <!-- STANDOFF SCREEN -->
 <div id="screen-standoff">
     <div class="tumbleweed"></div>
+    <div class="standoff-vs" id="standoff-vs"></div>
 
     <div class="duelist duelist-left" id="duelist-player">
         <div class="duelist-figure">🤠</div>
@@ -127,14 +139,17 @@
         <div class="duelist-figure">🤠</div>
         <div class="duelist-gun">🔫</div>
     </div>
+
+    <button class="btn btn-ghost btn-sm standoff-leave" id="standoff-leave-btn" onclick="leaveOnlineMatch()" data-i18n="leave_match" style="display:none;">Leave Match</button>
 </div>
 
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
     <div class="res-title" id="r-tier">—</div>
-    <div class="res-subtitle" data-i18n="res_subtitle">Your reaction time</div>
+    <div class="res-subtitle" id="r-subtitle" data-i18n="res_subtitle">Your reaction time</div>
     <div class="res-stats">
         <div class="res-stat"><div class="res-val" id="r-ms">0ms</div><div class="res-lbl" data-i18n="r_ms">Reaction Time</div></div>
+        <div class="res-stat" id="res-opponent-stat" style="display:none;"><div class="res-val" id="r-opp-ms">—</div><div class="res-lbl" data-i18n="opponent_reaction">Opponent's Reaction</div></div>
     </div>
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
@@ -145,6 +160,7 @@
 <script src="firebase-config.js"></script>
 <script src="account.js"></script>
 <script src="leaderboard.js"></script>
+<script src="netcode.js"></script>
 <script src="confetti.js"></script>
 <script src="i18n.js"></script>
 <script>
@@ -158,6 +174,8 @@ const I18N = {
     redgreen_p:      { en: 'Wait for the screen to turn green, then react as fast as you can', zh: '等待屏幕变绿，然后尽快做出反应' },
     standoff_h3:     { en: 'Standoff', zh: '对峙' },
     standoff_p:      { en: 'Face off against the clock — react the instant it says SHOOT!', zh: '与时间对决 — 出现“SHOOT!”的瞬间立刻反应！' },
+    standoffonline_h3: { en: '⚡ Standoff Online', zh: '⚡ 在线对峙' },
+    standoffonline_p:  { en: 'Face off live against a real opponent — first to react after SHOOT! wins. React early and you forfeit.', zh: '与真实玩家实时对决 — “SHOOT!”出现后先反应者获胜。过早反应将直接判负。' },
     next:            { en: 'Next', zh: '下一步' },
     key_h2:          { en: 'Set Your Reaction Key', zh: '设置你的反应按键' },
     key_p:           { en: 'Tap the box below, then press a key, click, or tap the screen to use for reacting', zh: '点击下方方框，然后按键、点击鼠标或触摸屏幕以设置反应方式' },
@@ -202,7 +220,16 @@ const I18N = {
     tier_good:       { en: 'Good', zh: '良好' },
     tier_average:    { en: 'Average', zh: '一般' },
     tier_practicing: { en: 'Keep Practicing', zh: '继续练习' },
-    press_key_cap:   { en: 'Press a key, click, or tap…', zh: '请按键、点击或触摸…' }
+    press_key_cap:   { en: 'Press a key, click, or tap…', zh: '请按键、点击或触摸…' },
+    online_early_forfeit: { en: 'Reacting before "SHOOT!" appears is an instant forfeit — stay patient.', zh: '在“SHOOT!”出现前反应将直接判负 — 请保持耐心。' },
+    mm_searching:    { en: 'Searching for an opponent…', zh: '正在寻找对手…' },
+    mm_cancel:       { en: 'Cancel', zh: '取消' },
+    vs_label:        { en: 'vs ', zh: '对战 ' },
+    leave_match:     { en: 'Leave Match', zh: '离开对局' },
+    online_you_win:  { en: 'You Win!', zh: '你赢了！' },
+    online_you_lose: { en: 'You Lose!', zh: '你输了！' },
+    online_opponent_left: { en: 'Opponent disconnected — You Win!', zh: '对手已断线 — 你赢了！' },
+    opponent_reaction: { en: "Opponent's Reaction", zh: '对手反应时间' }
 };
 
 document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
@@ -247,7 +274,7 @@ function navBack() {
     if (id === 'theme') { location.href = 'index.html'; return; }
     if (id === 'key') { show('theme'); return; }
     if (id === 'textsize') { show('key'); return; }
-    if (id === 'confirm') { show(cfg.theme === 'standoff' ? 'textsize' : 'key'); return; }
+    if (id === 'confirm') { show(cfg.theme === 'standoff' || cfg.theme === 'standoffonline' ? 'textsize' : 'key'); return; }
     if (id === 'guide') { show('confirm'); return; }
 }
 
@@ -272,7 +299,7 @@ function fromTheme() {
 
 function fromKey() {
     if (!cfg.key) return;
-    if (cfg.theme === 'standoff') {
+    if (cfg.theme === 'standoff' || cfg.theme === 'standoffonline') {
         show('textsize');
     } else {
         fillSummary();
@@ -286,11 +313,11 @@ function fromTextSize() {
 }
 
 function fillSummary() {
-    const themeLabel = { redgreen: t(I18N,'redgreen_h3'), standoff: t(I18N,'standoff_h3') }[cfg.theme];
+    const themeLabel = { redgreen: t(I18N,'redgreen_h3'), standoff: t(I18N,'standoff_h3'), standoffonline: t(I18N,'standoffonline_h3') }[cfg.theme];
     document.getElementById('s-theme').textContent = themeLabel;
     document.getElementById('s-rkey').textContent = cfg.keyLabel;
     const sizeRow = document.getElementById('s-size-row');
-    if (cfg.theme === 'standoff') {
+    if (cfg.theme === 'standoff' || cfg.theme === 'standoffonline') {
         sizeRow.style.display = '';
         document.getElementById('s-size').textContent = cfg.textSize + 'px';
     } else {
@@ -310,6 +337,12 @@ function fillGuide() {
             t(I18N,'watch_text'),
             `${t(I18N,'instant_shoot')} ${cfg.keyLabel}${t(I18N,'as_fast')}`,
             t(I18N,'early_shoot')
+        ]
+        : cfg.theme === 'standoffonline'
+        ? [
+            t(I18N,'watch_text'),
+            `${t(I18N,'instant_shoot')} ${cfg.keyLabel}${t(I18N,'as_fast')}`,
+            t(I18N,'online_early_forfeit')
         ]
         : [
             t(I18N,'screen_red'),
@@ -365,6 +398,7 @@ function beginTheme() {
     document.getElementById('page-nav').style.display = 'none';
     document.getElementById('wizard').style.display = 'none';
     if (cfg.theme === 'standoff') startStandoff();
+    else if (cfg.theme === 'standoffonline') startOnlineFlow();
     else startRedGreen();
 }
 
@@ -418,8 +452,172 @@ function startStandoff() {
     }, delay);
 }
 
+// ─── STANDOFF ONLINE (2-player, matchmaking + synced signal) ─────
+let onlineMatch = null;
+
+function computeStandoffOutcome(state) {
+    if (state.p1Fault) return 'p2';
+    if (state.p2Fault) return 'p1';
+    if (state.p1ReactionMs != null && state.p2ReactionMs != null) {
+        return state.p1ReactionMs <= state.p2ReactionMs ? 'p1' : 'p2';
+    }
+    return null;
+}
+
+function startOnlineFlow() {
+    document.getElementById('screen-matchmaking').classList.add('on');
+    document.getElementById('mm-status').textContent = t(I18N,'mm_searching');
+    syncClock().then(() => {
+        onlineMatch = { queueHandle: null, roomId: null, mySlot: null, unsubRoom: null, stopHeartbeat: null, goTimer: null, decided: false, finishRequested: false };
+        onlineMatch.queueHandle = joinQueue('reaction', {
+            buildInitialState() {
+                return {
+                    goAtMs: netNow() + 3000 + Math.random() * 5000,
+                    p1ReactionMs: null, p2ReactionMs: null,
+                    p1Fault: false, p2Fault: false,
+                    winner: null
+                };
+            },
+            onMatched(roomId) { enterOnlineRoom(roomId); },
+            onError(err) {
+                document.getElementById('mm-status').textContent = (err && err.message) || 'Error finding a match.';
+            }
+        });
+    });
+}
+
+function cancelMatchmaking() {
+    if (onlineMatch && onlineMatch.queueHandle) onlineMatch.queueHandle.cancel();
+    onlineMatch = null;
+    document.getElementById('screen-matchmaking').classList.remove('on');
+    document.getElementById('page-nav').style.display = '';
+    document.getElementById('wizard').style.display = '';
+    show('confirm');
+}
+
+function enterOnlineRoom(roomId) {
+    document.getElementById('screen-matchmaking').classList.remove('on');
+    const user = auth.currentUser;
+    onlineMatch.roomId = roomId;
+
+    const screen = document.getElementById('screen-standoff');
+    const textEl = document.getElementById('standoff-text');
+    screen.classList.add('on');
+    textEl.style.fontSize = cfg.textSize + 'px';
+    textEl.textContent = t(I18N,'wait_dots');
+    textEl.classList.remove('shoot');
+    document.getElementById('standoff-flash').textContent = '';
+    document.getElementById('duelist-player').classList.remove('draw');
+    document.getElementById('duelist-ai').classList.remove('draw');
+    document.getElementById('standoff-leave-btn').style.display = '';
+
+    rt.state = 'onlinewaiting';
+    inputMode = 'standoffonline';
+    let scheduled = false;
+
+    onlineMatch.unsubRoom = listenRoom(roomId, room => {
+        if (!onlineMatch) return;
+        onlineMatch.mySlot = mySlot(room, user.uid);
+        if (!onlineMatch.mySlot) return;
+        if (!onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat = startPresenceHeartbeat(roomId, onlineMatch.mySlot);
+
+        const oppSlotKey = otherSlot(onlineMatch.mySlot);
+        document.getElementById('standoff-vs').textContent = t(I18N,'vs_label') + room.players[oppSlotKey].username;
+
+        if (!scheduled && rt.state === 'onlinewaiting') {
+            scheduled = true;
+            const delay = Math.max(0, room.state.goAtMs - netNow());
+            onlineMatch.goTimer = setTimeout(() => {
+                if (!onlineMatch || rt.state !== 'onlinewaiting') return;
+                rt.state = 'go';
+                rt.goTime = performance.now();
+                textEl.textContent = t(I18N,'shoot');
+                textEl.classList.add('shoot');
+                document.getElementById('duelist-player').classList.add('draw');
+                document.getElementById('duelist-ai').classList.add('draw');
+            }, delay);
+        }
+
+        if (room.status === 'finished') {
+            if (!onlineMatch.decided) { onlineMatch.decided = true; finishOnlineRound(room); }
+            return;
+        }
+
+        const outcome = computeStandoffOutcome(room.state);
+        if (outcome && !onlineMatch.finishRequested) {
+            onlineMatch.finishRequested = true;
+            markRoomFinished(roomId, { winner: outcome }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+        } else if (!outcome && isOpponentStale(room, onlineMatch.mySlot) && !onlineMatch.finishRequested) {
+            onlineMatch.finishRequested = true;
+            markRoomFinished(roomId, { winner: onlineMatch.mySlot, disconnect: true }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+        }
+    });
+}
+
+function handleOnlineInput(code, e) {
+    if (code !== cfg.key) return;
+    if (!onlineMatch || !onlineMatch.roomId || !onlineMatch.mySlot) return;
+    e.preventDefault();
+    if (rt.state === 'onlinewaiting') {
+        rt.state = 'faulted';
+        inputMode = 'idle';
+        document.getElementById('standoff-flash').textContent = t(I18N,'too_early');
+        updateRoomState(onlineMatch.roomId, { [onlineMatch.mySlot + 'Fault']: true }).catch(() => {});
+    } else if (rt.state === 'go') {
+        const reaction = performance.now() - rt.goTime;
+        rt.state = 'submitted';
+        inputMode = 'idle';
+        updateRoomState(onlineMatch.roomId, { [onlineMatch.mySlot + 'ReactionMs']: reaction }).catch(() => {});
+    }
+}
+
+function finishOnlineRound(room) {
+    if (onlineMatch.unsubRoom) onlineMatch.unsubRoom();
+    if (onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat();
+    if (onlineMatch.goTimer) clearTimeout(onlineMatch.goTimer);
+    document.getElementById('screen-standoff').classList.remove('on', 'go');
+    document.getElementById('standoff-leave-btn').style.display = 'none';
+    inputMode = 'idle';
+    rt.state = null;
+
+    const mySlotKey = onlineMatch.mySlot;
+    const oppSlotKey = otherSlot(mySlotKey);
+    const iWon = room.state.winner === mySlotKey;
+    const myMs = room.state[mySlotKey + 'ReactionMs'];
+    const oppMs = room.state[oppSlotKey + 'ReactionMs'];
+    const myFault = room.state[mySlotKey + 'Fault'];
+    const opp = room.players[oppSlotKey];
+
+    document.getElementById('r-tier').textContent = iWon ? t(I18N,'online_you_win') : t(I18N,'online_you_lose');
+    document.getElementById('r-tier').style.color = iWon ? 'var(--green)' : 'var(--red)';
+    document.getElementById('r-subtitle').textContent = room.state.disconnect
+        ? t(I18N,'online_opponent_left')
+        : t(I18N,'vs_label') + opp.username;
+    document.getElementById('r-ms').textContent = (!myFault && myMs != null) ? Math.round(myMs) + 'ms' : '—';
+    document.getElementById('r-opp-ms').textContent = (oppMs != null) ? Math.round(oppMs) + 'ms' : '—';
+    document.getElementById('res-opponent-stat').style.display = '';
+    document.getElementById('screen-results').classList.add('on');
+    if (iWon) spawnConfetti();
+    if (!myFault && myMs != null) submitScore('reaction', Math.round(myMs));
+    onlineMatch = null;
+}
+
+function leaveOnlineMatch() {
+    if (!onlineMatch || !onlineMatch.roomId || onlineMatch.decided) return;
+    onlineMatch.decided = true;
+    markRoomFinished(onlineMatch.roomId, { winner: otherSlot(onlineMatch.mySlot) }).catch(() => {});
+    if (onlineMatch.unsubRoom) onlineMatch.unsubRoom();
+    if (onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat();
+    if (onlineMatch.goTimer) clearTimeout(onlineMatch.goTimer);
+    onlineMatch = null;
+    inputMode = 'idle';
+    document.getElementById('standoff-leave-btn').style.display = 'none';
+    location.href = 'index.html';
+}
+
 // ─── GAME INPUT (shared by both themes) ──────────────────────────
 function handleGameInput(code, e) {
+    if (inputMode === 'standoffonline') { handleOnlineInput(code, e); return; }
     if (inputMode !== 'redgreen' && inputMode !== 'standoff') return;
     if (code !== cfg.key) return;
     e.preventDefault();

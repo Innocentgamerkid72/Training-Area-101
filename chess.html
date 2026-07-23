@@ -25,7 +25,7 @@
             <h2 data-i18n="mode_h2">Select Mode</h2>
             <p data-i18n="mode_p">Choose how you want to play</p>
         </div>
-        <div class="mode-grid mode-grid-2">
+        <div class="mode-grid">
             <div class="mode-card" data-mode="2p" onclick="pickMode(this)">
                 <h3 data-i18n="mode_2p_h3">2 Player</h3>
                 <p data-i18n="mode_2p_p">Pass and play on the same device</p>
@@ -33,6 +33,10 @@
             <div class="mode-card" data-mode="bot" onclick="pickMode(this)">
                 <h3 data-i18n="mode_bot_h3">vs Bot</h3>
                 <p data-i18n="mode_bot_p">Play against the computer</p>
+            </div>
+            <div class="mode-card" data-mode="online" onclick="pickMode(this)">
+                <h3 data-i18n="mode_online_h3">⚡ Play Online</h3>
+                <p data-i18n="mode_online_p">Get matched with a real opponent online</p>
             </div>
         </div>
         <div class="step-foot">
@@ -111,6 +115,13 @@
 
 </div><!-- /wizard -->
 
+<!-- MATCHMAKING SCREEN -->
+<div id="screen-matchmaking">
+    <div class="mm-spinner"></div>
+    <div class="mm-status" id="mm-status" data-i18n="mm_searching">Searching for an opponent…</div>
+    <button class="btn btn-ghost" onclick="cancelMatchmaking()" data-i18n="mm_cancel">Cancel</button>
+</div>
+
 <!-- GAME SCREEN -->
 <div id="screen-game">
     <div class="game-hud">
@@ -118,6 +129,7 @@
         <div class="hud-stat"><div class="hud-val" id="hud-status">—</div><div class="hud-lbl" data-i18n="hud_status">Status</div></div>
         <button class="btn btn-ghost btn-sm" onclick="resign()" data-i18n="resign">Resign</button>
     </div>
+    <div class="chess-vs" id="chess-vs"></div>
     <div class="chess-wrap">
         <div class="chess-board" id="chess-board"></div>
     </div>
@@ -152,6 +164,7 @@
 <script src="firebase-config.js"></script>
 <script src="account.js"></script>
 <script src="leaderboard.js"></script>
+<script src="netcode.js"></script>
 <script src="confetti.js"></script>
 <script src="i18n.js"></script>
 <script>
@@ -507,6 +520,8 @@ const I18N = {
     mode_2p_p:       { en: 'Pass and play on the same device', zh: '在同一设备上轮流对战' },
     mode_bot_h3:     { en: 'vs Bot', zh: '人机对战' },
     mode_bot_p:      { en: 'Play against the computer', zh: '与电脑对战' },
+    mode_online_h3:  { en: '⚡ Play Online', zh: '⚡ 在线对战' },
+    mode_online_p:   { en: 'Get matched with a real opponent online', zh: '与真实玩家在线匹配对战' },
     next:            { en: 'Next', zh: '下一步' },
     bot_h2:          { en: 'Bot Settings', zh: '电脑设置' },
     bot_p:           { en: 'Choose your side and how strong the bot plays', zh: '选择你的执棋方以及电脑的强度' },
@@ -546,7 +561,11 @@ const I18N = {
     stalemate:       { en: 'Stalemate — no legal moves', zh: '逼和 — 无棋可走' },
     insufficient:    { en: 'Insufficient material', zh: '子力不足' },
     by_resignation:  { en: 'By resignation', zh: '因认输' },
-    draw:            { en: 'Draw', zh: '和棋' }
+    draw:            { en: 'Draw', zh: '和棋' },
+    mm_searching:    { en: 'Searching for an opponent…', zh: '正在寻找对手…' },
+    mm_cancel:       { en: 'Cancel', zh: '取消' },
+    vs_label:        { en: 'vs ', zh: '对战 ' },
+    opponent_disconnected: { en: 'Opponent disconnected', zh: '对手已断线' }
 };
 
 document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
@@ -616,6 +635,8 @@ const PIECE_GLYPHS = {
 function beginGame() {
     document.getElementById('page-nav').style.display = 'none';
     document.getElementById('wizard').style.display = 'none';
+
+    if (cfg.mode === 'online') { startOnlineFlow(); return; }
 
     let humanSide = 'w';
     if (cfg.mode === 'bot') {
@@ -723,7 +744,7 @@ function renderBoard() {
 
 function onSquareClick(r, c) {
     if (gs.locked || gs.pendingPromotion) return;
-    if (cfg.mode === 'bot' && gs.state.turn !== gs.humanSide) return;
+    if ((cfg.mode === 'bot' || cfg.mode === 'online') && gs.state.turn !== gs.humanSide) return;
 
     const p = gs.state.board[r][c];
 
@@ -770,6 +791,7 @@ function finishMove(move) {
     renderBoard();
     playAnimations(anims);
     updateHUD();
+    if (cfg.mode === 'online') syncOnlineMove(move);
     checkGameEnd();
     if (!gs.gameOver) maybeTriggerBot();
 }
@@ -823,7 +845,7 @@ function checkGameEnd() {
     if (status.reason === 'checkmate') {
         title = (status.winner === 'w' ? t(I18N,'white') : t(I18N,'black')) + t(I18N,'wins');
         subtitle = t(I18N,'checkmate');
-        if (cfg.mode === 'bot' && status.winner === gs.humanSide) submitChessWin();
+        if ((cfg.mode === 'bot' || cfg.mode === 'online') && status.winner === gs.humanSide) submitChessWin();
     } else if (status.reason === 'stalemate') {
         title = t(I18N,'draw');
         subtitle = t(I18N,'stalemate');
@@ -832,10 +854,20 @@ function checkGameEnd() {
         subtitle = t(I18N,'insufficient');
     }
     endGame(title, subtitle);
+    if (cfg.mode === 'online') cleanupOnlineMatch();
 }
 
 function resign() {
     if (gs.gameOver) return;
+    if (cfg.mode === 'online') {
+        gs.gameOver = true;
+        if (onlineMatch) markRoomFinished(onlineMatch.roomId, { resignedBy: onlineMatch.mySlot }).catch(() => {});
+        const winnerColor = gs.humanSide === 'w' ? 'b' : 'w';
+        const winnerLabel = winnerColor === 'w' ? t(I18N,'white') : t(I18N,'black');
+        endGame(winnerLabel + t(I18N,'wins'), t(I18N,'by_resignation'));
+        cleanupOnlineMatch();
+        return;
+    }
     const winner = gs.state.turn === 'w' ? t(I18N,'black') : t(I18N,'white');
     gs.gameOver = true;
     endGame(winner + t(I18N,'wins'), t(I18N,'by_resignation'));
@@ -853,6 +885,128 @@ function endGame(title, subtitle) {
 document.querySelectorAll('.promo-btn').forEach(btn => {
     btn.addEventListener('click', () => choosePromotion(btn.dataset.p));
 });
+
+// ─── ONLINE 2-PLAYER MODE ───────────────────────────────────────
+let onlineMatch = null;
+
+function startOnlineFlow() {
+    document.getElementById('screen-matchmaking').classList.add('on');
+    document.getElementById('mm-status').textContent = t(I18N,'mm_searching');
+    syncClock().then(() => {
+        onlineMatch = { queueHandle: null, roomId: null, mySlot: null, unsubRoom: null, stopHeartbeat: null, started: false, moveSeq: 0, lastAppliedSeq: 0 };
+        onlineMatch.queueHandle = joinQueue('chess', {
+            buildInitialState() {
+                return {
+                    p1Color: Math.random() < 0.5 ? 'w' : 'b',
+                    moveSeq: 0, lastMove: null, lastMoveBy: null, resignedBy: null
+                };
+            },
+            onMatched(roomId) { enterOnlineChessRoom(roomId); },
+            onError(err) {
+                document.getElementById('mm-status').textContent = (err && err.message) || 'Error finding a match.';
+            }
+        });
+    });
+}
+
+function cancelMatchmaking() {
+    if (onlineMatch && onlineMatch.queueHandle) onlineMatch.queueHandle.cancel();
+    onlineMatch = null;
+    document.getElementById('screen-matchmaking').classList.remove('on');
+    document.getElementById('page-nav').style.display = '';
+    document.getElementById('wizard').style.display = '';
+    show('mode');
+}
+
+function enterOnlineChessRoom(roomId) {
+    document.getElementById('screen-matchmaking').classList.remove('on');
+    const user = auth.currentUser;
+    onlineMatch.roomId = roomId;
+
+    onlineMatch.unsubRoom = listenRoom(roomId, room => {
+        if (!onlineMatch) return;
+        onlineMatch.mySlot = mySlot(room, user.uid);
+        if (!onlineMatch.mySlot) return;
+        if (!onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat = startPresenceHeartbeat(roomId, onlineMatch.mySlot);
+
+        if (!onlineMatch.started) {
+            onlineMatch.started = true;
+            const myColor = onlineMatch.mySlot === 'p1' ? room.state.p1Color : (room.state.p1Color === 'w' ? 'b' : 'w');
+            const oppSlotKey = otherSlot(onlineMatch.mySlot);
+            gs = {
+                state: newGame(),
+                humanSide: myColor,
+                flipped: myColor === 'b',
+                selected: null,
+                legalTargets: [],
+                locked: false,
+                pendingPromotion: null,
+                gameOver: false
+            };
+            document.getElementById('screen-game').classList.add('on');
+            buildBoardDom();
+            renderBoard();
+            updateHUD();
+            document.getElementById('chess-vs').textContent = t(I18N,'vs_label') + room.players[oppSlotKey].username;
+        }
+
+        if (typeof room.state.moveSeq === 'number' && room.state.moveSeq !== onlineMatch.lastAppliedSeq) {
+            onlineMatch.lastAppliedSeq = room.state.moveSeq;
+            onlineMatch.moveSeq = room.state.moveSeq;
+            if (room.state.lastMoveBy && room.state.lastMoveBy !== onlineMatch.mySlot && room.state.lastMove) {
+                applyRemoteMove(room.state.lastMove);
+            }
+        }
+
+        if (room.state.resignedBy && room.state.resignedBy !== onlineMatch.mySlot && !gs.gameOver) {
+            handleRemoteResign();
+        } else if (!gs.gameOver && isOpponentStale(room, onlineMatch.mySlot)) {
+            handleOpponentDisconnect();
+        }
+    });
+}
+
+function applyRemoteMove(move) {
+    const anims = collectMoveAnimTargets(move);
+    gs.state = makeMove(gs.state, move);
+    renderBoard();
+    playAnimations(anims);
+    updateHUD();
+    checkGameEnd();
+}
+
+function syncOnlineMove(move) {
+    if (!onlineMatch || !onlineMatch.roomId) return;
+    const nextSeq = onlineMatch.moveSeq + 1;
+    onlineMatch.moveSeq = nextSeq;
+    onlineMatch.lastAppliedSeq = nextSeq;
+    updateRoomState(onlineMatch.roomId, { moveSeq: nextSeq, lastMove: move, lastMoveBy: onlineMatch.mySlot }).catch(() => {});
+}
+
+function handleRemoteResign() {
+    if (gs.gameOver) return;
+    gs.gameOver = true;
+    const winnerLabel = gs.humanSide === 'w' ? t(I18N,'white') : t(I18N,'black');
+    endGame(winnerLabel + t(I18N,'wins'), t(I18N,'by_resignation'));
+    submitChessWin();
+    cleanupOnlineMatch();
+}
+
+function handleOpponentDisconnect() {
+    if (gs.gameOver) return;
+    gs.gameOver = true;
+    const winnerLabel = gs.humanSide === 'w' ? t(I18N,'white') : t(I18N,'black');
+    endGame(winnerLabel + t(I18N,'wins'), t(I18N,'opponent_disconnected'));
+    submitChessWin();
+    cleanupOnlineMatch();
+}
+
+function cleanupOnlineMatch() {
+    if (!onlineMatch) return;
+    if (onlineMatch.unsubRoom) onlineMatch.unsubRoom();
+    if (onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat();
+    onlineMatch = null;
+}
 </script>
 </body>
 </html>

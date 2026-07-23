@@ -10,8 +10,9 @@
 
 <!-- PAGE NAV (hidden during game/results) -->
 <nav class="page-nav" id="page-nav">
-    <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Chess</span>
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Chess</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -20,88 +21,88 @@
     <!-- STEP 1: Mode -->
     <div class="step active" id="step-mode">
         <div class="step-head">
-            <h2>Select Mode</h2>
-            <p>Choose how you want to play</p>
+            <h2 data-i18n="mode_h2">Select Mode</h2>
+            <p data-i18n="mode_p">Choose how you want to play</p>
         </div>
         <div class="mode-grid mode-grid-2">
             <div class="mode-card" data-mode="2p" onclick="pickMode(this)">
-                <h3>2 Player</h3>
-                <p>Pass and play on the same device</p>
+                <h3 data-i18n="mode_2p_h3">2 Player</h3>
+                <p data-i18n="mode_2p_p">Pass and play on the same device</p>
             </div>
             <div class="mode-card" data-mode="bot" onclick="pickMode(this)">
-                <h3>vs Bot</h3>
-                <p>Play against the computer</p>
+                <h3 data-i18n="mode_bot_h3">vs Bot</h3>
+                <p data-i18n="mode_bot_p">Play against the computer</p>
             </div>
         </div>
         <div class="step-foot">
             <div></div>
-            <button class="btn btn-primary" id="btn-mode-next" disabled onclick="fromMode()">Next</button>
+            <button class="btn btn-primary" id="btn-mode-next" disabled onclick="fromMode()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 2: Bot Settings (bot mode only) -->
     <div class="step" id="step-bot">
         <div class="step-head">
-            <h2>Bot Settings</h2>
-            <p>Choose your side and how strong the bot plays</p>
+            <h2 data-i18n="bot_h2">Bot Settings</h2>
+            <p data-i18n="bot_p">Choose your side and how strong the bot plays</p>
         </div>
         <div class="form-group">
-            <label>Your Side</label>
+            <label data-i18n="your_side">Your Side</label>
             <div class="mode-grid" style="grid-template-columns:repeat(3,1fr);">
                 <div class="mode-card side-card sel" data-side="w" onclick="pickSide(this)">
-                    <h3>White</h3>
-                    <p>You move first</p>
+                    <h3 data-i18n="side_white_h3">White</h3>
+                    <p data-i18n="side_white_p">You move first</p>
                 </div>
                 <div class="mode-card side-card" data-side="b" onclick="pickSide(this)">
-                    <h3>Black</h3>
-                    <p>Bot moves first</p>
+                    <h3 data-i18n="side_black_h3">Black</h3>
+                    <p data-i18n="side_black_p">Bot moves first</p>
                 </div>
                 <div class="mode-card side-card" data-side="random" onclick="pickSide(this)">
-                    <h3>Random</h3>
-                    <p>Coin flip</p>
+                    <h3 data-i18n="side_random_h3">Random</h3>
+                    <p data-i18n="side_random_p">Coin flip</p>
                 </div>
             </div>
         </div>
         <div class="form-group">
-            <label>Bot Difficulty</label>
+            <label data-i18n="bot_difficulty">Bot Difficulty</label>
             <div class="mode-grid" style="grid-template-columns:repeat(3,1fr);">
                 <div class="mode-card diff-card sel" data-depth="1" onclick="pickDifficulty(this)">
-                    <h3>Easy</h3>
-                    <p>Looks 1 move ahead</p>
+                    <h3 data-i18n="diff_easy_h3">Easy</h3>
+                    <p data-i18n="diff_easy_p">Looks 1 move ahead</p>
                 </div>
                 <div class="mode-card diff-card" data-depth="2" onclick="pickDifficulty(this)">
-                    <h3>Medium</h3>
-                    <p>Looks 2 moves ahead</p>
+                    <h3 data-i18n="diff_medium_h3">Medium</h3>
+                    <p data-i18n="diff_medium_p">Looks 2 moves ahead</p>
                 </div>
                 <div class="mode-card diff-card" data-depth="3" onclick="pickDifficulty(this)">
-                    <h3>Hard</h3>
-                    <p>Looks 3 moves ahead</p>
+                    <h3 data-i18n="diff_hard_h3">Hard</h3>
+                    <p data-i18n="diff_hard_p">Looks 3 moves ahead</p>
                 </div>
             </div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('mode')">Back</button>
-            <button class="btn btn-primary" onclick="fromBotSettings()">Next</button>
+            <button class="btn btn-ghost" onclick="show('mode')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="fromBotSettings()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 3: How to Play -->
     <div class="step" id="step-guide">
         <div class="step-head">
-            <h2>How to Play</h2>
-            <p>Quick rundown before you start</p>
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
         </div>
         <div class="guide-card" style="--guide-color: var(--silver);">
             <ul class="guide-list">
-                <li>Standard chess rules — tap a piece to select it, legal moves highlight on the board.</li>
-                <li>Tap a highlighted square to move there. Green dots are quiet moves, red rings are captures.</li>
-                <li>Castling, en passant, and pawn promotion are all supported automatically — promoting lets you choose the piece.</li>
-                <li>Checkmate ends the game in a win; if the side to move has no legal moves and isn't in check, it's a stalemate draw.</li>
+                <li data-i18n="guide_1">Standard chess rules — tap a piece to select it, legal moves highlight on the board.</li>
+                <li data-i18n="guide_2">Tap a highlighted square to move there. Green dots are quiet moves, red rings are captures.</li>
+                <li data-i18n="guide_3">Castling, en passant, and pawn promotion are all supported automatically — promoting lets you choose the piece.</li>
+                <li data-i18n="guide_4">Checkmate ends the game in a win; if the side to move has no legal moves and isn't in check, it's a stalemate draw.</li>
             </ul>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" id="btn-guide-back" onclick="show('mode')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginGame()">Let's Go!</button>
+            <button class="btn btn-ghost" id="btn-guide-back" onclick="show('mode')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginGame()" data-i18n="lets_go">Let's Go!</button>
         </div>
     </div>
 
@@ -112,9 +113,9 @@
 <!-- GAME SCREEN -->
 <div id="screen-game">
     <div class="game-hud">
-        <div class="hud-stat"><div class="hud-val" id="hud-turn">White</div><div class="hud-lbl">Turn</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-status">—</div><div class="hud-lbl">Status</div></div>
-        <button class="btn btn-ghost btn-sm" onclick="resign()">Resign</button>
+        <div class="hud-stat"><div class="hud-val" id="hud-turn">White</div><div class="hud-lbl" data-i18n="hud_turn">Turn</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-status">—</div><div class="hud-lbl" data-i18n="hud_status">Status</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="resign()" data-i18n="resign">Resign</button>
     </div>
     <div class="chess-wrap">
         <div class="chess-board" id="chess-board"></div>
@@ -124,7 +125,7 @@
 <!-- PROMOTION PICKER -->
 <div class="promo-overlay" id="promo-overlay">
     <div class="promo-card">
-        <div class="promo-title">Promote to</div>
+        <div class="promo-title" data-i18n="promote_to">Promote to</div>
         <div class="promo-choices" id="promo-choices">
             <button class="promo-btn" data-p="Q">♕</button>
             <button class="promo-btn" data-p="R">♖</button>
@@ -139,12 +140,13 @@
     <div class="res-title" id="r-title">—</div>
     <div class="res-subtitle" id="r-subtitle">—</div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-moves">0</div><div class="res-lbl">Total Moves</div></div>
+        <div class="res-stat"><div class="res-val" id="r-moves">0</div><div class="res-lbl" data-i18n="total_moves">Total Moves</div></div>
     </div>
-    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
 <script src="confetti.js"></script>
+<script src="i18n.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════════
 // CHESS ENGINE — pure logic, no DOM. board[row][col]: row 0 = rank 8
@@ -488,6 +490,63 @@ function minimax(state, depth, alpha, beta, color) {
 // ══════════════════════════════════════════════════════════════════
 // UI
 // ══════════════════════════════════════════════════════════════════
+const I18N = {
+    back:            { en: 'Back', zh: '返回' },
+    page_title:      { en: 'Chess', zh: '国际象棋' },
+    mode_h2:         { en: 'Select Mode', zh: '选择模式' },
+    mode_p:          { en: 'Choose how you want to play', zh: '选择你想要的对局方式' },
+    mode_2p_h3:      { en: '2 Player', zh: '双人对战' },
+    mode_2p_p:       { en: 'Pass and play on the same device', zh: '在同一设备上轮流对战' },
+    mode_bot_h3:     { en: 'vs Bot', zh: '人机对战' },
+    mode_bot_p:      { en: 'Play against the computer', zh: '与电脑对战' },
+    next:            { en: 'Next', zh: '下一步' },
+    bot_h2:          { en: 'Bot Settings', zh: '电脑设置' },
+    bot_p:           { en: 'Choose your side and how strong the bot plays', zh: '选择你的执棋方以及电脑的强度' },
+    your_side:       { en: 'Your Side', zh: '你的执棋方' },
+    side_white_h3:   { en: 'White', zh: '白方' },
+    side_white_p:    { en: 'You move first', zh: '你先行' },
+    side_black_h3:   { en: 'Black', zh: '黑方' },
+    side_black_p:    { en: 'Bot moves first', zh: '电脑先行' },
+    side_random_h3:  { en: 'Random', zh: '随机' },
+    side_random_p:   { en: 'Coin flip', zh: '随机决定' },
+    bot_difficulty:  { en: 'Bot Difficulty', zh: '电脑难度' },
+    diff_easy_h3:    { en: 'Easy', zh: '简单' },
+    diff_easy_p:     { en: 'Looks 1 move ahead', zh: '思考 1 步' },
+    diff_medium_h3:  { en: 'Medium', zh: '中等' },
+    diff_medium_p:   { en: 'Looks 2 moves ahead', zh: '思考 2 步' },
+    diff_hard_h3:    { en: 'Hard', zh: '困难' },
+    diff_hard_p:     { en: 'Looks 3 moves ahead', zh: '思考 3 步' },
+    guide_h2:        { en: 'How to Play', zh: '玩法说明' },
+    guide_p:         { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    guide_1:         { en: 'Standard chess rules — tap a piece to select it, legal moves highlight on the board.', zh: '标准国际象棋规则 — 点击棋子选中它，合法走法会在棋盘上高亮显示。' },
+    guide_2:         { en: 'Tap a highlighted square to move there. Green dots are quiet moves, red rings are captures.', zh: '点击高亮的格子即可移动到那里。绿点表示普通走法，红圈表示吃子。' },
+    guide_3:         { en: 'Castling, en passant, and pawn promotion are all supported automatically — promoting lets you choose the piece.', zh: '王车易位、吃过路兵和兵的升变均自动支持 — 升变时可自行选择棋子。' },
+    guide_4:         { en: "Checkmate ends the game in a win; if the side to move has no legal moves and isn't in check, it's a stalemate draw.", zh: '将死即分出胜负；若轮到一方无棋可走且未被将军，则为逼和（和棋）。' },
+    lets_go:         { en: "Let's Go!", zh: '开始吧！' },
+    hud_turn:        { en: 'Turn', zh: '回合' },
+    hud_status:      { en: 'Status', zh: '状态' },
+    resign:          { en: 'Resign', zh: '认输' },
+    promote_to:      { en: 'Promote to', zh: '升变为' },
+    total_moves:     { en: 'Total Moves', zh: '总步数' },
+    back_home:       { en: 'Back to Home', zh: '返回首页' },
+    white:           { en: 'White', zh: '白方' },
+    black:           { en: 'Black', zh: '黑方' },
+    check:           { en: 'Check!', zh: '将军！' },
+    thinking:        { en: 'Bot is thinking…', zh: '电脑思考中…' },
+    wins:            { en: 'Wins!', zh: ' 获胜！' },
+    checkmate:       { en: 'Checkmate', zh: '将死' },
+    stalemate:       { en: 'Stalemate — no legal moves', zh: '逼和 — 无棋可走' },
+    insufficient:    { en: 'Insufficient material', zh: '子力不足' },
+    by_resignation:  { en: 'By resignation', zh: '因认输' },
+    draw:            { en: 'Draw', zh: '和棋' }
+};
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
+
+function onLangChange() {
+    if (document.getElementById('screen-game').classList.contains('on')) updateHUD();
+}
+
 const cfg = { mode: null, side: 'w', depth: 1 };
 let gs = {};
 
@@ -718,7 +777,7 @@ function maybeTriggerBot() {
     if (cfg.mode !== 'bot' || gs.state.turn === gs.humanSide) return;
     gs.locked = true;
     const statusEl = document.getElementById('hud-status');
-    statusEl.textContent = 'Bot is thinking…';
+    statusEl.textContent = t(I18N,'thinking');
     statusEl.classList.add('thinking');
     const thinkTime = 2000 + Math.random() * 3000; // 2-5s, so the bot doesn't feel instant/robotic
     console.log('[chess] bot will move in', Math.round(thinkTime), 'ms');
@@ -741,11 +800,11 @@ function maybeTriggerBot() {
 }
 
 function updateHUD() {
-    document.getElementById('hud-turn').textContent = gs.state.turn === 'w' ? 'White' : 'Black';
+    document.getElementById('hud-turn').textContent = gs.state.turn === 'w' ? t(I18N,'white') : t(I18N,'black');
     const inCheck = isInCheck(gs.state, gs.state.turn);
     const statusEl = document.getElementById('hud-status');
     statusEl.classList.remove('thinking');
-    statusEl.textContent = inCheck ? 'Check!' : '—';
+    statusEl.textContent = inCheck ? t(I18N,'check') : '—';
 }
 
 function checkGameEnd() {
@@ -754,23 +813,23 @@ function checkGameEnd() {
     gs.gameOver = true;
     let title, subtitle;
     if (status.reason === 'checkmate') {
-        title = (status.winner === 'w' ? 'White' : 'Black') + ' Wins!';
-        subtitle = 'Checkmate';
+        title = (status.winner === 'w' ? t(I18N,'white') : t(I18N,'black')) + t(I18N,'wins');
+        subtitle = t(I18N,'checkmate');
     } else if (status.reason === 'stalemate') {
-        title = 'Draw';
-        subtitle = 'Stalemate — no legal moves';
+        title = t(I18N,'draw');
+        subtitle = t(I18N,'stalemate');
     } else {
-        title = 'Draw';
-        subtitle = 'Insufficient material';
+        title = t(I18N,'draw');
+        subtitle = t(I18N,'insufficient');
     }
     endGame(title, subtitle);
 }
 
 function resign() {
     if (gs.gameOver) return;
-    const winner = gs.state.turn === 'w' ? 'Black' : 'White';
+    const winner = gs.state.turn === 'w' ? t(I18N,'black') : t(I18N,'white');
     gs.gameOver = true;
-    endGame(winner + ' Wins!', 'By resignation');
+    endGame(winner + t(I18N,'wins'), t(I18N,'by_resignation'));
 }
 
 function endGame(title, subtitle) {

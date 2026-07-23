@@ -10,8 +10,9 @@
 
 <!-- PAGE NAV (hidden during game/results) -->
 <nav class="page-nav" id="page-nav">
-    <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Timing</span>
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Timing</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -20,37 +21,37 @@
     <!-- STEP 1: Orientation -->
     <div class="step active" id="step-orientation">
         <div class="step-head">
-            <h2>Bar Orientation</h2>
-            <p>Choose how the timing bar crosses the screen</p>
+            <h2 data-i18n="orient_h2">Bar Orientation</h2>
+            <p data-i18n="orient_p">Choose how the timing bar crosses the screen</p>
         </div>
         <div class="mode-grid mode-grid-2">
             <div class="mode-card" data-orientation="horizontal" onclick="pickOrientation(this)">
-                <h3>Horizontal</h3>
-                <p>The bar runs left to right across the screen</p>
+                <h3 data-i18n="horizontal_h3">Horizontal</h3>
+                <p data-i18n="horizontal_p">The bar runs left to right across the screen</p>
             </div>
             <div class="mode-card" data-orientation="vertical" onclick="pickOrientation(this)">
-                <h3>Vertical</h3>
-                <p>The bar runs top to bottom across the screen</p>
+                <h3 data-i18n="vertical_h3">Vertical</h3>
+                <p data-i18n="vertical_p">The bar runs top to bottom across the screen</p>
             </div>
         </div>
         <div class="step-foot">
             <div></div>
-            <button class="btn btn-primary" id="btn-orientation-next" disabled onclick="fromOrientation()">Next</button>
+            <button class="btn btn-primary" id="btn-orientation-next" disabled onclick="fromOrientation()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 2: Speed & Duration -->
     <div class="step" id="step-session">
         <div class="step-head">
-            <h2>Speed &amp; Duration</h2>
-            <p>Control how fast the square sweeps and how long you'll train</p>
+            <h2 data-i18n="session_h2">Speed &amp; Duration</h2>
+            <p data-i18n="session_p">Control how fast the square sweeps and how long you'll train</p>
         </div>
         <div class="form-group">
-            <label>Sweep Speed — time for one pass across the bar: <span class="val-label" id="speed-val">1.2s</span></label>
+            <label><span data-i18n="sweep_speed">Sweep Speed — time for one pass across the bar:</span> <span class="val-label" id="speed-val">1.2s</span></label>
             <input type="range" id="inp-speed" min="0.4" max="3" step="0.1" value="1.2" oninput="onSpeedChange(this.value)">
         </div>
         <div class="form-group">
-            <label>Session Duration</label>
+            <label data-i18n="session_dur">Session Duration</label>
             <div class="presets" id="dur-presets">
                 <div class="preset" onclick="setDurPreset(15,this)">15s</div>
                 <div class="preset sel" onclick="setDurPreset(30,this)">30s</div>
@@ -58,40 +59,40 @@
                 <div class="preset" onclick="setDurPreset(120,this)">2m</div>
                 <div class="preset" onclick="setDurPreset(300,this)">5m</div>
             </div>
-            <label style="margin-top:10px;">Custom: <span class="val-label" id="dur-val">30s</span></label>
+            <label style="margin-top:10px;"><span data-i18n="custom">Custom:</span> <span class="val-label" id="dur-val">30s</span></label>
             <input type="range" id="inp-dur" min="10" max="300" step="5" value="30" oninput="onDurChange(this.value)">
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('orientation')">Back</button>
-            <button class="btn btn-primary" onclick="fromSession()">Next</button>
+            <button class="btn btn-ghost" onclick="show('orientation')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="fromSession()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 3: Timing Key -->
     <div class="step" id="step-key">
         <div class="step-head">
-            <h2>Set Your Timing Key</h2>
-            <p>Tap the box below, then press a key, click, or tap the screen to use for timing</p>
+            <h2 data-i18n="key_h2">Set Your Timing Key</h2>
+            <p data-i18n="key_p">Tap the box below, then press a key, click, or tap the screen to use for timing</p>
         </div>
-        <div class="key-capture" id="key-display" onclick="startKeyCapture()">Tap to set key</div>
+        <div class="key-capture" id="key-display" onclick="startKeyCapture()" data-i18n="tap_to_set">Tap to set key</div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('session')">Back</button>
-            <button class="btn btn-primary" id="btn-key-next" disabled onclick="fromKey()">Next</button>
+            <button class="btn btn-ghost" onclick="show('session')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" id="btn-key-next" disabled onclick="fromKey()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 4: Bar & Slot Size -->
     <div class="step" id="step-sizes">
         <div class="step-head">
-            <h2>Bar &amp; Slot Size</h2>
-            <p>Set how long the bar is and how wide the timing slot is</p>
+            <h2 data-i18n="sizes_h2">Bar &amp; Slot Size</h2>
+            <p data-i18n="sizes_p">Set how long the bar is and how wide the timing slot is</p>
         </div>
         <div class="form-group">
-            <label>Bar Size: <span class="val-label" id="barsize-val">70%</span></label>
+            <label><span data-i18n="bar_size">Bar Size:</span> <span class="val-label" id="barsize-val">70%</span></label>
             <input type="range" id="inp-barsize" min="30" max="95" step="1" value="70" oninput="onBarSizeChange(this.value)">
         </div>
         <div class="form-group">
-            <label>Timing Slot Size — smaller is harder: <span class="val-label" id="slotsize-val">14%</span></label>
+            <label><span data-i18n="slot_size">Timing Slot Size — smaller is harder:</span> <span class="val-label" id="slotsize-val">14%</span></label>
             <input type="range" id="inp-slotsize" min="4" max="30" step="1" value="14" oninput="onSlotSizeChange(this.value)">
         </div>
         <div class="size-prev-wrap" id="size-prev-wrap">
@@ -100,43 +101,43 @@
             </div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('key')">Back</button>
-            <button class="btn btn-primary" onclick="fromSizes()">Next</button>
+            <button class="btn btn-ghost" onclick="show('key')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="fromSizes()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 5: Confirm -->
     <div class="step" id="step-confirm">
         <div class="step-head">
-            <h2>Ready to Train</h2>
-            <p>Review your settings then start when ready</p>
+            <h2 data-i18n="ready_h2">Ready to Train</h2>
+            <p data-i18n="ready_p">Review your settings then start when ready</p>
         </div>
         <div class="summary-card">
-            <div class="summary-row"><span class="s-key">Orientation</span><span class="s-val" id="s-orient">—</span></div>
-            <div class="summary-row"><span class="s-key">Sweep Speed</span><span class="s-val" id="s-speed">—</span></div>
-            <div class="summary-row"><span class="s-key">Duration</span><span class="s-val" id="s-dur">—</span></div>
-            <div class="summary-row"><span class="s-key">Timing Key</span><span class="s-val" id="s-key">—</span></div>
-            <div class="summary-row"><span class="s-key">Bar Size</span><span class="s-val" id="s-barsize">—</span></div>
-            <div class="summary-row"><span class="s-key">Slot Size</span><span class="s-val" id="s-slotsize">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_orient">Orientation</span><span class="s-val" id="s-orient">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_speed">Sweep Speed</span><span class="s-val" id="s-speed">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_dur">Duration</span><span class="s-val" id="s-dur">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_key">Timing Key</span><span class="s-val" id="s-key">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_barsize">Bar Size</span><span class="s-val" id="s-barsize">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_slotsize">Slot Size</span><span class="s-val" id="s-slotsize">—</span></div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('sizes')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="fromConfirm()">Start Training</button>
+            <button class="btn btn-ghost" onclick="show('sizes')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="fromConfirm()" data-i18n="start_training">Start Training</button>
         </div>
     </div>
 
     <!-- STEP 6: How to Play -->
     <div class="step" id="step-guide">
         <div class="step-head">
-            <h2>How to Play</h2>
-            <p>Quick rundown before you start</p>
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
         </div>
         <div class="guide-card" style="--guide-color: var(--purple);">
             <ul class="guide-list" id="guide-list"></ul>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Let's Go!</button>
+            <button class="btn btn-ghost" onclick="show('confirm')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTraining()" data-i18n="lets_go">Let's Go!</button>
         </div>
     </div>
 
@@ -150,11 +151,11 @@
 <!-- GAME SCREEN -->
 <div id="screen-game">
     <div class="game-hud">
-        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl">Time</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl">Score</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-land">0</div><div class="hud-lbl">Landings</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-fail">0</div><div class="hud-lbl">Fails</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-miss">0</div><div class="hud-lbl">Missed</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl" data-i18n="hud_time">Time</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-land">0</div><div class="hud-lbl" data-i18n="hud_land">Landings</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-fail">0</div><div class="hud-lbl" data-i18n="hud_fail">Fails</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-miss">0</div><div class="hud-lbl" data-i18n="hud_missed">Missed</div></div>
     </div>
     <div class="game-area game-area-center" id="game-area">
         <div class="timing-track" id="timing-track">
@@ -166,20 +167,104 @@
 
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
-    <div class="res-title">Session Complete!</div>
-    <div class="res-subtitle">Here's how you timed it</div>
+    <div class="res-title" data-i18n="res_title">Session Complete!</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Here's how you timed it</div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl">Score</div></div>
-        <div class="res-stat"><div class="res-val" id="r-land">0</div><div class="res-lbl">Landings</div></div>
-        <div class="res-stat"><div class="res-val" id="r-fail">0</div><div class="res-lbl">Fails</div></div>
-        <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl">Missed</div></div>
-        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl">Accuracy</div></div>
+        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="res-stat"><div class="res-val" id="r-land">0</div><div class="res-lbl" data-i18n="hud_land">Landings</div></div>
+        <div class="res-stat"><div class="res-val" id="r-fail">0</div><div class="res-lbl" data-i18n="hud_fail">Fails</div></div>
+        <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl" data-i18n="hud_missed">Missed</div></div>
+        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
     </div>
-    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
 <script src="confetti.js"></script>
+<script src="i18n.js"></script>
 <script>
+const I18N = {
+    back:           { en: 'Back', zh: '返回' },
+    page_title:     { en: 'Timing', zh: '时机训练' },
+    orient_h2:      { en: 'Bar Orientation', zh: '横条方向' },
+    orient_p:       { en: 'Choose how the timing bar crosses the screen', zh: '选择计时横条在屏幕上的方向' },
+    horizontal_h3:  { en: 'Horizontal', zh: '水平' },
+    horizontal_p:   { en: 'The bar runs left to right across the screen', zh: '横条从左到右横穿屏幕' },
+    vertical_h3:    { en: 'Vertical', zh: '垂直' },
+    vertical_p:     { en: 'The bar runs top to bottom across the screen', zh: '横条从上到下贯穿屏幕' },
+    next:           { en: 'Next', zh: '下一步' },
+    session_h2:     { en: 'Speed & Duration', zh: '速度与时长' },
+    session_p:      { en: "Control how fast the square sweeps and how long you'll train", zh: '控制方块的移动速度以及训练时长' },
+    sweep_speed:    { en: 'Sweep Speed — time for one pass across the bar:', zh: '移动速度 — 方块走完一趟所需时间：' },
+    session_dur:    { en: 'Session Duration', zh: '训练时长' },
+    custom:         { en: 'Custom:', zh: '自定义：' },
+    key_h2:         { en: 'Set Your Timing Key', zh: '设置你的计时按键' },
+    key_p:          { en: 'Tap the box below, then press a key, click, or tap the screen to use for timing', zh: '点击下方方框，然后按键、点击鼠标或触摸屏幕以设置计时方式' },
+    tap_to_set:     { en: 'Tap to set key', zh: '点击以设置按键' },
+    sizes_h2:       { en: 'Bar & Slot Size', zh: '横条与目标区大小' },
+    sizes_p:        { en: 'Set how long the bar is and how wide the timing slot is', zh: '设置横条的长度和目标区的宽度' },
+    bar_size:       { en: 'Bar Size:', zh: '横条大小：' },
+    slot_size:      { en: 'Timing Slot Size — smaller is harder:', zh: '目标区大小 — 越小越难：' },
+    ready_h2:       { en: 'Ready to Train', zh: '准备开始训练' },
+    ready_p:        { en: 'Review your settings then start when ready', zh: '查看你的设置，准备好后开始训练' },
+    s_orient:       { en: 'Orientation', zh: '方向' },
+    s_speed:        { en: 'Sweep Speed', zh: '移动速度' },
+    s_dur:          { en: 'Duration', zh: '时长' },
+    s_key:          { en: 'Timing Key', zh: '计时按键' },
+    s_barsize:      { en: 'Bar Size', zh: '横条大小' },
+    s_slotsize:     { en: 'Slot Size', zh: '目标区大小' },
+    start_training: { en: 'Start Training', zh: '开始训练' },
+    guide_h2:       { en: 'How to Play', zh: '玩法说明' },
+    guide_p:        { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    lets_go:        { en: "Let's Go!", zh: '开始吧！' },
+    hud_time:       { en: 'Time', zh: '时间' },
+    hud_score:      { en: 'Score', zh: '得分' },
+    hud_land:       { en: 'Landings', zh: '命中次数' },
+    hud_fail:       { en: 'Fails', zh: '失败次数' },
+    hud_missed:     { en: 'Missed', zh: '未命中' },
+    hud_accuracy:   { en: 'Accuracy', zh: '准确率' },
+    res_title:      { en: 'Session Complete!', zh: '训练完成！' },
+    res_subtitle:   { en: "Here's how you timed it", zh: '这是你的计时表现' },
+    back_home:      { en: 'Back to Home', zh: '返回首页' },
+    sec:            { en: 's', zh: '秒' },
+    min:            { en: 'm', zh: '分' },
+    per_pass:       { en: 's per pass', zh: ' 秒/趟' },
+    horizontal_val: { en: 'Horizontal', zh: '水平' },
+    vertical_val:   { en: 'Vertical', zh: '垂直' },
+    top_to_bottom:  { en: 'top to bottom', zh: '从上到下' },
+    left_to_right:  { en: 'left to right', zh: '从左到右' },
+    guide_dir:      { en: 'A white square sweeps back and forth along the bar, running', zh: '一个白色方块沿横条来回移动，方向为' },
+    guide_press:    { en: 'Press, click, or tap', zh: '在方块进入绿色目标区的瞬间，按键、点击或触摸' },
+    guide_press2:   { en: 'the instant the square is inside the highlighted green slot.', zh: '。' },
+    guide_score:    { en: 'A good landing scores points. Pressing at the wrong time is a Fail; letting the square pass through untouched is a Miss.', zh: '成功命中会得分。时机错误算作失败；未做任何反应让方块滑过则算作未命中。' },
+    guide_shuffle:  { en: 'Every landing or fail immediately moves the slot to a new spot, so stay ready.', zh: '每次命中或失败后，目标区都会立刻移动到新的位置，请保持警惕。' },
+    tap_screen:     { en: 'Tap Screen', zh: '点击屏幕' },
+    left_click:     { en: 'Left Click', zh: '左键点击' },
+    middle_click:   { en: 'Middle Click', zh: '中键点击' },
+    right_click:    { en: 'Right Click', zh: '右键点击' },
+    mouse_back:     { en: 'Mouse Back', zh: '鼠标后退键' },
+    mouse_forward:  { en: 'Mouse Forward', zh: '鼠标前进键' },
+    space:          { en: 'Space', zh: '空格键' },
+    press_key_cap:  { en: 'Press a key, click, or tap…', zh: '请按键、点击或触摸…' }
+};
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
+
+function onLangChange() {
+    if (cfg.key) {
+        cfg.keyLabel = labelForCode(cfg.key, cfg.rawKey || cfg.keyLabel);
+        if (!document.getElementById('key-display').classList.contains('capturing')) {
+            document.getElementById('key-display').textContent = cfg.keyLabel;
+        }
+    } else if (!document.getElementById('key-display').classList.contains('capturing')) {
+        document.getElementById('key-display').textContent = t(I18N,'tap_to_set');
+    }
+    if (document.getElementById('key-display').classList.contains('capturing')) {
+        document.getElementById('key-display').textContent = t(I18N,'press_key_cap');
+    }
+    if (document.getElementById('step-confirm').classList.contains('active')) fillSummary();
+    if (document.getElementById('screen-game').classList.contains('on')) updateHUD();
+}
+
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = {
     orientation: null,
@@ -212,9 +297,9 @@ function navBack() {
 }
 
 function fmtTime(s) {
-    if (s < 60) return s + 's';
+    if (s < 60) return s + t(I18N,'sec');
     const m = Math.floor(s / 60), r = s % 60;
-    return m + 'm' + (r ? ' ' + r + 's' : '');
+    return m + t(I18N,'min') + (r ? ' ' + r + t(I18N,'sec') : '');
 }
 
 // ─── ORIENTATION STEP ───────────────────────────────────────────
@@ -234,7 +319,7 @@ function fromOrientation() {
 // ─── SPEED & DURATION STEP ──────────────────────────────────────
 function onSpeedChange(val) {
     cfg.speed = parseFloat(val);
-    document.getElementById('speed-val').textContent = cfg.speed.toFixed(1) + 's';
+    document.getElementById('speed-val').textContent = cfg.speed.toFixed(1) + t(I18N,'sec');
 }
 
 function setDurPreset(val, el) {
@@ -258,14 +343,15 @@ function fromSession() {
 function startKeyCapture() {
     inputMode = 'capture';
     const el = document.getElementById('key-display');
-    el.textContent = 'Press a key, click, or tap…';
+    el.textContent = t(I18N,'press_key_cap');
     el.classList.add('capturing');
 }
 
 function handleCapture(code, e) {
     e.preventDefault();
     cfg.key = code;
-    cfg.keyLabel = labelForCode(code, e);
+    cfg.rawKey = e.key;
+    cfg.keyLabel = labelForCode(code, e.key);
     inputMode = 'idle';
     const el = document.getElementById('key-display');
     el.textContent = cfg.keyLabel;
@@ -273,13 +359,13 @@ function handleCapture(code, e) {
     document.getElementById('btn-key-next').disabled = false;
 }
 
-const MOUSE_LABELS = { Mouse0: 'Left Click', Mouse1: 'Middle Click', Mouse2: 'Right Click', Mouse3: 'Mouse Back', Mouse4: 'Mouse Forward' };
+const MOUSE_LABEL_KEYS = { Mouse0: 'left_click', Mouse1: 'middle_click', Mouse2: 'right_click', Mouse3: 'mouse_back', Mouse4: 'mouse_forward' };
 
-function labelForCode(code, e) {
-    if (code === 'Tap') return 'Tap Screen';
-    if (MOUSE_LABELS[code]) return MOUSE_LABELS[code];
-    if (code === 'Space') return 'Space';
-    return e.key.length === 1 ? e.key.toUpperCase() : e.key;
+function labelForCode(code, rawKey) {
+    if (code === 'Tap') return t(I18N,'tap_screen');
+    if (MOUSE_LABEL_KEYS[code]) return t(I18N, MOUSE_LABEL_KEYS[code]);
+    if (code === 'Space') return t(I18N,'space');
+    return rawKey.length === 1 ? rawKey.toUpperCase() : rawKey;
 }
 
 function fromKey() {
@@ -329,8 +415,8 @@ function fromSizes() {
 }
 
 function fillSummary() {
-    document.getElementById('s-orient').textContent = cfg.orientation === 'vertical' ? 'Vertical' : 'Horizontal';
-    document.getElementById('s-speed').textContent = cfg.speed.toFixed(1) + 's per pass';
+    document.getElementById('s-orient').textContent = cfg.orientation === 'vertical' ? t(I18N,'vertical_val') : t(I18N,'horizontal_val');
+    document.getElementById('s-speed').textContent = cfg.speed.toFixed(1) + t(I18N,'per_pass');
     document.getElementById('s-dur').textContent = fmtTime(cfg.duration);
     document.getElementById('s-key').textContent = cfg.keyLabel;
     document.getElementById('s-barsize').textContent = cfg.barSize + '%';
@@ -344,13 +430,13 @@ function fromConfirm() {
 
 function fillGuide() {
     const list = document.getElementById('guide-list');
-    const dir = cfg.orientation === 'vertical' ? 'top to bottom' : 'left to right';
+    const dir = cfg.orientation === 'vertical' ? t(I18N,'top_to_bottom') : t(I18N,'left_to_right');
     list.innerHTML = [
-        `A white square sweeps back and forth along the bar, running ${dir}.`,
-        `Press, click, or tap ${cfg.keyLabel} the instant the square is inside the highlighted green slot.`,
-        `A good landing scores points. Pressing at the wrong time is a Fail; letting the square pass through untouched is a Miss.`,
-        `Every landing or fail immediately moves the slot to a new spot, so stay ready.`
-    ].map(t => `<li>${t}</li>`).join('');
+        `${t(I18N,'guide_dir')} ${dir}.`,
+        `${t(I18N,'guide_press')} ${cfg.keyLabel} ${t(I18N,'guide_press2')}`,
+        t(I18N,'guide_score'),
+        t(I18N,'guide_shuffle')
+    ].map(text => `<li>${text}</li>`).join('');
 }
 
 // ─── COUNTDOWN ──────────────────────────────────────────────────
@@ -503,7 +589,7 @@ function handleTimingInput(code, e) {
 }
 
 function updateHUD() {
-    document.getElementById('hud-time').textContent = gs.timeLeft + 's';
+    document.getElementById('hud-time').textContent = gs.timeLeft + t(I18N,'sec');
     document.getElementById('hud-score').textContent = gs.score;
     document.getElementById('hud-land').textContent = gs.landings;
     document.getElementById('hud-fail').textContent = gs.fails;

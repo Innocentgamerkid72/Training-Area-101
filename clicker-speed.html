@@ -10,8 +10,9 @@
 
 <!-- PAGE NAV (hidden during countdown/game/results) -->
 <nav class="page-nav" id="page-nav">
-    <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Clicking Speed</span>
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Clicking Speed</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -20,8 +21,8 @@
     <!-- STEP 1: Duration -->
     <div class="step active" id="step-duration">
         <div class="step-head">
-            <h2>Select Duration</h2>
-            <p>Choose how long the clicking speed test will last</p>
+            <h2 data-i18n="dur_h2">Select Duration</h2>
+            <p data-i18n="dur_p">Choose how long the clicking speed test will last</p>
         </div>
         <div class="form-group">
             <div class="presets" id="dur-presets">
@@ -32,46 +33,46 @@
                 <div class="preset" onclick="setDurPreset(120,this)">2m</div>
                 <div class="preset" onclick="setDurPreset(300,this)">5m</div>
             </div>
-            <label style="margin-top:10px;">Custom: <span class="val-label" id="dur-val">30s</span></label>
+            <label style="margin-top:10px;"><span data-i18n="custom">Custom:</span> <span class="val-label" id="dur-val">30s</span></label>
             <input type="range" id="inp-dur" min="5" max="300" step="1" value="30" oninput="onDurChange(this.value)">
         </div>
         <div class="step-foot">
             <div></div>
-            <button class="btn btn-primary" onclick="fromDuration()">Next</button>
+            <button class="btn btn-primary" onclick="fromDuration()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 2: Confirm -->
     <div class="step" id="step-confirm">
         <div class="step-head">
-            <h2>Ready to Train</h2>
-            <p>Review your settings then start when ready</p>
+            <h2 data-i18n="ready_h2">Ready to Train</h2>
+            <p data-i18n="ready_p">Review your settings then start when ready</p>
         </div>
         <div class="summary-card">
-            <div class="summary-row"><span class="s-key">Test Duration</span><span class="s-val" id="s-dur">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_dur">Test Duration</span><span class="s-val" id="s-dur">—</span></div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('duration')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="show('guide')">Start Training</button>
+            <button class="btn btn-ghost" onclick="show('duration')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="show('guide')" data-i18n="start_training">Start Training</button>
         </div>
     </div>
 
     <!-- STEP 3: How to Play -->
     <div class="step" id="step-guide">
         <div class="step-head">
-            <h2>How to Play</h2>
-            <p>Quick rundown before you start</p>
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
         </div>
         <div class="guide-card" style="--guide-color: var(--orange);">
             <ul class="guide-list">
-                <li>Click the black square as many times as you can before time runs out.</li>
-                <li>Every click counts, however fast you can go — there's no penalty for missing.</li>
-                <li>Your result is measured in Clicks Per Minute (CPM), calculated from your total clicks.</li>
+                <li data-i18n="guide_1">Click the black square as many times as you can before time runs out.</li>
+                <li data-i18n="guide_2">Every click counts, however fast you can go — there's no penalty for missing.</li>
+                <li data-i18n="guide_3">Your result is measured in Clicks Per Minute (CPM), calculated from your total clicks.</li>
             </ul>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginCountdown()">Let's Go!</button>
+            <button class="btn btn-ghost" onclick="show('confirm')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginCountdown()" data-i18n="lets_go">Let's Go!</button>
         </div>
     </div>
 
@@ -85,9 +86,9 @@
 <!-- GAME SCREEN -->
 <div id="screen-game">
     <div class="game-hud">
-        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl">Time</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-clicks">0</div><div class="hud-lbl">Clicks</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-cps">0.0</div><div class="hud-lbl">Clicks/sec</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl" data-i18n="hud_time">Time</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-clicks">0</div><div class="hud-lbl" data-i18n="hud_clicks">Clicks</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-cps">0.0</div><div class="hud-lbl" data-i18n="hud_cps">Clicks/sec</div></div>
     </div>
     <div class="game-area game-area-center" id="game-area">
         <div class="speed-target" id="speed-target"></div>
@@ -96,18 +97,49 @@
 
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
-    <div class="res-title">Time's Up!</div>
-    <div class="res-subtitle">Here's your clicking speed</div>
+    <div class="res-title" data-i18n="res_title">Time's Up!</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Here's your clicking speed</div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-cpm">0</div><div class="res-lbl">Clicks / Minute</div></div>
-        <div class="res-stat"><div class="res-val" id="r-clicks">0</div><div class="res-lbl">Total Clicks</div></div>
-        <div class="res-stat"><div class="res-val" id="r-dur">0s</div><div class="res-lbl">Duration</div></div>
+        <div class="res-stat"><div class="res-val" id="r-cpm">0</div><div class="res-lbl" data-i18n="r_cpm">Clicks / Minute</div></div>
+        <div class="res-stat"><div class="res-val" id="r-clicks">0</div><div class="res-lbl" data-i18n="r_clicks">Total Clicks</div></div>
+        <div class="res-stat"><div class="res-val" id="r-dur">0s</div><div class="res-lbl" data-i18n="r_dur">Duration</div></div>
     </div>
-    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
 <script src="confetti.js"></script>
+<script src="i18n.js"></script>
 <script>
+const I18N = {
+    back:           { en: 'Back', zh: '返回' },
+    page_title:     { en: 'Clicking Speed', zh: '点击速度' },
+    dur_h2:         { en: 'Select Duration', zh: '选择时长' },
+    dur_p:          { en: 'Choose how long the clicking speed test will last', zh: '选择点击速度测试的持续时间' },
+    custom:         { en: 'Custom:', zh: '自定义：' },
+    next:           { en: 'Next', zh: '下一步' },
+    ready_h2:       { en: 'Ready to Train', zh: '准备开始训练' },
+    ready_p:        { en: 'Review your settings then start when ready', zh: '查看你的设置，准备好后开始训练' },
+    s_dur:          { en: 'Test Duration', zh: '测试时长' },
+    start_training: { en: 'Start Training', zh: '开始训练' },
+    guide_h2:       { en: 'How to Play', zh: '玩法说明' },
+    guide_p:        { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    guide_1:        { en: 'Click the black square as many times as you can before time runs out.', zh: '在时间耗尽前，尽可能多次点击黑色方块。' },
+    guide_2:        { en: "Every click counts, however fast you can go — there's no penalty for missing.", zh: '每次点击都算数，尽可能快地点击 — 点空不会扣分。' },
+    guide_3:        { en: 'Your result is measured in Clicks Per Minute (CPM), calculated from your total clicks.', zh: '你的结果以每分钟点击数（CPM）衡量，根据总点击次数计算。' },
+    lets_go:        { en: "Let's Go!", zh: '开始吧！' },
+    hud_time:       { en: 'Time', zh: '时间' },
+    hud_clicks:     { en: 'Clicks', zh: '点击次数' },
+    hud_cps:        { en: 'Clicks/sec', zh: '每秒点击' },
+    res_title:      { en: "Time's Up!", zh: '时间到！' },
+    res_subtitle:   { en: "Here's your clicking speed", zh: '这是你的点击速度' },
+    r_cpm:          { en: 'Clicks / Minute', zh: '每分钟点击数' },
+    r_clicks:       { en: 'Total Clicks', zh: '总点击次数' },
+    r_dur:          { en: 'Duration', zh: '时长' },
+    back_home:      { en: 'Back to Home', zh: '返回首页' },
+    sec:            { en: 's', zh: '秒' },
+    min:            { en: 'm', zh: '分' }
+};
+
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = { duration: 30 };
 
@@ -124,9 +156,17 @@ function navBack() {
 }
 
 function fmtTime(s) {
-    if (s < 60) return s + 's';
+    if (s < 60) return s + t(I18N,'sec');
     const m = Math.floor(s / 60), r = s % 60;
-    return m + 'm' + (r ? ' ' + r + 's' : '');
+    return m + t(I18N,'min') + (r ? ' ' + r + t(I18N,'sec') : '');
+}
+
+function onLangChange() {
+    document.getElementById('dur-val').textContent = fmtTime(parseInt(document.getElementById('inp-dur').value));
+    if (document.getElementById('step-confirm').classList.contains('active')) {
+        document.getElementById('s-dur').textContent = fmtTime(cfg.duration);
+    }
+    if (document.getElementById('screen-game').classList.contains('on')) updateHUD();
 }
 
 // ─── DURATION STEP ──────────────────────────────────────────────
@@ -202,7 +242,7 @@ function flashTarget() {
 }
 
 function updateHUD() {
-    document.getElementById('hud-time').textContent = gs.timeLeft + 's';
+    document.getElementById('hud-time').textContent = gs.timeLeft + t(I18N,'sec');
     document.getElementById('hud-clicks').textContent = gs.clicks;
     const elapsed = Math.max(1, cfg.duration - gs.timeLeft);
     document.getElementById('hud-cps').textContent = (gs.clicks / elapsed).toFixed(1);
@@ -221,6 +261,8 @@ function endGame() {
     document.getElementById('screen-results').classList.add('on');
     spawnConfetti();
 }
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
 </script>
 </body>
 </html>

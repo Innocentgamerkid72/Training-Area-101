@@ -10,8 +10,9 @@
 
 <!-- PAGE NAV (hidden during game/results) -->
 <nav class="page-nav" id="page-nav">
-    <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Reaction Time</span>
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Reaction Time</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -20,84 +21,84 @@
     <!-- STEP 1: Theme -->
     <div class="step active" id="step-theme">
         <div class="step-head">
-            <h2>Select Theme</h2>
-            <p>Choose how you want to train your reaction time</p>
+            <h2 data-i18n="theme_h2">Select Theme</h2>
+            <p data-i18n="theme_p">Choose how you want to train your reaction time</p>
         </div>
         <div class="mode-grid mode-grid-2">
             <div class="mode-card" data-theme="redgreen" onclick="pickTheme(this)">
-                <h3>Red Light</h3>
-                <p>Wait for the screen to turn green, then react as fast as you can</p>
+                <h3 data-i18n="redgreen_h3">Red Light</h3>
+                <p data-i18n="redgreen_p">Wait for the screen to turn green, then react as fast as you can</p>
             </div>
             <div class="mode-card" data-theme="standoff" onclick="pickTheme(this)">
-                <h3>Standoff</h3>
-                <p>Face off against the clock — react the instant it says SHOOT!</p>
+                <h3 data-i18n="standoff_h3">Standoff</h3>
+                <p data-i18n="standoff_p">Face off against the clock — react the instant it says SHOOT!</p>
             </div>
         </div>
         <div class="step-foot">
             <div></div>
-            <button class="btn btn-primary" id="btn-theme-next" disabled onclick="fromTheme()">Next</button>
+            <button class="btn btn-primary" id="btn-theme-next" disabled onclick="fromTheme()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 2: Reaction Key -->
     <div class="step" id="step-key">
         <div class="step-head">
-            <h2>Set Your Reaction Key</h2>
-            <p>Tap the box below, then press a key, click, or tap the screen to use for reacting</p>
+            <h2 data-i18n="key_h2">Set Your Reaction Key</h2>
+            <p data-i18n="key_p">Tap the box below, then press a key, click, or tap the screen to use for reacting</p>
         </div>
-        <div class="key-capture" id="key-display" onclick="startKeyCapture()">Tap to set key</div>
+        <div class="key-capture" id="key-display" onclick="startKeyCapture()" data-i18n="tap_to_set">Tap to set key</div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('theme')">Back</button>
-            <button class="btn btn-primary" id="btn-key-next" disabled onclick="fromKey()">Next</button>
+            <button class="btn btn-ghost" onclick="show('theme')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" id="btn-key-next" disabled onclick="fromKey()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 3: Signal Text Size (standoff only) -->
     <div class="step" id="step-textsize">
         <div class="step-head">
-            <h2>Signal Text Size</h2>
-            <p>Adjust how large the "SHOOT!" signal appears</p>
+            <h2 data-i18n="size_h2">Signal Text Size</h2>
+            <p data-i18n="size_p">Adjust how large the "SHOOT!" signal appears</p>
         </div>
         <div class="form-group">
-            <label>Text Size: <span class="val-label" id="size-val">80px</span></label>
+            <label><span data-i18n="text_size">Text Size:</span> <span class="val-label" id="size-val">80px</span></label>
             <input type="range" id="inp-textsize" min="40" max="160" step="4" value="80" oninput="onTextSizeChange(this.value)">
         </div>
         <div class="size-preview" id="size-preview" style="font-size:80px;">SHOOT!</div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('key')">Back</button>
-            <button class="btn btn-primary" onclick="fromTextSize()">Next</button>
+            <button class="btn btn-ghost" onclick="show('key')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" onclick="fromTextSize()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 4: Confirm -->
     <div class="step" id="step-confirm">
         <div class="step-head">
-            <h2>Ready to Train</h2>
-            <p>Review your settings then start when ready</p>
+            <h2 data-i18n="ready_h2">Ready to Train</h2>
+            <p data-i18n="ready_p">Review your settings then start when ready</p>
         </div>
         <div class="summary-card">
-            <div class="summary-row"><span class="s-key">Theme</span><span class="s-val" id="s-theme">—</span></div>
-            <div class="summary-row"><span class="s-key">Reaction Key</span><span class="s-val" id="s-rkey">—</span></div>
-            <div class="summary-row" id="s-size-row"><span class="s-key">Text Size</span><span class="s-val" id="s-size">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_theme">Theme</span><span class="s-val" id="s-theme">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_rkey">Reaction Key</span><span class="s-val" id="s-rkey">—</span></div>
+            <div class="summary-row" id="s-size-row"><span class="s-key" data-i18n="s_size">Text Size</span><span class="s-val" id="s-size">—</span></div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show(cfg.theme === 'standoff' ? 'textsize' : 'key')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="fromConfirm()">Start Training</button>
+            <button class="btn btn-ghost" onclick="show(cfg.theme === 'standoff' ? 'textsize' : 'key')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="fromConfirm()" data-i18n="start_training">Start Training</button>
         </div>
     </div>
 
     <!-- STEP 5: How to Play -->
     <div class="step" id="step-guide">
         <div class="step-head">
-            <h2>How to Play</h2>
-            <p>Quick rundown before you start</p>
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
         </div>
         <div class="guide-card" style="--guide-color: var(--green);">
             <ul class="guide-list" id="guide-list"></ul>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTheme()">Let's Go!</button>
+            <button class="btn btn-ghost" onclick="show('confirm')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTheme()" data-i18n="lets_go">Let's Go!</button>
         </div>
     </div>
 
@@ -130,15 +131,90 @@
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
     <div class="res-title" id="r-tier">—</div>
-    <div class="res-subtitle">Your reaction time</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Your reaction time</div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-ms">0ms</div><div class="res-lbl">Reaction Time</div></div>
+        <div class="res-stat"><div class="res-val" id="r-ms">0ms</div><div class="res-lbl" data-i18n="r_ms">Reaction Time</div></div>
     </div>
-    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
 <script src="confetti.js"></script>
+<script src="i18n.js"></script>
 <script>
+const I18N = {
+    back:            { en: 'Back', zh: '返回' },
+    page_title:      { en: 'Reaction Time', zh: '反应时间' },
+    theme_h2:        { en: 'Select Theme', zh: '选择主题' },
+    theme_p:         { en: 'Choose how you want to train your reaction time', zh: '选择训练反应时间的方式' },
+    redgreen_h3:     { en: 'Red Light', zh: '红绿灯' },
+    redgreen_p:      { en: 'Wait for the screen to turn green, then react as fast as you can', zh: '等待屏幕变绿，然后尽快做出反应' },
+    standoff_h3:     { en: 'Standoff', zh: '对峙' },
+    standoff_p:      { en: 'Face off against the clock — react the instant it says SHOOT!', zh: '与时间对决 — 出现“SHOOT!”的瞬间立刻反应！' },
+    next:            { en: 'Next', zh: '下一步' },
+    key_h2:          { en: 'Set Your Reaction Key', zh: '设置你的反应按键' },
+    key_p:           { en: 'Tap the box below, then press a key, click, or tap the screen to use for reacting', zh: '点击下方方框，然后按键、点击鼠标或触摸屏幕以设置反应方式' },
+    tap_to_set:      { en: 'Tap to set key', zh: '点击以设置按键' },
+    size_h2:         { en: 'Signal Text Size', zh: '信号文字大小' },
+    size_p:          { en: 'Adjust how large the "SHOOT!" signal appears', zh: '调整“SHOOT!”信号文字的显示大小' },
+    text_size:       { en: 'Text Size:', zh: '文字大小：' },
+    ready_h2:        { en: 'Ready to Train', zh: '准备开始训练' },
+    ready_p:         { en: 'Review your settings then start when ready', zh: '查看你的设置，准备好后开始训练' },
+    s_theme:         { en: 'Theme', zh: '主题' },
+    s_rkey:          { en: 'Reaction Key', zh: '反应按键' },
+    s_size:          { en: 'Text Size', zh: '文字大小' },
+    start_training:  { en: 'Start Training', zh: '开始训练' },
+    guide_h2:        { en: 'How to Play', zh: '玩法说明' },
+    guide_p:         { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    lets_go:         { en: "Let's Go!", zh: '开始吧！' },
+    res_subtitle:    { en: 'Your reaction time', zh: '你的反应时间' },
+    r_ms:            { en: 'Reaction Time', zh: '反应时间' },
+    back_home:       { en: 'Back to Home', zh: '返回首页' },
+    get_ready:       { en: 'Get ready…', zh: '准备…' },
+    wait_dots:       { en: 'Wait...', zh: '等待...' },
+    go:              { en: 'GO!', zh: '走！' },
+    shoot:           { en: 'SHOOT!', zh: 'SHOOT!' },
+    too_early:       { en: 'Too early! Restarting…', zh: '太早了！正在重新开始…' },
+    press_key:       { en: 'Wait for green, then press', zh: '等待变绿，然后按下' },
+    watch_text:      { en: 'Watch the big text in the middle — it starts by saying "Wait...".', zh: '注意屏幕中央的大字 — 一开始会显示“等待...”。' },
+    instant_shoot:   { en: 'The instant it changes to "SHOOT!", press', zh: '文字变为“SHOOT!”的瞬间，立刻按下' },
+    as_fast:         { en: 'as fast as you can.', zh: '，越快越好。' },
+    early_shoot:     { en: 'Reacting before "SHOOT!" appears forces a restart — stay patient.', zh: '在“SHOOT!”出现前反应会强制重新开始 — 请保持耐心。' },
+    screen_red:      { en: 'The screen starts red — wait for it to turn green.', zh: '屏幕一开始为红色 — 请等待它变绿。' },
+    instant_green:   { en: 'The instant it turns green, press', zh: '屏幕变绿的瞬间，立刻按下' },
+    early_green:     { en: 'Reacting too early forces a restart — stay patient.', zh: '反应过早会强制重新开始 — 请保持耐心。' },
+    tap_screen:      { en: 'Tap Screen', zh: '点击屏幕' },
+    left_click:      { en: 'Left Click', zh: '左键点击' },
+    middle_click:    { en: 'Middle Click', zh: '中键点击' },
+    right_click:     { en: 'Right Click', zh: '右键点击' },
+    mouse_back:      { en: 'Mouse Back', zh: '鼠标后退键' },
+    mouse_forward:   { en: 'Mouse Forward', zh: '鼠标前进键' },
+    space:           { en: 'Space', zh: '空格键' },
+    tier_lightning:  { en: 'Lightning Fast', zh: '闪电般迅速' },
+    tier_excellent:  { en: 'Excellent', zh: '优秀' },
+    tier_good:       { en: 'Good', zh: '良好' },
+    tier_average:    { en: 'Average', zh: '一般' },
+    tier_practicing: { en: 'Keep Practicing', zh: '继续练习' },
+    press_key_cap:   { en: 'Press a key, click, or tap…', zh: '请按键、点击或触摸…' }
+};
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
+
+function onLangChange() {
+    // re-render whatever dynamic text is currently on screen
+    if (cfg.key) {
+        cfg.keyLabel = relabelCurrentKey();
+        if (!document.getElementById('key-display').classList.contains('capturing')) {
+            document.getElementById('key-display').textContent = cfg.keyLabel;
+        }
+        if (document.getElementById('step-confirm').classList.contains('active')) fillSummary();
+    }
+    if (document.getElementById('key-display').classList.contains('capturing')) {
+        document.getElementById('key-display').textContent = t(I18N,'press_key_cap');
+    } else if (!cfg.key) {
+        document.getElementById('key-display').textContent = t(I18N,'tap_to_set');
+    }
+}
+
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = {
     theme: null,
@@ -178,8 +254,9 @@ function fromTheme() {
     if (!cfg.theme) return;
     cfg.key = null;
     cfg.keyLabel = null;
+    cfg.keyCode = null;
     const el = document.getElementById('key-display');
-    el.textContent = 'Tap to set key';
+    el.textContent = t(I18N,'tap_to_set');
     el.classList.remove('capturing');
     document.getElementById('btn-key-next').disabled = true;
     show('key');
@@ -201,7 +278,7 @@ function fromTextSize() {
 }
 
 function fillSummary() {
-    const themeLabel = { redgreen: 'Red Light', standoff: 'Standoff' }[cfg.theme];
+    const themeLabel = { redgreen: t(I18N,'redgreen_h3'), standoff: t(I18N,'standoff_h3') }[cfg.theme];
     document.getElementById('s-theme').textContent = themeLabel;
     document.getElementById('s-rkey').textContent = cfg.keyLabel;
     const sizeRow = document.getElementById('s-size-row');
@@ -222,30 +299,32 @@ function fillGuide() {
     const list = document.getElementById('guide-list');
     const items = cfg.theme === 'standoff'
         ? [
-            `Watch the big text in the middle — it starts by saying "Wait...".`,
-            `The instant it changes to "SHOOT!", press ${cfg.keyLabel} as fast as you can.`,
-            `Reacting before "SHOOT!" appears forces a restart — stay patient.`
+            t(I18N,'watch_text'),
+            `${t(I18N,'instant_shoot')} ${cfg.keyLabel}${t(I18N,'as_fast')}`,
+            t(I18N,'early_shoot')
         ]
         : [
-            `The screen starts red — wait for it to turn green.`,
-            `The instant it turns green, press ${cfg.keyLabel} as fast as you can.`,
-            `Reacting too early forces a restart — stay patient.`
+            t(I18N,'screen_red'),
+            `${t(I18N,'instant_green')} ${cfg.keyLabel}${t(I18N,'as_fast')}`,
+            t(I18N,'early_green')
         ];
-    list.innerHTML = items.map(t => `<li>${t}</li>`).join('');
+    list.innerHTML = items.map(text => `<li>${text}</li>`).join('');
 }
 
 // ─── KEY CAPTURE ────────────────────────────────────────────────
 function startKeyCapture() {
     inputMode = 'capture';
     const el = document.getElementById('key-display');
-    el.textContent = 'Press a key, click, or tap…';
+    el.textContent = t(I18N,'press_key_cap');
     el.classList.add('capturing');
 }
 
 function handleCapture(code, e) {
     e.preventDefault();
     cfg.key = code;
-    cfg.keyLabel = labelForCode(code, e);
+    cfg.keyCode = code;
+    cfg.rawKey = e.key;
+    cfg.keyLabel = labelForCode(code, e.key);
     inputMode = 'idle';
     const el = document.getElementById('key-display');
     el.textContent = cfg.keyLabel;
@@ -253,13 +332,17 @@ function handleCapture(code, e) {
     document.getElementById('btn-key-next').disabled = false;
 }
 
-const MOUSE_LABELS = { Mouse0: 'Left Click', Mouse1: 'Middle Click', Mouse2: 'Right Click', Mouse3: 'Mouse Back', Mouse4: 'Mouse Forward' };
+const MOUSE_LABEL_KEYS = { Mouse0: 'left_click', Mouse1: 'middle_click', Mouse2: 'right_click', Mouse3: 'mouse_back', Mouse4: 'mouse_forward' };
 
-function labelForCode(code, e) {
-    if (code === 'Tap') return 'Tap Screen';
-    if (MOUSE_LABELS[code]) return MOUSE_LABELS[code];
-    if (code === 'Space') return 'Space';
-    return e.key.length === 1 ? e.key.toUpperCase() : e.key;
+function labelForCode(code, rawKey) {
+    if (code === 'Tap') return t(I18N,'tap_screen');
+    if (MOUSE_LABEL_KEYS[code]) return t(I18N, MOUSE_LABEL_KEYS[code]);
+    if (code === 'Space') return t(I18N,'space');
+    return rawKey.length === 1 ? rawKey.toUpperCase() : rawKey;
+}
+
+function relabelCurrentKey() {
+    return labelForCode(cfg.keyCode, cfg.rawKey || cfg.keyLabel);
 }
 
 // ─── TEXT SIZE ──────────────────────────────────────────────────
@@ -284,7 +367,7 @@ function startRedGreen() {
     const screen = document.getElementById('screen-redgreen');
     screen.classList.add('on');
     screen.classList.remove('go');
-    document.getElementById('rg-msg').textContent = `Wait for green, then press ${cfg.keyLabel}`;
+    document.getElementById('rg-msg').textContent = `${t(I18N,'press_key')} ${cfg.keyLabel}`;
     document.getElementById('rg-flash').textContent = '';
     rt.state = 'waiting';
     inputMode = 'redgreen';
@@ -295,7 +378,7 @@ function startRedGreen() {
         rt.state = 'go';
         rt.goTime = performance.now();
         screen.classList.add('go');
-        document.getElementById('rg-msg').textContent = 'GO!';
+        document.getElementById('rg-msg').textContent = t(I18N,'go');
     }, delay);
 }
 
@@ -307,7 +390,7 @@ function startStandoff() {
     const textEl = document.getElementById('standoff-text');
     screen.classList.add('on');
     textEl.style.fontSize = cfg.textSize + 'px';
-    textEl.textContent = 'Wait...';
+    textEl.textContent = t(I18N,'wait_dots');
     textEl.classList.remove('shoot');
     document.getElementById('standoff-flash').textContent = '';
     document.getElementById('duelist-player').classList.remove('draw');
@@ -320,7 +403,7 @@ function startStandoff() {
         if (myGen !== rt.gen) return;
         rt.state = 'go';
         rt.goTime = performance.now();
-        textEl.textContent = 'SHOOT!';
+        textEl.textContent = t(I18N,'shoot');
         textEl.classList.add('shoot');
         document.getElementById('duelist-player').classList.add('draw');
         document.getElementById('duelist-ai').classList.add('draw');
@@ -342,7 +425,7 @@ function handleGameInput(code, e) {
         clearTimeout(rt.timer);
         rt.gen++;
         inputMode = 'idle';
-        document.getElementById(flashId).textContent = 'Too early! Restarting…';
+        document.getElementById(flashId).textContent = t(I18N,'too_early');
         setTimeout(startFn, 1200);
     } else if (rt.state === 'go') {
         const reaction = performance.now() - rt.goTime;
@@ -362,11 +445,11 @@ function showResults(ms) {
 }
 
 function tierFor(ms) {
-    if (ms < 180) return 'Lightning Fast';
-    if (ms < 250) return 'Excellent';
-    if (ms < 320) return 'Good';
-    if (ms < 400) return 'Average';
-    return 'Keep Practicing';
+    if (ms < 180) return t(I18N,'tier_lightning');
+    if (ms < 250) return t(I18N,'tier_excellent');
+    if (ms < 320) return t(I18N,'tier_good');
+    if (ms < 400) return t(I18N,'tier_average');
+    return t(I18N,'tier_practicing');
 }
 
 // ─── GLOBAL INPUT ROUTER ────────────────────────────────────────

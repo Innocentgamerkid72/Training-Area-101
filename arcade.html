@@ -10,8 +10,9 @@
 
 <!-- PAGE NAV (hidden during game/results) -->
 <nav class="page-nav" id="page-nav">
-    <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Stroop Rush</span>
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Stroop Rush</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -20,11 +21,11 @@
     <!-- STEP 1: Session Settings -->
     <div class="step active" id="step-session">
         <div class="step-head">
-            <h2>Stroop Rush</h2>
-            <p>Every leaf in a round shares one color — green means trust the arrow, yellow means the arrow is lying to you</p>
+            <h2 data-i18n="page_title">Stroop Rush</h2>
+            <p data-i18n="intro_p">Every leaf in a round shares one color — green means trust the arrow, yellow means the arrow is lying to you</p>
         </div>
         <div class="form-group">
-            <label>Session Duration</label>
+            <label data-i18n="session_dur">Session Duration</label>
             <div class="presets" id="dur-presets">
                 <div class="preset" onclick="setDurPreset(15,this)">15s</div>
                 <div class="preset sel" onclick="setDurPreset(30,this)">30s</div>
@@ -32,53 +33,53 @@
                 <div class="preset" onclick="setDurPreset(120,this)">2m</div>
                 <div class="preset" onclick="setDurPreset(300,this)">5m</div>
             </div>
-            <label style="margin-top:10px;">Custom: <span class="val-label" id="dur-val">30s</span></label>
+            <label style="margin-top:10px;"><span data-i18n="custom">Custom:</span> <span class="val-label" id="dur-val">30s</span></label>
             <input type="range" id="inp-dur" min="10" max="300" step="5" value="30" oninput="onDurChange(this.value)">
         </div>
         <div class="form-group">
-            <label>Time per Leaf — how long before an unanswered leaf counts as missed: <span class="val-label" id="ptime-val">2.5s</span></label>
+            <label><span data-i18n="time_per_leaf">Time per Leaf — how long before an unanswered leaf counts as missed:</span> <span class="val-label" id="ptime-val">2.5s</span></label>
             <input type="range" id="inp-ptime" min="0.5" max="5" step="0.1" value="2.5" oninput="onPromptTimeChange(this.value)">
         </div>
         <div class="step-foot">
             <div></div>
-            <button class="btn btn-primary" onclick="fromSession()">Next</button>
+            <button class="btn btn-primary" onclick="fromSession()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 2: Confirm -->
     <div class="step" id="step-confirm">
         <div class="step-head">
-            <h2>Ready to Train</h2>
-            <p>Review your settings then start when ready</p>
+            <h2 data-i18n="ready_h2">Ready to Train</h2>
+            <p data-i18n="ready_p">Review your settings then start when ready</p>
         </div>
         <div class="summary-card">
-            <div class="summary-row"><span class="s-key">Duration</span><span class="s-val" id="s-dur">—</span></div>
-            <div class="summary-row"><span class="s-key">Time per Leaf</span><span class="s-val" id="s-ptime">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_dur">Duration</span><span class="s-val" id="s-dur">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_ptime">Time per Leaf</span><span class="s-val" id="s-ptime">—</span></div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('session')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="show('guide')">Start Training</button>
+            <button class="btn btn-ghost" onclick="show('session')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="show('guide')" data-i18n="start_training">Start Training</button>
         </div>
     </div>
 
     <!-- STEP 3: How to Play -->
     <div class="step" id="step-guide">
         <div class="step-head">
-            <h2>How to Play</h2>
-            <p>Quick rundown before you start</p>
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
         </div>
         <div class="guide-card" style="--guide-color: var(--yellow);">
             <ul class="guide-list">
-                <li>Every leaf in a round is the same color — either all green or all yellow — and every leaf shows an arrow.</li>
-                <li>Green round: the arrows are honest — answer with the direction each leaf is pointing.</li>
-                <li>Yellow round: the arrows are decoys — ignore them and answer with the direction the leaf is actually drifting instead.</li>
-                <li>Getting one right immediately reshuffles every leaf you haven't answered yet, so don't scout ahead.</li>
-                <li>Resolve each leaf in turn using the arrow keys, WASD, or the on-screen d-pad — before its timer runs out.</li>
+                <li data-i18n="guide_1">Every leaf in a round is the same color — either all green or all yellow — and every leaf shows an arrow.</li>
+                <li data-i18n="guide_2">Green round: the arrows are honest — answer with the direction each leaf is pointing.</li>
+                <li data-i18n="guide_3">Yellow round: the arrows are decoys — ignore them and answer with the direction the leaf is actually drifting instead.</li>
+                <li data-i18n="guide_4">Getting one right immediately reshuffles every leaf you haven't answered yet, so don't scout ahead.</li>
+                <li data-i18n="guide_5">Resolve each leaf in turn using the arrow keys, WASD, or the on-screen d-pad — before its timer runs out.</li>
             </ul>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Let's Go!</button>
+            <button class="btn btn-ghost" onclick="show('confirm')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTraining()" data-i18n="lets_go">Let's Go!</button>
         </div>
     </div>
 
@@ -92,11 +93,11 @@
 <!-- GAME SCREEN -->
 <div id="screen-game">
     <div class="game-hud">
-        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl">Time</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl">Score</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-correct">0</div><div class="hud-lbl">Correct</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-wrong">0</div><div class="hud-lbl">Wrong</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-missed">0</div><div class="hud-lbl">Missed</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl" data-i18n="hud_time">Time</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-correct">0</div><div class="hud-lbl" data-i18n="hud_correct">Correct</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-wrong">0</div><div class="hud-lbl" data-i18n="hud_wrong">Wrong</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-missed">0</div><div class="hud-lbl" data-i18n="hud_missed">Missed</div></div>
     </div>
     <div class="stroop-area">
         <div class="stroop-panel">
@@ -134,21 +135,64 @@
 
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
-    <div class="res-title">Time's Up!</div>
-    <div class="res-subtitle">Here's how your focus held up</div>
+    <div class="res-title" data-i18n="res_title">Time's Up!</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Here's how your focus held up</div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl">Score</div></div>
-        <div class="res-stat"><div class="res-val" id="r-correct">0</div><div class="res-lbl">Correct</div></div>
-        <div class="res-stat"><div class="res-val" id="r-wrong">0</div><div class="res-lbl">Wrong</div></div>
-        <div class="res-stat"><div class="res-val" id="r-missed">0</div><div class="res-lbl">Missed</div></div>
-        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl">Accuracy</div></div>
-        <div class="res-stat"><div class="res-val" id="r-rt">—</div><div class="res-lbl">Avg Reaction</div></div>
+        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="res-stat"><div class="res-val" id="r-correct">0</div><div class="res-lbl" data-i18n="hud_correct">Correct</div></div>
+        <div class="res-stat"><div class="res-val" id="r-wrong">0</div><div class="res-lbl" data-i18n="hud_wrong">Wrong</div></div>
+        <div class="res-stat"><div class="res-val" id="r-missed">0</div><div class="res-lbl" data-i18n="hud_missed">Missed</div></div>
+        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
+        <div class="res-stat"><div class="res-val" id="r-rt">—</div><div class="res-lbl" data-i18n="r_rt">Avg Reaction</div></div>
     </div>
-    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
 <script src="confetti.js"></script>
+<script src="i18n.js"></script>
 <script>
+const I18N = {
+    back:           { en: 'Back', zh: '返回' },
+    page_title:     { en: 'Stroop Rush', zh: '斯特鲁普冲刺' },
+    intro_p:        { en: 'Every leaf in a round shares one color — green means trust the arrow, yellow means the arrow is lying to you', zh: '每一轮的所有叶子都是同一种颜色 — 绿色代表相信箭头，黄色代表箭头在骗你' },
+    session_dur:    { en: 'Session Duration', zh: '训练时长' },
+    custom:         { en: 'Custom:', zh: '自定义：' },
+    time_per_leaf:  { en: 'Time per Leaf — how long before an unanswered leaf counts as missed:', zh: '每片叶子的时间 — 未作答多久后算作未命中：' },
+    next:           { en: 'Next', zh: '下一步' },
+    ready_h2:       { en: 'Ready to Train', zh: '准备开始训练' },
+    ready_p:        { en: 'Review your settings then start when ready', zh: '查看你的设置，准备好后开始训练' },
+    s_dur:          { en: 'Duration', zh: '时长' },
+    s_ptime:        { en: 'Time per Leaf', zh: '每片叶子的时间' },
+    start_training: { en: 'Start Training', zh: '开始训练' },
+    guide_h2:       { en: 'How to Play', zh: '玩法说明' },
+    guide_p:        { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    guide_1:        { en: 'Every leaf in a round is the same color — either all green or all yellow — and every leaf shows an arrow.', zh: '每一轮的叶子都是同一种颜色 — 全绿或全黄 — 且每片叶子都会显示箭头。' },
+    guide_2:        { en: 'Green round: the arrows are honest — answer with the direction each leaf is pointing.', zh: '绿色回合：箭头是诚实的 — 请按每片叶子指向的方向作答。' },
+    guide_3:        { en: 'Yellow round: the arrows are decoys — ignore them and answer with the direction the leaf is actually drifting instead.', zh: '黄色回合：箭头是诱饵 — 请忽略它们，改为按叶子实际漂流的方向作答。' },
+    guide_4:        { en: "Getting one right immediately reshuffles every leaf you haven't answered yet, so don't scout ahead.", zh: '答对一个会立刻重新打乱所有尚未作答的叶子，所以不要提前观察。' },
+    guide_5:        { en: 'Resolve each leaf in turn using the arrow keys, WASD, or the on-screen d-pad — before its timer runs out.', zh: '请依次使用方向键、WASD 或屏幕上的方向按钮解答每片叶子 — 要在时间耗尽前完成。' },
+    lets_go:        { en: "Let's Go!", zh: '开始吧！' },
+    hud_time:       { en: 'Time', zh: '时间' },
+    hud_score:      { en: 'Score', zh: '得分' },
+    hud_correct:    { en: 'Correct', zh: '正确' },
+    hud_wrong:      { en: 'Wrong', zh: '错误' },
+    hud_missed:     { en: 'Missed', zh: '未命中' },
+    hud_accuracy:   { en: 'Accuracy', zh: '准确率' },
+    res_title:      { en: "Time's Up!", zh: '时间到！' },
+    res_subtitle:   { en: "Here's how your focus held up", zh: '这是你的专注力表现' },
+    r_rt:           { en: 'Avg Reaction', zh: '平均反应时间' },
+    back_home:      { en: 'Back to Home', zh: '返回首页' },
+    sec:            { en: 's', zh: '秒' },
+    min:            { en: 'm', zh: '分' }
+};
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
+
+function onLangChange() {
+    if (document.getElementById('step-confirm').classList.contains('active')) fillSummary();
+    if (document.getElementById('screen-game').classList.contains('on')) updateHUD();
+}
+
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = { duration: 30, promptTime: 2.5 };
 
@@ -184,9 +228,9 @@ function navBack() {
 }
 
 function fmtTime(s) {
-    if (s < 60) return s + 's';
+    if (s < 60) return s + t(I18N,'sec');
     const m = Math.floor(s / 60), r = s % 60;
-    return m + 'm' + (r ? ' ' + r + 's' : '');
+    return m + t(I18N,'min') + (r ? ' ' + r + t(I18N,'sec') : '');
 }
 
 // ─── SESSION STEP ───────────────────────────────────────────────
@@ -204,7 +248,7 @@ function onDurChange(val) {
 
 function onPromptTimeChange(val) {
     cfg.promptTime = parseFloat(val);
-    document.getElementById('ptime-val').textContent = cfg.promptTime.toFixed(1) + 's';
+    document.getElementById('ptime-val').textContent = cfg.promptTime.toFixed(1) + t(I18N,'sec');
 }
 
 function fromSession() {
@@ -215,7 +259,7 @@ function fromSession() {
 
 function fillSummary() {
     document.getElementById('s-dur').textContent = fmtTime(cfg.duration);
-    document.getElementById('s-ptime').textContent = cfg.promptTime.toFixed(1) + 's';
+    document.getElementById('s-ptime').textContent = cfg.promptTime.toFixed(1) + t(I18N,'sec');
 }
 
 // ─── COUNTDOWN ──────────────────────────────────────────────────
@@ -377,7 +421,7 @@ function flashLeafItem(el, cls) {
 }
 
 function updateHUD() {
-    document.getElementById('hud-time').textContent = gs.timeLeft + 's';
+    document.getElementById('hud-time').textContent = gs.timeLeft + t(I18N,'sec');
     document.getElementById('hud-score').textContent = gs.score;
     document.getElementById('hud-correct').textContent = gs.correct;
     document.getElementById('hud-wrong').textContent = gs.wrong;

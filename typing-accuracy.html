@@ -10,8 +10,9 @@
 
 <!-- PAGE NAV (hidden during game/results) -->
 <nav class="page-nav" id="page-nav">
-    <button class="back-btn" onclick="navBack()">Back</button>
-    <span class="page-title">Typing Accuracy</span>
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Typing Accuracy</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -20,8 +21,8 @@
     <!-- STEP 1: Duration -->
     <div class="step active" id="step-duration">
         <div class="step-head">
-            <h2>Select Duration</h2>
-            <p>Choose how long you'll be typing</p>
+            <h2 data-i18n="dur_h2">Select Duration</h2>
+            <p data-i18n="dur_p">Choose how long you'll be typing</p>
         </div>
         <div class="form-group">
             <div class="presets" id="dur-presets">
@@ -31,78 +32,78 @@
                 <div class="preset" onclick="setDurPreset(120,this)">2m</div>
                 <div class="preset" onclick="setDurPreset(300,this)">5m</div>
             </div>
-            <label style="margin-top:10px;">Custom: <span class="val-label" id="dur-val">30s</span></label>
+            <label style="margin-top:10px;"><span data-i18n="custom">Custom:</span> <span class="val-label" id="dur-val">30s</span></label>
             <input type="range" id="inp-dur" min="10" max="300" step="5" value="30" oninput="onDurChange(this.value)">
         </div>
         <div class="step-foot">
             <div></div>
-            <button class="btn btn-primary" onclick="fromDuration()">Next</button>
+            <button class="btn btn-primary" onclick="fromDuration()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 2: Content Theme -->
     <div class="step" id="step-theme">
         <div class="step-head">
-            <h2>Choose Your Text</h2>
-            <p>Pick what kind of passage you want to type</p>
+            <h2 data-i18n="theme_h2">Choose Your Text</h2>
+            <p data-i18n="theme_p">Pick what kind of passage you want to type</p>
         </div>
         <div class="mode-grid">
             <div class="mode-card" data-theme="science" onclick="pickContentTheme(this)">
-                <h3>Science Essay</h3>
-                <p>A passage on scientific thinking and method</p>
+                <h3 data-i18n="science_h3">Science Essay</h3>
+                <p data-i18n="science_p">A passage on scientific thinking and method</p>
             </div>
             <div class="mode-card" data-theme="english" onclick="pickContentTheme(this)">
-                <h3>English Essay</h3>
-                <p>A passage on literature and writing</p>
+                <h3 data-i18n="english_h3">English Essay</h3>
+                <p data-i18n="english_p">A passage on literature and writing</p>
             </div>
             <div class="mode-card" data-theme="book" onclick="pickContentTheme(this)">
-                <h3>Book Excerpt</h3>
-                <p>A short narrative passage in a storytelling style</p>
+                <h3 data-i18n="book_h3">Book Excerpt</h3>
+                <p data-i18n="book_p">A short narrative passage in a storytelling style</p>
             </div>
             <div class="mode-card" data-theme="random" onclick="pickContentTheme(this)">
-                <h3>Random Words</h3>
-                <p>A stream of common everyday words in no particular order</p>
+                <h3 data-i18n="random_h3">Random Words</h3>
+                <p data-i18n="random_p">A stream of common everyday words in no particular order</p>
             </div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('duration')">Back</button>
-            <button class="btn btn-primary" id="btn-theme-next" disabled onclick="fromThemeStep()">Next</button>
+            <button class="btn btn-ghost" onclick="show('duration')" data-i18n="back">Back</button>
+            <button class="btn btn-primary" id="btn-theme-next" disabled onclick="fromThemeStep()" data-i18n="next">Next</button>
         </div>
     </div>
 
     <!-- STEP 3: Confirm -->
     <div class="step" id="step-confirm">
         <div class="step-head">
-            <h2>Ready to Train</h2>
-            <p>Review your settings then start when ready</p>
+            <h2 data-i18n="ready_h2">Ready to Train</h2>
+            <p data-i18n="ready_p">Review your settings then start when ready</p>
         </div>
         <div class="summary-card">
-            <div class="summary-row"><span class="s-key">Duration</span><span class="s-val" id="s-dur">—</span></div>
-            <div class="summary-row"><span class="s-key">Text</span><span class="s-val" id="s-theme">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_dur">Duration</span><span class="s-val" id="s-dur">—</span></div>
+            <div class="summary-row"><span class="s-key" data-i18n="s_text">Text</span><span class="s-val" id="s-theme">—</span></div>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('theme')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="show('guide')">Start Training</button>
+            <button class="btn btn-ghost" onclick="show('theme')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="show('guide')" data-i18n="start_training">Start Training</button>
         </div>
     </div>
 
     <!-- STEP 4: How to Play -->
     <div class="step" id="step-guide">
         <div class="step-head">
-            <h2>How to Play</h2>
-            <p>Quick rundown before you start</p>
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
         </div>
         <div class="guide-card" style="--guide-color: var(--red);">
             <ul class="guide-list">
-                <li>Type the passage exactly as shown, character by character.</li>
-                <li>A mistake turns that character red — fix it and it turns yellow instead of green.</li>
-                <li>Correctly typed characters turn green as you go.</li>
-                <li>Your WPM and accuracy are calculated from what you've typed when time runs out.</li>
+                <li data-i18n="guide_1">Type the passage exactly as shown, character by character.</li>
+                <li data-i18n="guide_2">A mistake turns that character red — fix it and it turns yellow instead of green.</li>
+                <li data-i18n="guide_3">Correctly typed characters turn green as you go.</li>
+                <li data-i18n="guide_4">Your WPM and accuracy are calculated from what you've typed when time runs out.</li>
             </ul>
         </div>
         <div class="step-foot">
-            <button class="btn btn-ghost" onclick="show('confirm')">Back</button>
-            <button class="btn btn-primary btn-lg" onclick="beginTraining()">Let's Go!</button>
+            <button class="btn btn-ghost" onclick="show('confirm')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginTraining()" data-i18n="lets_go">Let's Go!</button>
         </div>
     </div>
 
@@ -116,9 +117,9 @@
 <!-- TYPING SCREEN -->
 <div id="screen-typing">
     <div class="game-hud">
-        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl">Time</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-wpm">0</div><div class="hud-lbl">WPM</div></div>
-        <div class="hud-stat"><div class="hud-val" id="hud-acc">—</div><div class="hud-lbl">Accuracy</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-time">—</div><div class="hud-lbl" data-i18n="hud_time">Time</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-wpm">0</div><div class="hud-lbl" data-i18n="hud_wpm">WPM</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-acc">—</div><div class="hud-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
     </div>
     <div class="typing-area" id="typing-area">
         <div class="typing-passage" id="typing-passage"></div>
@@ -130,20 +131,74 @@
 
 <!-- RESULTS SCREEN -->
 <div id="screen-results">
-    <div class="res-title">Time's Up!</div>
-    <div class="res-subtitle">Here's how you typed</div>
+    <div class="res-title" data-i18n="res_title">Time's Up!</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Here's how you typed</div>
     <div class="res-stats">
-        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl">Score</div></div>
-        <div class="res-stat"><div class="res-val" id="r-wpm">0</div><div class="res-lbl">WPM</div></div>
-        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl">Accuracy</div></div>
-        <div class="res-stat"><div class="res-val" id="r-fixed">0</div><div class="res-lbl">Fixed Mistakes</div></div>
-        <div class="res-stat"><div class="res-val" id="r-mistakes">0</div><div class="res-lbl">Mistakes Left</div></div>
+        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="r_score">Score</div></div>
+        <div class="res-stat"><div class="res-val" id="r-wpm">0</div><div class="res-lbl" data-i18n="hud_wpm">WPM</div></div>
+        <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
+        <div class="res-stat"><div class="res-val" id="r-fixed">0</div><div class="res-lbl" data-i18n="r_fixed">Fixed Mistakes</div></div>
+        <div class="res-stat"><div class="res-val" id="r-mistakes">0</div><div class="res-lbl" data-i18n="r_mistakes">Mistakes Left</div></div>
     </div>
-    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Back to Home</button>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
 <script src="confetti.js"></script>
+<script src="i18n.js"></script>
 <script>
+const I18N = {
+    back:           { en: 'Back', zh: '返回' },
+    page_title:     { en: 'Typing Accuracy', zh: '打字精准度' },
+    dur_h2:         { en: 'Select Duration', zh: '选择时长' },
+    dur_p:          { en: "Choose how long you'll be typing", zh: '选择打字训练的持续时间' },
+    custom:         { en: 'Custom:', zh: '自定义：' },
+    next:           { en: 'Next', zh: '下一步' },
+    theme_h2:       { en: 'Choose Your Text', zh: '选择文本' },
+    theme_p:        { en: 'Pick what kind of passage you want to type', zh: '选择你想要打的文章类型' },
+    science_h3:     { en: 'Science Essay', zh: '科学随笔' },
+    science_p:      { en: 'A passage on scientific thinking and method', zh: '一篇关于科学思维与方法的文章' },
+    english_h3:     { en: 'English Essay', zh: '文学随笔' },
+    english_p:      { en: 'A passage on literature and writing', zh: '一篇关于文学与写作的文章' },
+    book_h3:        { en: 'Book Excerpt', zh: '书籍节选' },
+    book_p:         { en: 'A short narrative passage in a storytelling style', zh: '一段简短的叙事性文字' },
+    random_h3:      { en: 'Random Words', zh: '随机单词' },
+    random_p:       { en: 'A stream of common everyday words in no particular order', zh: '一串无特定顺序的常见日常单词（英文）' },
+    ready_h2:       { en: 'Ready to Train', zh: '准备开始训练' },
+    ready_p:        { en: 'Review your settings then start when ready', zh: '查看你的设置，准备好后开始训练' },
+    s_dur:          { en: 'Duration', zh: '时长' },
+    s_text:         { en: 'Text', zh: '文本' },
+    start_training: { en: 'Start Training', zh: '开始训练' },
+    guide_h2:       { en: 'How to Play', zh: '玩法说明' },
+    guide_p:        { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    guide_1:        { en: 'Type the passage exactly as shown, character by character.', zh: '逐字符准确输入显示的文章内容。' },
+    guide_2:        { en: 'A mistake turns that character red — fix it and it turns yellow instead of green.', zh: '打错的字符会变红 — 修正后会变黄而不是绿色。' },
+    guide_3:        { en: 'Correctly typed characters turn green as you go.', zh: '正确输入的字符会实时变绿。' },
+    guide_4:        { en: "Your WPM and accuracy are calculated from what you've typed when time runs out.", zh: '时间结束时，将根据你已输入的内容计算 WPM 和准确率。' },
+    lets_go:        { en: "Let's Go!", zh: '开始吧！' },
+    hud_time:       { en: 'Time', zh: '时间' },
+    hud_wpm:        { en: 'WPM', zh: '每分钟字数' },
+    hud_accuracy:   { en: 'Accuracy', zh: '准确率' },
+    res_title:      { en: "Time's Up!", zh: '时间到！' },
+    res_subtitle:   { en: 'Here\'s how you typed', zh: '这是你的打字表现' },
+    r_score:        { en: 'Score', zh: '得分' },
+    r_fixed:        { en: 'Fixed Mistakes', zh: '已修正错误' },
+    r_mistakes:     { en: 'Mistakes Left', zh: '剩余错误' },
+    back_home:      { en: 'Back to Home', zh: '返回首页' },
+    sec:            { en: 's', zh: '秒' },
+    min:            { en: 'm', zh: '分' },
+    theme_science:  { en: 'Science Essay', zh: '科学随笔' },
+    theme_english:  { en: 'English Essay', zh: '文学随笔' },
+    theme_book:     { en: 'Book Excerpt', zh: '书籍节选' },
+    theme_random:   { en: 'Random Words', zh: '随机单词' }
+};
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
+
+function onLangChange() {
+    if (document.getElementById('step-confirm').classList.contains('active')) fillSummary();
+    if (document.getElementById('screen-typing').classList.contains('on')) updateHUD();
+}
+
 // ─── SETTINGS STATE ─────────────────────────────────────────────
 const cfg = { duration: 30, theme: null };
 
@@ -164,9 +219,9 @@ function navBack() {
 }
 
 function fmtTime(s) {
-    if (s < 60) return s + 's';
+    if (s < 60) return s + t(I18N,'sec');
     const m = Math.floor(s / 60), r = s % 60;
-    return m + 'm' + (r ? ' ' + r + 's' : '');
+    return m + t(I18N,'min') + (r ? ' ' + r + t(I18N,'sec') : '');
 }
 
 // ─── DURATION STEP ──────────────────────────────────────────────
@@ -203,11 +258,11 @@ function fromThemeStep() {
 
 function fillSummary() {
     document.getElementById('s-dur').textContent = fmtTime(cfg.duration);
-    const label = { science: 'Science Essay', english: 'English Essay', book: 'Book Excerpt', random: 'Random Words' }[cfg.theme];
+    const label = { science: t(I18N,'theme_science'), english: t(I18N,'theme_english'), book: t(I18N,'theme_book'), random: t(I18N,'theme_random') }[cfg.theme];
     document.getElementById('s-theme').textContent = label;
 }
 
-// ─── PASSAGE GENERATION ─────────────────────────────────────────
+// ─── PASSAGE GENERATION (kept in English — this is an English typing trainer) ───
 const PASSAGES = {
     science: "The scientific method begins with observation. A researcher notices a pattern in nature, forms a question, and proposes a hypothesis that might explain what was seen. From there, careful experiments are designed to test the idea under controlled conditions, isolating variables so that cause and effect can be measured with confidence. Data collected during these trials is analyzed using statistics, which help separate meaningful signals from random noise. If the results support the hypothesis, other scientists attempt to repeat the experiment independently, because reproducibility is the cornerstone of reliable knowledge. Over time, hypotheses that survive repeated testing may be woven into broader theories, frameworks that explain many related phenomena at once. Even well established theories remain open to revision whenever new evidence emerges, which is what separates science from dogma. Learning to think like a scientist means staying curious, questioning assumptions, and valuing evidence over intuition, even when the evidence contradicts what feels obviously true.",
     english: "Great literature endures because it captures something true about the human condition that outlives the era in which it was written. A novel written two centuries ago can still move a reader today, not because the customs it describes are familiar, but because the emotions underneath them are not. Fear, love, ambition, and regret do not go out of style. When we study literature, we are really studying how different writers have chosen to frame these universal feelings using the tools available to them: rhythm, imagery, structure, and voice. A well placed metaphor can compress an entire argument into a single image, while a shift in tense or point of view can quietly change how much we trust a narrator. Reading closely means noticing these choices rather than skimming past them. Writing well means making similar choices deliberately, revising a sentence not because it is wrong, but because a better version is still hiding somewhere inside it, waiting to be found.",
@@ -361,7 +416,7 @@ function tallyStats() {
 }
 
 function updateHUD() {
-    document.getElementById('hud-time').textContent = gs.timeLeft + 's';
+    document.getElementById('hud-time').textContent = gs.timeLeft + t(I18N,'sec');
     const { correct, corrected, typed } = tallyStats();
     const elapsedMin = Math.max(1 / 60, (cfg.duration - gs.timeLeft) / 60);
     const wpm = Math.round((correct + corrected) / 5 / elapsedMin);

@@ -12,6 +12,7 @@
         <header class="home-header">
             <h1 data-i18n="title">Training Area 101</h1>
             <p data-i18n="subtitle">Select a category to begin training</p>
+            <p><a href="leaderboard.html" class="lb-link" data-i18n="view_leaderboards">🏆 View Leaderboards</a></p>
         </header>
 
         <nav class="category-grid">
@@ -59,11 +60,17 @@
         </nav>
     </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
 <script src="i18n.js"></script>
 <script>
 const I18N = {
-    title:          { en: 'Training Area 101', zh: '训练场 101' },
-    subtitle:       { en: 'Select a category to begin training', zh: '选择一个类别开始训练' },
+    title:              { en: 'Training Area 101', zh: '训练场 101' },
+    subtitle:           { en: 'Select a category to begin training', zh: '选择一个类别开始训练' },
+    view_leaderboards:  { en: '🏆 View Leaderboards', zh: '🏆 查看排行榜' },
     accuracy_name:  { en: 'Clicker Accuracy', zh: '点击精准度' },
     accuracy_desc:  { en: 'Train your clicking precision and target recognition', zh: '训练你的点击精准度和目标识别能力' },
     speed_name:     { en: 'Clicking Speed', zh: '点击速度' },

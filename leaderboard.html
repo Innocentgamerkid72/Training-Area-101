@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboards — Training Area 101</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="page-nav" id="page-nav">
+    <button class="back-btn" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
+    <span class="page-title" data-i18n="page_title">Leaderboards</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
+</nav>
+
+<div class="wizard">
+    <div class="step active">
+        <div class="step-head">
+            <h2 data-i18n="lb_h2">Leaderboards</h2>
+            <p data-i18n="lb_p">Top scores across every category — sign in on any game page to appear here</p>
+        </div>
+
+        <div class="lb-tabs" id="lb-tabs"></div>
+
+        <div class="lb-status" id="lb-status" data-i18n="loading">Loading…</div>
+        <table class="lb-table" id="lb-table" style="display:none;">
+            <thead>
+                <tr>
+                    <th data-i18n="rank">Rank</th>
+                    <th data-i18n="player">Player</th>
+                    <th data-i18n="score">Score</th>
+                </tr>
+            </thead>
+            <tbody id="lb-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
+<script src="leaderboard.js"></script>
+<script src="i18n.js"></script>
+<script>
+const I18N = {
+    back_home: { en: 'Back to Home', zh: '返回首页' },
+    page_title:{ en: 'Leaderboards', zh: '排行榜' },
+    lb_h2:     { en: 'Leaderboards', zh: '排行榜' },
+    lb_p:      { en: 'Top scores across every category — sign in on any game page to appear here', zh: '各类别的最高分排行 — 在任意训练页面登录即可上榜' },
+    loading:   { en: 'Loading…', zh: '加载中…' },
+    empty:     { en: 'No scores yet — be the first!', zh: '暂无成绩 — 快来成为第一个吧！' },
+    error:     { en: 'Could not load the leaderboard. Check your Firebase setup.', zh: '无法加载排行榜，请检查你的 Firebase 配置。' },
+    rank:      { en: 'Rank', zh: '排名' },
+    player:    { en: 'Player', zh: '玩家' },
+    score:     { en: 'Score', zh: '成绩' }
+};
+
+let activeCategory = new URLSearchParams(location.search).get('cat') || 'accuracy';
+if (!CATEGORIES[activeCategory]) activeCategory = 'accuracy';
+
+function buildTabs() {
+    const tabs = document.getElementById('lb-tabs');
+    tabs.innerHTML = Object.keys(CATEGORIES).map(key => {
+        const label = CATEGORIES[key][getLang()] || CATEGORIES[key].en;
+        return `<button class="lb-tab${key === activeCategory ? ' sel' : ''}" data-cat="${key}">${label}</button>`;
+    }).join('');
+    tabs.querySelectorAll('.lb-tab').forEach(btn => {
+        btn.onclick = () => {
+            activeCategory = btn.dataset.cat;
+            history.replaceState(null, '', '?cat=' + activeCategory);
+            buildTabs();
+            loadLeaderboard();
+        };
+    });
+}
+
+async function loadLeaderboard() {
+    const status = document.getElementById('lb-status');
+    const table = document.getElementById('lb-table');
+    const body = document.getElementById('lb-body');
+    table.style.display = 'none';
+    status.style.display = '';
+    status.textContent = t(I18N, 'loading');
+
+    let rows = [];
+    try {
+        rows = await fetchLeaderboard(activeCategory, 10);
+    } catch (err) {
+        status.textContent = t(I18N, 'error');
+        console.error(err);
+        return;
+    }
+
+    if (rows.length === 0) {
+        status.textContent = t(I18N, 'empty');
+        return;
+    }
+
+    const info = CATEGORIES[activeCategory];
+    body.innerHTML = rows.map((row, i) => `
+        <tr>
+            <td>${i + 1}</td>
+            <td>${escapeHtml(row.username)}</td>
+            <td>${row.value}${info.unit}</td>
+        </tr>
+    `).join('');
+    status.style.display = 'none';
+    table.style.display = '';
+}
+
+function onLangChange() {
+    buildTabs();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initI18n(I18N);
+    buildTabs();
+    loadLeaderboard();
+});
+</script>
+</body>
+</html>

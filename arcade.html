@@ -13,6 +13,7 @@
     <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
     <span class="page-title" data-i18n="page_title">Stroop Rush</span>
     <button class="lang-toggle" id="lang-toggle-page">中文</button>
+    <a href="leaderboard.html?cat=stroop" class="btn btn-ghost btn-sm" data-i18n="leaderboard_link">🏆 Leaderboard</a>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -148,12 +149,19 @@
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
+<script src="leaderboard.js"></script>
 <script src="confetti.js"></script>
 <script src="i18n.js"></script>
 <script>
 const I18N = {
     back:           { en: 'Back', zh: '返回' },
     page_title:     { en: 'Stroop Rush', zh: '斯特鲁普冲刺' },
+    leaderboard_link: { en: '🏆 Leaderboard', zh: '🏆 排行榜' },
     intro_p:        { en: 'Every leaf in a round shares one color — green means trust the arrow, yellow means the arrow is lying to you', zh: '每一轮的所有叶子都是同一种颜色 — 绿色代表相信箭头，黄色代表箭头在骗你' },
     session_dur:    { en: 'Session Duration', zh: '训练时长' },
     custom:         { en: 'Custom:', zh: '自定义：' },
@@ -448,6 +456,7 @@ function endGame() {
 
     document.getElementById('screen-results').classList.add('on');
     spawnConfetti();
+    submitScore('stroop', gs.score);
 }
 
 // ─── KEYBOARD SHORTCUTS (arrow keys or WASD) ─────────────────────

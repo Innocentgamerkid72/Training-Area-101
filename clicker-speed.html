@@ -13,6 +13,7 @@
     <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
     <span class="page-title" data-i18n="page_title">Clicking Speed</span>
     <button class="lang-toggle" id="lang-toggle-page">中文</button>
+    <a href="leaderboard.html?cat=speed" class="btn btn-ghost btn-sm" data-i18n="leaderboard_link">🏆 Leaderboard</a>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -107,12 +108,19 @@
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
+<script src="leaderboard.js"></script>
 <script src="confetti.js"></script>
 <script src="i18n.js"></script>
 <script>
 const I18N = {
     back:           { en: 'Back', zh: '返回' },
     page_title:     { en: 'Clicking Speed', zh: '点击速度' },
+    leaderboard_link: { en: '🏆 Leaderboard', zh: '🏆 排行榜' },
     dur_h2:         { en: 'Select Duration', zh: '选择时长' },
     dur_p:          { en: 'Choose how long the clicking speed test will last', zh: '选择点击速度测试的持续时间' },
     custom:         { en: 'Custom:', zh: '自定义：' },
@@ -260,6 +268,7 @@ function endGame() {
 
     document.getElementById('screen-results').classList.add('on');
     spawnConfetti();
+    submitScore('speed', cpm);
 }
 
 document.addEventListener('DOMContentLoaded', () => initI18n(I18N));

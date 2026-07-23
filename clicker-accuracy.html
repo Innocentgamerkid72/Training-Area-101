@@ -13,6 +13,7 @@
     <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
     <span class="page-title" data-i18n="page_title">Clicker Accuracy</span>
     <button class="lang-toggle" id="lang-toggle-page">中文</button>
+    <a href="leaderboard.html?cat=accuracy" class="btn btn-ghost btn-sm" data-i18n="leaderboard_link">🏆 Leaderboard</a>
 </nav>
 
 <!-- WIZARD CONTAINER -->
@@ -235,12 +236,19 @@
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
+<script src="leaderboard.js"></script>
 <script src="confetti.js"></script>
 <script src="i18n.js"></script>
 <script>
 const I18N = {
     back:              { en: 'Back', zh: '返回' },
     page_title:        { en: 'Clicker Accuracy', zh: '点击精准度' },
+    leaderboard_link:  { en: '🏆 Leaderboard', zh: '🏆 排行榜' },
     mode_h2:           { en: 'Select Mode', zh: '选择模式' },
     mode_p:            { en: 'Choose how targets appear during your session', zh: '选择目标在训练中出现的方式' },
     mode_array_h3:     { en: 'Array', zh: '阵列' },
@@ -1013,6 +1021,7 @@ function endGame() {
     const rs = document.getElementById('screen-results');
     rs.classList.add('on');
     spawnConfetti();
+    submitScore('accuracy', gs.score);
 
     const total = gs.hits + gs.miss;
     document.getElementById('r-score').textContent = gs.score;

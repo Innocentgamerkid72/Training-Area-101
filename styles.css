@@ -68,6 +68,14 @@ body {
 }
 
 .home-header p { color: var(--dim); font-size: 1.05rem; }
+.lb-link {
+    display: inline-block;
+    margin-top: 12px;
+    color: var(--blue);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+}
 
 .category-grid {
     display: grid;
@@ -1095,6 +1103,112 @@ input[type="range"] {
 }
 .promo-btn:active { transform: scale(0.92); }
 
+/* ACCOUNT WIDGET */
+.account-widget {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 10px;
+}
+.home-header .account-widget {
+    margin: 14px auto 0;
+    justify-content: center;
+}
+.account-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+/* AUTH MODAL */
+.auth-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    align-items: center;
+    justify-content: center;
+    z-index: 30;
+    padding: 20px;
+}
+.auth-overlay.on { display: flex; }
+.auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 28px;
+    width: 100%;
+    max-width: 340px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.auth-tabs { display: flex; gap: 8px; }
+.auth-tab {
+    flex: 1;
+    padding: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--rs);
+    color: var(--dim);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all var(--t);
+}
+.auth-tab.sel { border-color: var(--blue); color: var(--blue); }
+.auth-error { color: var(--red); font-size: 0.82rem; min-height: 1.2em; }
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+.auth-form input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--rs);
+    color: var(--bright);
+    padding: 10px 13px;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color var(--t);
+}
+.auth-form input:focus { border-color: var(--blue); }
+.auth-close { width: 100%; justify-content: center; }
+
+/* LEADERBOARD */
+.lb-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.lb-tab {
+    padding: 8px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    color: var(--dim);
+    font-size: 0.85rem;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: all var(--t);
+}
+.lb-tab.sel { border-color: var(--blue); color: var(--blue); }
+.lb-status { color: var(--dim); text-align: center; padding: 30px 0; }
+.lb-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+}
+.lb-table th, .lb-table td {
+    padding: 12px 18px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+}
+.lb-table th { color: var(--dim); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+.lb-table td { color: var(--text); }
+.lb-table tbody tr:last-child td { border-bottom: none; }
+.lb-table tbody tr:first-child td { color: var(--bright); font-weight: 700; }
+
 /* TIMING TRACK */
 .timing-track {
     position: relative;
@@ -1225,6 +1339,13 @@ input[type="range"] {
     .back-btn { padding: 8px 16px; min-height: 36px; }
     .lang-toggle { padding: 8px 14px; min-height: 36px; font-size: 0.8rem; }
 
+    .page-nav { flex-wrap: wrap; row-gap: 8px; }
+    .account-widget { margin-left: 0; }
+    .account-name { font-size: 0.78rem; }
+
+    .lb-table th, .lb-table td { padding: 10px 12px; font-size: 0.85rem; }
+    .lb-tab { padding: 6px 12px; font-size: 0.8rem; }
+
     .key-capture { padding: 28px 16px; font-size: 1.1rem; }
 
     .variant-list { max-height: 45vh; }
@@ -1250,6 +1371,9 @@ input[type="range"] {
     .variant-item:hover   { border-color: var(--border2); }
     .key-capture:hover    { border-color: var(--blue); }
     .promo-btn:hover      { border-color: var(--blue); }
+    .auth-tab:hover       { border-color: var(--blue); color: var(--blue); }
+    .lb-tab:hover         { border-color: var(--blue); color: var(--blue); }
+    .lb-link:hover        { text-decoration: underline; }
     .chess-sq:hover       { filter: brightness(1.25); }
     .dir-btn:hover         { filter: brightness(1.2); transform: translateY(-1px); }
 }

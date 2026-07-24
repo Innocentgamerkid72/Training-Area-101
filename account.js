@@ -11,6 +11,35 @@ function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
+// ─── QUICK SIGN UP (GitHub-style: random username + password, no typing) ──
+// Firebase's email/password provider still needs *some* email under the
+// hood, so a fake-but-syntactically-valid one is derived deterministically
+// from the username (lowercased) -- that's also what lets logging back in
+// happen by username instead of email, with no separate lookup table.
+const USERNAME_ADJECTIVES = ['Swift','Clever','Brave','Silent','Cosmic','Lucky','Mighty','Gentle','Bold','Quick','Sunny','Rapid','Bright','Wild','Calm','Sharp','Wise','Nimble','Fierce','Jolly','Noble','Vivid','Golden','Silver'];
+const USERNAME_NOUNS = ['Falcon','Tiger','Otter','Comet','Panda','Wolf','Hawk','Fox','Dragon','Phoenix','Lynx','Eagle','Raven','Panther','Shark','Whale','Badger','Heron','Cobra','Jaguar','Puma','Griffin','Kestrel','Viper'];
+
+function generateUsername() {
+    const adj = USERNAME_ADJECTIVES[Math.floor(Math.random() * USERNAME_ADJECTIVES.length)];
+    const noun = USERNAME_NOUNS[Math.floor(Math.random() * USERNAME_NOUNS.length)];
+    const num = Math.floor(Math.random() * 900) + 100;
+    return adj + noun + num;
+}
+
+function generatePassword() {
+    const chars = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'; // no 0/O/1/l/I -- avoids ambiguity when copied by hand
+    const arr = new Uint32Array(14);
+    if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(arr);
+    else for (let i = 0; i < arr.length; i++) arr[i] = Math.floor(Math.random() * 4294967295);
+    let out = '';
+    for (let i = 0; i < arr.length; i++) out += chars[arr[i] % chars.length];
+    return out;
+}
+
+function usernameToEmail(username) {
+    return username.trim().toLowerCase() + '@ta101-account.invalid';
+}
+
 // ─── WIDGET ─────────────────────────────────────────────────────
 function buildAccountWidget() {
     if (document.getElementById('account-widget')) return;
@@ -53,16 +82,24 @@ function buildAuthModal() {
             '</div>' +
             '<div class="auth-error" id="auth-error"></div>' +
             '<form id="auth-form-login" class="auth-form">' +
-                '<input type="email" id="login-email" placeholder="Email" required autocomplete="email">' +
+                '<input type="text" id="login-identifier" placeholder="Username or Email" required autocomplete="username">' +
                 '<input type="password" id="login-password" placeholder="Password" required autocomplete="current-password">' +
                 '<button class="btn btn-primary" type="submit">Log In</button>' +
             '</form>' +
             '<form id="auth-form-signup" class="auth-form" style="display:none;">' +
+                '<button type="button" class="btn btn-primary" id="btn-quick-signup">⚡ Quick Sign Up (random username)</button>' +
+                '<div class="auth-divider"><span>or use your own email</span></div>' +
                 '<input type="text" id="signup-username" placeholder="Username (shown on leaderboards)" required maxlength="20">' +
                 '<input type="email" id="signup-email" placeholder="Email" required autocomplete="email">' +
                 '<input type="password" id="signup-password" placeholder="Password (6+ characters)" required minlength="6" autocomplete="new-password">' +
-                '<button class="btn btn-primary" type="submit">Create Account</button>' +
+                '<button class="btn btn-ghost" type="submit">Create Account with Email</button>' +
             '</form>' +
+            '<div class="auth-generated" id="auth-generated" style="display:none;">' +
+                '<p class="auth-generated-note">Account created! Save these — there\'s no email attached, so this is the only way to log back in on another device.</p>' +
+                '<div class="auth-cred-row"><span class="auth-cred-label">Username</span><code id="gen-username"></code></div>' +
+                '<div class="auth-cred-row"><span class="auth-cred-label">Password</span><code id="gen-password"></code></div>' +
+                '<button class="btn btn-primary" id="auth-generated-continue">I\'ve Saved It — Continue</button>' +
+            '</div>' +
             '<button class="btn btn-ghost auth-close" id="auth-close">Close</button>' +
         '</div>';
     document.body.appendChild(overlay);
@@ -89,8 +126,9 @@ function buildAuthModal() {
 
     document.getElementById('auth-form-login').addEventListener('submit', e => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value;
+        const identifier = document.getElementById('login-identifier').value.trim();
         const password = document.getElementById('login-password').value;
+        const email = identifier.includes('@') ? identifier : usernameToEmail(identifier);
         auth.signInWithEmailAndPassword(email, password)
             .then(() => closeAuthModal())
             .catch(showAuthError);
@@ -107,6 +145,54 @@ function buildAuthModal() {
             .then(() => closeAuthModal())
             .catch(showAuthError);
     });
+
+    document.getElementById('btn-quick-signup').onclick = () => quickSignUp();
+
+    document.getElementById('auth-generated-continue').onclick = () => {
+        restoreAuthModalDefaults();
+        closeAuthModal();
+    };
+}
+
+function quickSignUp(attempt) {
+    attempt = attempt || 0;
+    if (attempt >= 5) { showAuthError({ message: 'Could not generate a unique account -- please try again.' }); return; }
+    const username = generateUsername();
+    const password = generatePassword();
+    auth.createUserWithEmailAndPassword(usernameToEmail(username), password)
+        .then(cred => cred.user.updateProfile({ displayName: username }))
+        .then(() => showGeneratedCredentials(username, password))
+        .catch(err => {
+            if (err && err.code === 'auth/email-already-in-use') { quickSignUp(attempt + 1); return; }
+            showAuthError(err);
+        });
+}
+
+function showGeneratedCredentials(username, password) {
+    document.getElementById('gen-username').textContent = username;
+    document.getElementById('gen-password').textContent = password;
+    document.querySelector('.auth-google').style.display = 'none';
+    document.querySelectorAll('.auth-divider').forEach(d => { d.style.display = 'none'; });
+    document.querySelector('.auth-tabs').style.display = 'none';
+    document.getElementById('auth-form-login').style.display = 'none';
+    document.getElementById('auth-form-signup').style.display = 'none';
+    document.getElementById('auth-error').style.display = 'none';
+    document.getElementById('auth-close').style.display = 'none';
+    document.getElementById('auth-generated').style.display = '';
+}
+
+function restoreAuthModalDefaults() {
+    document.querySelector('.auth-google').style.display = '';
+    document.querySelectorAll('.auth-divider').forEach(d => { d.style.display = ''; });
+    document.querySelector('.auth-tabs').style.display = '';
+    document.getElementById('auth-form-login').style.display = '';
+    document.getElementById('auth-form-signup').style.display = 'none';
+    document.getElementById('auth-error').style.display = '';
+    document.getElementById('auth-error').textContent = '';
+    document.getElementById('auth-close').style.display = '';
+    document.getElementById('auth-generated').style.display = 'none';
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('sel'));
+    document.querySelector('.auth-tab[data-tab="login"]').classList.add('sel');
 }
 
 function showAuthError(err) {

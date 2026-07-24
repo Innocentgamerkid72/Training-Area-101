@@ -1226,6 +1226,21 @@ input[type="range"] {
 .auth-form input:focus { border-color: var(--blue); }
 .auth-close { width: 100%; justify-content: center; }
 
+.auth-generated { display: flex; flex-direction: column; gap: 14px; }
+.auth-generated-note { font-size: 0.85rem; color: var(--dim); line-height: 1.5; }
+.auth-cred-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--rs);
+    padding: 10px 13px;
+}
+.auth-cred-label { font-size: 0.8rem; color: var(--dim); font-weight: 600; }
+.auth-cred-row code { color: var(--bright); font-size: 0.95rem; font-weight: 700; user-select: all; }
+
 /* LEADERBOARD */
 .lb-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
 .lb-tab {

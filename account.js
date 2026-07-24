@@ -137,11 +137,10 @@ function buildAuthModal() {
             '</form>' +
             '<form id="auth-form-signup" class="auth-form" style="display:none;">' +
                 '<button type="button" class="btn btn-primary" id="btn-quick-signup">⚡ Quick Sign Up (random username)</button>' +
-                '<div class="auth-divider"><span>or use your own email</span></div>' +
+                '<div class="auth-divider"><span>or pick your own username</span></div>' +
                 '<input type="text" id="signup-username" placeholder="Username (shown on leaderboards)" required maxlength="20">' +
-                '<input type="email" id="signup-email" placeholder="Email" required autocomplete="email">' +
                 '<input type="password" id="signup-password" placeholder="Password (6+ characters)" required minlength="6" autocomplete="new-password">' +
-                '<button class="btn btn-ghost" type="submit">Create Account with Email</button>' +
+                '<button class="btn btn-ghost" type="submit">Create Account</button>' +
             '</form>' +
             '<div class="auth-generated" id="auth-generated" style="display:none;">' +
                 '<p class="auth-generated-note">Account created! Save these — there\'s no email attached, so this is the only way to log back in on another device.</p>' +
@@ -186,13 +185,15 @@ function buildAuthModal() {
     document.getElementById('auth-form-signup').addEventListener('submit', e => {
         e.preventDefault();
         const username = document.getElementById('signup-username').value.trim();
-        const email = document.getElementById('signup-email').value;
         const password = document.getElementById('signup-password').value;
         if (!username) { showAuthError({ message: 'Please choose a username.' }); return; }
-        auth.createUserWithEmailAndPassword(email, password)
+        auth.createUserWithEmailAndPassword(usernameToEmail(username), password)
             .then(cred => cred.user.updateProfile({ displayName: username }))
             .then(() => closeAuthModal())
-            .catch(showAuthError);
+            .catch(err => {
+                if (err && err.code === 'auth/email-already-in-use') { showAuthError({ message: 'That username is already taken -- try another.' }); return; }
+                showAuthError(err);
+            });
     });
 
     document.getElementById('btn-quick-signup').onclick = () => quickSignUp();

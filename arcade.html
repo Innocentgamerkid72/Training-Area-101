@@ -576,7 +576,7 @@ function showOnlineResult(room) {
         : t(I18N,'vs_label') + room.players[oppSlotKey].username;
     document.getElementById('r-opp-score').textContent = (oppScore != null) ? oppScore : '—';
     document.getElementById('res-opponent-stat').style.display = '';
-    if (iWon) spawnConfetti();
+    if (iWon) { spawnConfetti(); awardXp(XP_WIN_BONUS); }
     onlineMatch = null;
 }
 

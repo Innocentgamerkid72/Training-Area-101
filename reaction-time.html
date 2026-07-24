@@ -597,8 +597,9 @@ function finishOnlineRound(room) {
     document.getElementById('r-opp-ms').textContent = (oppMs != null) ? Math.round(oppMs) + 'ms' : '—';
     document.getElementById('res-opponent-stat').style.display = '';
     document.getElementById('screen-results').classList.add('on');
-    if (iWon) spawnConfetti();
+    if (iWon) { spawnConfetti(); awardXp(XP_WIN_BONUS); }
     if (!myFault && myMs != null) submitScore('reaction', Math.round(myMs));
+    else awardXp(XP_SESSION); // faulted -- submitScore is skipped, but a completed attempt still earns participation XP
     onlineMatch = null;
 }
 

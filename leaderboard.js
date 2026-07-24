@@ -17,6 +17,7 @@ const CATEGORIES = {
 function submitScore(category, value) {
     const user = auth.currentUser;
     if (!user) return Promise.resolve(); // not logged in -- just skip silently
+    awardXp(XP_SESSION);
     return db.collection('scores').add({
         uid: user.uid,
         username: user.displayName || 'Player',
@@ -31,6 +32,7 @@ function submitScore(category, value) {
 function submitChessWin() {
     const user = auth.currentUser;
     if (!user) return Promise.resolve();
+    awardXp(XP_WIN_BONUS);
     const ref = db.collection('chessStats').doc(user.uid);
     return db.runTransaction(tx => {
         return tx.get(ref).then(doc => {

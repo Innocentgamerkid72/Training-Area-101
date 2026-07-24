@@ -842,16 +842,19 @@ function checkGameEnd() {
     if (!status.over) return;
     gs.gameOver = true;
     let title, subtitle;
+    const scored = cfg.mode === 'bot' || cfg.mode === 'online';
     if (status.reason === 'checkmate') {
         title = (status.winner === 'w' ? t(I18N,'white') : t(I18N,'black')) + t(I18N,'wins');
         subtitle = t(I18N,'checkmate');
-        if ((cfg.mode === 'bot' || cfg.mode === 'online') && status.winner === gs.humanSide) submitChessWin();
+        if (scored) { if (status.winner === gs.humanSide) submitChessWin(); else awardXp(XP_SESSION); }
     } else if (status.reason === 'stalemate') {
         title = t(I18N,'draw');
         subtitle = t(I18N,'stalemate');
+        if (scored) awardXp(XP_SESSION);
     } else {
         title = t(I18N,'draw');
         subtitle = t(I18N,'insufficient');
+        if (scored) awardXp(XP_SESSION);
     }
     endGame(title, subtitle);
     if (cfg.mode === 'online') cleanupOnlineMatch();
@@ -862,12 +865,14 @@ function resign() {
     if (cfg.mode === 'online') {
         gs.gameOver = true;
         if (onlineMatch) markRoomFinished(onlineMatch.roomId, { resignedBy: onlineMatch.mySlot }).catch(() => {});
+        awardXp(XP_SESSION);
         const winnerColor = gs.humanSide === 'w' ? 'b' : 'w';
         const winnerLabel = winnerColor === 'w' ? t(I18N,'white') : t(I18N,'black');
         endGame(winnerLabel + t(I18N,'wins'), t(I18N,'by_resignation'));
         cleanupOnlineMatch();
         return;
     }
+    if (cfg.mode === 'bot') awardXp(XP_SESSION);
     const winner = gs.state.turn === 'w' ? t(I18N,'black') : t(I18N,'white');
     gs.gameOver = true;
     endGame(winner + t(I18N,'wins'), t(I18N,'by_resignation'));

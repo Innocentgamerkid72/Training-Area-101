@@ -57,6 +57,12 @@
                 <h2 data-i18n="chess_name">Chess</h2>
                 <p data-i18n="chess_desc">2 player or against the computer</p>
             </a>
+
+            <a href="#" class="category-card tag2 disabled" id="tag2-card" target="_blank" rel="noopener noreferrer">
+                <div class="card-dot"></div>
+                <h2 id="tag2-title" data-i18n="tag2_name_locked">🔒 Tag Game 2</h2>
+                <p id="tag2-desc" data-i18n="tag2_desc_locked">Unlocks at Level 100</p>
+            </a>
         </nav>
     </div>
 
@@ -84,10 +90,56 @@ const I18N = {
     stroop_name:    { en: 'Stroop Rush', zh: '斯特鲁普冲刺' },
     stroop_desc:    { en: 'Beat the color-word illusion under pressure', zh: '在压力下战胜颜色文字错觉' },
     chess_name:     { en: 'Chess', zh: '国际象棋' },
-    chess_desc:     { en: '2 player or against the computer', zh: '双人对战或人机对战' }
+    chess_desc:     { en: '2 player or against the computer', zh: '双人对战或人机对战' },
+    tag2_name_locked:   { en: '🔒 Tag Game 2', zh: '🔒 追逐游戏 2' },
+    tag2_desc_locked:   { en: 'Unlocks at Level 100', zh: '达到100级后解锁' },
+    tag2_desc_locked_progress: { en: 'Unlocks at Level 100 (you\'re Lv.', zh: '达到100级后解锁（你目前是 Lv.' },
+    tag2_name_unlocked: { en: '🎮 Tag Game 2', zh: '🎮 追逐游戏 2' },
+    tag2_desc_unlocked: { en: 'A full 3D multiplayer tag game — opens in a new tab', zh: '完整的3D多人追逐游戏 — 将在新标签页打开' },
+    sign_in_to_track:   { en: 'Sign in to track your level', zh: '登录以追踪你的等级' }
 };
 
+let tag2Level = 0, tag2SignedIn = false;
+
+function updateTag2Gate(level, signedIn) {
+    tag2Level = level;
+    tag2SignedIn = signedIn;
+    const card = document.getElementById('tag2-card');
+    const title = document.getElementById('tag2-title');
+    const desc = document.getElementById('tag2-desc');
+    const unlocked = signedIn && level >= 100;
+    card.classList.toggle('disabled', !unlocked);
+    if (unlocked) {
+        card.href = 'https://tag-game-2.vercel.app';
+        title.textContent = t(I18N, 'tag2_name_unlocked');
+        desc.textContent = t(I18N, 'tag2_desc_unlocked');
+    } else {
+        card.removeAttribute('href');
+        title.textContent = t(I18N, 'tag2_name_locked');
+        desc.textContent = signedIn
+            ? t(I18N, 'tag2_desc_locked_progress') + level + '/100)'
+            : t(I18N, 'sign_in_to_track');
+    }
+}
+
+// applyTranslations() re-stamps every [data-i18n] element (including the
+// tag2 title/desc) back to their static defaults on every language toggle --
+// re-run the dynamic gate render afterward so unlocked/progress text survives.
+function onLangChange() {
+    updateTag2Gate(tag2Level, tag2SignedIn);
+}
+
 initI18n(I18N);
+
+let tag2Unsub = null;
+auth.onAuthStateChanged(user => {
+    if (tag2Unsub) { tag2Unsub(); tag2Unsub = null; }
+    if (user) {
+        tag2Unsub = listenUserProgress(user.uid, xp => updateTag2Gate(levelForXp(xp), true));
+    } else {
+        updateTag2Gate(0, false);
+    }
+});
 </script>
 </body>
 </html>

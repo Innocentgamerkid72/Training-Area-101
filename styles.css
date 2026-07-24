@@ -107,6 +107,7 @@ body {
 .category-card.typing    { --card-color: var(--red); }
 .category-card.stroop    { --card-color: var(--yellow); }
 .category-card.chess     { --card-color: var(--silver); }
+.category-card.tag2      { --card-color: var(--red); }
 
 .category-card.disabled { opacity: 0.38; cursor: not-allowed; pointer-events: none; }
 
@@ -1161,6 +1162,16 @@ input[type="range"] {
 .home-header .account-widget {
     margin: 14px auto 0;
     justify-content: center;
+}
+.account-level {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--bg);
+    background: var(--blue);
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+    cursor: default;
 }
 .account-name {
     font-size: 0.85rem;

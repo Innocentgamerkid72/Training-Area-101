@@ -40,6 +40,53 @@ function usernameToEmail(username) {
     return username.trim().toLowerCase() + '@ta101-account.invalid';
 }
 
+// ─── XP / LEVELS ──────────────────────────────────────────────────
+// Reaching level L from L-1 costs L*100 XP (so lvl2=100, lvl3=+200=300
+// cumulative, lvl4=+300=600 cumulative, etc -- a gently steepening curve).
+// XP_SESSION fires automatically from every submitScore() call (leaderboard.js
+// -- covers every solo session AND both sides of an online race, win or
+// lose, since both players call submitScore with their own result).
+// XP_WIN_BONUS fires automatically from submitChessWin() and is added
+// explicitly wherever a game's own "iWon" branch already exists. Games whose
+// losing path doesn't run through either of those (a Standoff fault-forfeit,
+// a chess resignation) call awardXp(XP_SESSION) directly at that spot instead.
+const XP_SESSION = 15;
+const XP_WIN_BONUS = 25;
+
+function levelForXp(xp) {
+    let level = 1, remaining = xp || 0;
+    while (remaining >= level * 100) {
+        remaining -= level * 100;
+        level++;
+    }
+    return level;
+}
+
+function xpProgress(xp) {
+    const level = levelForXp(xp);
+    let consumed = 0;
+    for (let l = 1; l < level; l++) consumed += l * 100;
+    const xpIntoLevel = (xp || 0) - consumed;
+    const xpForThisLevel = level * 100;
+    return { level, xpIntoLevel, xpForThisLevel };
+}
+
+function awardXp(amount) {
+    const user = auth.currentUser;
+    if (!user) return Promise.resolve();
+    return db.collection('userProgress').doc(user.uid).set({
+        uid: user.uid,
+        username: user.displayName || 'Player',
+        xp: firebase.firestore.FieldValue.increment(amount)
+    }, { merge: true });
+}
+
+function listenUserProgress(uid, cb) {
+    return db.collection('userProgress').doc(uid).onSnapshot(snap => {
+        cb(snap.exists ? (snap.data().xp || 0) : 0);
+    });
+}
+
 // ─── WIDGET ─────────────────────────────────────────────────────
 function buildAccountWidget() {
     if (document.getElementById('account-widget')) return;
@@ -56,7 +103,9 @@ function renderAccountWidget() {
     const widget = document.getElementById('account-widget');
     if (!widget) return;
     if (currentUser) {
+        const level = levelForXp(currentXp);
         widget.innerHTML =
+            '<span class="account-level" title="' + xpProgress(currentXp).xpIntoLevel + ' / ' + xpProgress(currentXp).xpForThisLevel + ' XP to next level">Lv.' + level + '</span>' +
             '<span class="account-name">👤 ' + escapeHtml(currentUser.displayName || 'Player') + '</span>' +
             '<button class="btn btn-ghost btn-sm" id="btn-logout">Log Out</button>';
         document.getElementById('btn-logout').onclick = () => auth.signOut();
@@ -210,8 +259,20 @@ function closeAuthModal() {
     if (overlay) overlay.classList.remove('on');
 }
 
+let currentXp = 0;
+let unsubUserProgress = null;
+
 auth.onAuthStateChanged(user => {
     currentUser = user;
+    if (unsubUserProgress) { unsubUserProgress(); unsubUserProgress = null; }
+    if (user) {
+        unsubUserProgress = listenUserProgress(user.uid, xp => {
+            currentXp = xp;
+            renderAccountWidget();
+        });
+    } else {
+        currentXp = 0;
+    }
     renderAccountWidget();
 });
 

@@ -36,7 +36,7 @@
             </div>
             <div class="mode-card" onclick="startOnlineFlow()">
                 <h3 data-i18n="mode_online_h3">⚡ Play Online</h3>
-                <p data-i18n="mode_online_p">Get matched with a real opponent in a fixed 30s ranked round</p>
+                <p data-i18n="mode_online_p">Rhythm battle — hit falling notes to push a shared health bar toward your opponent</p>
             </div>
         </div>
         <div class="step-foot">
@@ -155,10 +155,33 @@
     <button class="btn btn-ghost" onclick="cancelMatchmaking()" data-i18n="mm_cancel">Cancel</button>
 </div>
 
-<!-- COUNTDOWN SCREEN -->
+<!-- COUNTDOWN SCREEN (solo mode only) -->
 <div id="screen-countdown">
-    <div class="online-vs-label" id="online-vs"></div>
     <div class="countdown-num" id="countdown-num">3</div>
+</div>
+
+<!-- RHYTHM BATTLE SCREEN (online mode only) -->
+<div id="screen-rhythm">
+    <div class="online-vs-label" id="rhythm-vs"></div>
+    <div class="rhythm-health-wrap">
+        <div class="rhythm-health-label rhythm-health-label-p1" id="rhythm-label-p1">P1</div>
+        <div class="rhythm-health-bar"><div class="rhythm-health-fill" id="rhythm-health-fill"></div></div>
+        <div class="rhythm-health-label rhythm-health-label-p2" id="rhythm-label-p2">P2</div>
+    </div>
+    <div class="rhythm-combo" id="rhythm-combo"></div>
+    <div class="rhythm-judgment" id="rhythm-judgment"></div>
+    <div class="rhythm-highway">
+        <div class="rhythm-lane rhythm-lane-0" id="rhythm-lane-0"><div class="rhythm-hitline">←</div></div>
+        <div class="rhythm-lane rhythm-lane-1" id="rhythm-lane-1"><div class="rhythm-hitline">↓</div></div>
+        <div class="rhythm-lane rhythm-lane-2" id="rhythm-lane-2"><div class="rhythm-hitline">↑</div></div>
+        <div class="rhythm-lane rhythm-lane-3" id="rhythm-lane-3"><div class="rhythm-hitline">→</div></div>
+    </div>
+    <div class="rhythm-lane-buttons">
+        <button class="dir-btn" onclick="pressLane(0)">←</button>
+        <button class="dir-btn" onclick="pressLane(1)">↓</button>
+        <button class="dir-btn" onclick="pressLane(2)">↑</button>
+        <button class="dir-btn" onclick="pressLane(3)">→</button>
+    </div>
 </div>
 
 <!-- GAME SCREEN -->
@@ -183,13 +206,19 @@
     <div class="res-title" id="r-title" data-i18n="res_title">Session Complete!</div>
     <div class="res-subtitle" id="r-subtitle" data-i18n="res_subtitle">Here's how you timed it</div>
     <div class="mm-status" id="online-wait-status" style="display:none;"></div>
-    <div class="res-stats">
+    <div class="res-stats" id="solo-results">
         <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
         <div class="res-stat"><div class="res-val" id="r-land">0</div><div class="res-lbl" data-i18n="hud_land">Landings</div></div>
         <div class="res-stat"><div class="res-val" id="r-fail">0</div><div class="res-lbl" data-i18n="hud_fail">Fails</div></div>
         <div class="res-stat"><div class="res-val" id="r-miss">0</div><div class="res-lbl" data-i18n="hud_missed">Missed</div></div>
         <div class="res-stat"><div class="res-val" id="r-acc">0%</div><div class="res-lbl" data-i18n="hud_accuracy">Accuracy</div></div>
-        <div class="res-stat" id="res-opponent-stat" style="display:none;"><div class="res-val" id="r-opp-score">—</div><div class="res-lbl" data-i18n="opponent_score">Opponent's Score</div></div>
+    </div>
+    <div class="res-stats" id="rhythm-results" style="display:none;">
+        <div class="res-stat"><div class="res-val" id="rr-sick">0</div><div class="res-lbl" data-i18n="judge_sick">Sick</div></div>
+        <div class="res-stat"><div class="res-val" id="rr-good">0</div><div class="res-lbl" data-i18n="judge_good">Good</div></div>
+        <div class="res-stat"><div class="res-val" id="rr-bad">0</div><div class="res-lbl" data-i18n="judge_bad">Bad</div></div>
+        <div class="res-stat"><div class="res-val" id="rr-miss">0</div><div class="res-lbl" data-i18n="judge_miss">Miss</div></div>
+        <div class="res-stat"><div class="res-val" id="rr-combo">0</div><div class="res-lbl" data-i18n="max_combo">Max Combo</div></div>
     </div>
     <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
 </div>
@@ -269,7 +298,7 @@ const I18N = {
     space:          { en: 'Space', zh: '空格键' },
     press_key_cap:  { en: 'Press a key, click, or tap…', zh: '请按键、点击或触摸…' },
     mode_online_h3: { en: '⚡ Play Online', zh: '⚡ 在线对战' },
-    mode_online_p:  { en: 'Get matched with a real opponent in a fixed 30s ranked round', zh: '与真实玩家匹配，进行固定30秒的排位赛' },
+    mode_online_p:  { en: 'Rhythm battle — hit falling notes to push a shared health bar toward your opponent', zh: '节奏对战 — 命中下落音符，将共享血条推向对手一侧' },
     mm_searching:   { en: 'Searching for an opponent…', zh: '正在寻找对手…' },
     mm_cancel:      { en: 'Cancel', zh: '取消' },
     vs_label:       { en: 'vs ', zh: '对战 ' },
@@ -278,7 +307,12 @@ const I18N = {
     online_you_lose:{ en: 'You Lose!', zh: '你输了！' },
     online_draw:    { en: "It's a Draw!", zh: '平局！' },
     online_opponent_left: { en: 'Opponent disconnected — You Win!', zh: '对手已断线 — 你赢了！' },
-    opponent_score: { en: "Opponent's Score", zh: '对手得分' }
+    you_label:      { en: 'You', zh: '你' },
+    judge_sick:     { en: 'Sick', zh: 'Sick' },
+    judge_good:     { en: 'Good', zh: 'Good' },
+    judge_bad:      { en: 'Bad', zh: 'Bad' },
+    judge_miss:     { en: 'Miss', zh: 'Miss' },
+    max_combo:      { en: 'Max Combo', zh: '最大连击' }
 };
 
 document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
@@ -310,7 +344,7 @@ const cfg = {
     slotSize: 14
 };
 
-let inputMode = 'idle'; // idle | capture | timing
+let inputMode = 'idle'; // idle | capture | timing | rhythm
 
 // ─── STEP NAVIGATION ────────────────────────────────────────────
 function show(stepId) {
@@ -647,12 +681,117 @@ function endGame() {
 
     document.getElementById('screen-results').classList.add('on');
     submitScore('timing', gs.score);
-
-    if (onlineMatch) { finishOnlineRound(gs.score); return; }
     spawnConfetti();
 }
 
-// ─── ONLINE 1v1 (synced fixed-duration ranked round) ─────────────
+// ─── RHYTHM BATTLE ENGINE (online mode only, pure logic) ─────────
+// Both clients generate the IDENTICAL note chart from one shared seed
+// (written once by whoever wins the matchmaking claim), so no chart data
+// ever needs to be transmitted -- just the seed and the synced start time.
+function makeSeededRandom(seed) {
+    let s = seed >>> 0;
+    return function () {
+        s |= 0; s = (s + 0x6D2B79F5) | 0;
+        let t = Math.imul(s ^ (s >>> 15), 1 | s);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+}
+
+const RHYTHM_BPM = 100;
+const RHYTHM_BEAT_MS = 60000 / RHYTHM_BPM;
+const RHYTHM_NOTE_COUNT = 64;
+const RHYTHM_LANES = 4;
+const RHYTHM_TRAVEL_MS = 1400;
+const RHYTHM_LEAD_BEATS = 2;
+
+function generateChart(seed) {
+    const rand = makeSeededRandom(seed);
+    const notes = [];
+    for (let i = 0; i < RHYTHM_NOTE_COUNT; i++) {
+        notes.push({ id: i, lane: Math.floor(rand() * RHYTHM_LANES), timeMs: (i + RHYTHM_LEAD_BEATS) * RHYTHM_BEAT_MS });
+    }
+    return notes;
+}
+
+const JUDGE_WINDOWS = { sick: 45, good: 90, bad: 150 };
+const JUDGE_HEALTH  = { sick: 4, good: 2, bad: -2, miss: -5 };
+const JUDGE_SCORE   = { sick: 100, good: 60, bad: 20, miss: 0 };
+
+function judgeHit(offsetMs) {
+    const abs = Math.abs(offsetMs);
+    if (abs <= JUDGE_WINDOWS.sick) return 'sick';
+    if (abs <= JUDGE_WINDOWS.good) return 'good';
+    if (abs <= JUDGE_WINDOWS.bad) return 'bad';
+    return 'miss';
+}
+
+// Health is stored as "p1's favor", 0-100, starting at 50. A good hit by a
+// player pushes it toward THEIR favor; a bad hit pushes it toward their
+// opponent's -- exactly the shared tug-of-war feel of the source game.
+function healthDelta(grade, isP1) {
+    const base = JUDGE_HEALTH[grade];
+    return isP1 ? base : -base;
+}
+
+function healthWinner(health) {
+    if (health <= 0) return 'p2';
+    if (health >= 100) return 'p1';
+    if (health > 50) return 'p1';
+    if (health < 50) return 'p2';
+    return null;
+}
+
+function computeRhythmScore(counts) {
+    return counts.sick * 10 + counts.good * 6 + counts.bad * 2;
+}
+
+// ─── AUDIO (original procedural beat, no copyrighted assets) ────
+let rhythmAudioCtx = null;
+function getRhythmAudioCtx() {
+    if (rhythmAudioCtx) return rhythmAudioCtx;
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    rhythmAudioCtx = new Ctx();
+    return rhythmAudioCtx;
+}
+
+function playRhythmBeep(freq, startTime, durationSec, type, gainVal) {
+    const ctx = getRhythmAudioCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(gainVal, startTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, startTime + durationSec);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(startTime);
+    osc.stop(startTime + durationSec);
+}
+
+function scheduleChartAudio(goAtMs) {
+    const ctx = getRhythmAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume();
+    const BASS_NOTES = [110, 110, 146.83, 130.81];
+    const startAudioTime = ctx.currentTime + Math.max(0, (goAtMs - netNow()) / 1000);
+    for (let i = 0; i < RHYTHM_NOTE_COUNT + RHYTHM_LEAD_BEATS; i++) {
+        const t = startAudioTime + i * (RHYTHM_BEAT_MS / 1000);
+        playRhythmBeep(60, t, 0.12, 'sine', 0.3);
+        playRhythmBeep(BASS_NOTES[i % BASS_NOTES.length], t + 0.02, 0.25, 'triangle', 0.08);
+    }
+}
+
+function playRhythmHitSound(grade) {
+    const ctx = getRhythmAudioCtx();
+    if (!ctx) return;
+    const freq = grade === 'sick' ? 880 : grade === 'good' ? 660 : grade === 'bad' ? 440 : 220;
+    playRhythmBeep(freq, ctx.currentTime, 0.08, 'square', 0.06);
+}
+
+// ─── ONLINE 1v1 (FNF-style rhythm battle) ────────────────────────
 let onlineMatch = null;
 
 function startOnlineFlow() {
@@ -660,19 +799,24 @@ function startOnlineFlow() {
     document.getElementById('wizard').style.display = 'none';
     document.getElementById('screen-matchmaking').classList.add('on');
     document.getElementById('mm-status').textContent = t(I18N,'mm_searching');
-    cfg.orientation = 'horizontal';
-    cfg.speed = 1.2;
-    cfg.duration = 30;
-    cfg.key = 'Space';
-    cfg.rawKey = ' ';
-    cfg.keyLabel = t(I18N,'space');
-    cfg.barSize = 70;
-    cfg.slotSize = 14;
     syncClock().then(() => {
-        onlineMatch = { queueHandle: null, roomId: null, mySlot: null, unsubRoom: null, stopHeartbeat: null, started: false, finishRequested: false };
+        onlineMatch = {
+            queueHandle: null, roomId: null, mySlot: null, unsubRoom: null, stopHeartbeat: null,
+            started: false, decided: false, finishRequested: false, myFinished: false,
+            chart: null, judged: new Set(), noteEls: new Map(),
+            counts: { sick: 0, good: 0, bad: 0, miss: 0 }, combo: 0, maxCombo: 0,
+            chartStartMs: 0, rafId: null
+        };
         onlineMatch.queueHandle = joinQueue('timing', {
             buildInitialState() {
-                return { goAtMs: netNow() + 3000 + Math.random() * 2000, p1Score: null, p2Score: null, p1Finished: false, p2Finished: false, winner: null };
+                return {
+                    seed: (Math.floor(netNow()) ^ Math.floor(Math.random() * 1e9)) >>> 0,
+                    goAtMs: netNow() + 3000,
+                    health: 50,
+                    p1Finished: false, p2Finished: false,
+                    p1Counts: null, p2Counts: null,
+                    winner: null, disconnect: false
+                };
             },
             onMatched(roomId) { enterOnlineRoom(roomId); },
             onError(err) { document.getElementById('mm-status').textContent = (err && err.message) || 'Error finding a match.'; }
@@ -703,45 +847,153 @@ function enterOnlineRoom(roomId) {
 
         if (!onlineMatch.started) {
             onlineMatch.started = true;
-            document.getElementById('online-vs').textContent = t(I18N,'vs_label') + room.players[oppSlotKey].username;
-            const delay = Math.max(0, room.state.goAtMs - netNow());
-            setTimeout(() => { if (onlineMatch) beginTraining(); }, delay);
+            onlineMatch.oppName = room.players[oppSlotKey].username;
+            beginRhythmBattle(room.state.seed, room.state.goAtMs);
         }
 
+        updateHealthBarDom(room.state.health);
+
         if (room.status === 'finished') {
-            if (!onlineMatch.decided) { onlineMatch.decided = true; showOnlineResult(room); }
+            if (!onlineMatch.decided) { onlineMatch.decided = true; showRhythmResult(room); }
             return;
         }
 
-        const myFinished = room.state[onlineMatch.mySlot + 'Finished'];
-        const oppFinished = room.state[oppSlotKey + 'Finished'];
-        if (myFinished && oppFinished && !onlineMatch.finishRequested) {
+        if (onlineMatch.finishRequested) return;
+        if (room.state.health <= 0 || room.state.health >= 100) {
             onlineMatch.finishRequested = true;
-            const myScore = room.state[onlineMatch.mySlot + 'Score'];
-            const oppScore = room.state[oppSlotKey + 'Score'];
-            const winner = myScore === oppScore ? null : (myScore > oppScore ? onlineMatch.mySlot : oppSlotKey);
-            markRoomFinished(roomId, { winner }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
-        } else if (myFinished && !oppFinished && isOpponentStale(room, onlineMatch.mySlot) && !onlineMatch.finishRequested) {
+            markRoomFinished(roomId, { winner: room.state.health <= 0 ? 'p2' : 'p1', decidedEarly: true })
+                .catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+        } else if (room.state.p1Finished && room.state.p2Finished) {
             onlineMatch.finishRequested = true;
-            markRoomFinished(roomId, { winner: onlineMatch.mySlot, disconnect: true }).catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+            markRoomFinished(roomId, { winner: healthWinner(room.state.health) })
+                .catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
+        } else if (room.state[onlineMatch.mySlot + 'Finished'] && !room.state[oppSlotKey + 'Finished'] && isOpponentStale(room, onlineMatch.mySlot)) {
+            onlineMatch.finishRequested = true;
+            markRoomFinished(roomId, { winner: onlineMatch.mySlot, disconnect: true })
+                .catch(() => { if (onlineMatch) onlineMatch.finishRequested = false; });
         }
     });
 }
 
-function finishOnlineRound(myScore) {
-    document.getElementById('online-wait-status').style.display = '';
-    document.getElementById('online-wait-status').textContent = t(I18N,'waiting_opponent');
-    updateRoomState(onlineMatch.roomId, { [onlineMatch.mySlot + 'Score']: myScore, [onlineMatch.mySlot + 'Finished']: true }).catch(() => {});
+function beginRhythmBattle(seed, goAtMs) {
+    document.getElementById('screen-rhythm').classList.add('on');
+    onlineMatch.chart = generateChart(seed);
+    onlineMatch.chartStartMs = goAtMs;
+    document.getElementById('rhythm-label-p1').textContent = onlineMatch.mySlot === 'p1' ? t(I18N,'you_label') : onlineMatch.oppName;
+    document.getElementById('rhythm-label-p2').textContent = onlineMatch.mySlot === 'p2' ? t(I18N,'you_label') : onlineMatch.oppName;
+    document.getElementById('rhythm-vs').textContent = t(I18N,'vs_label') + onlineMatch.oppName;
+    inputMode = 'rhythm';
+    scheduleChartAudio(goAtMs);
+    onlineMatch.rafId = requestAnimationFrame(rhythmTick);
 }
 
-function showOnlineResult(room) {
+function rhythmTick() {
+    if (!onlineMatch || !onlineMatch.chart || onlineMatch.myFinished) return;
+    const elapsed = netNow() - onlineMatch.chartStartMs;
+    renderNotes(elapsed);
+
+    onlineMatch.chart.forEach(note => {
+        if (!onlineMatch.judged.has(note.id) && elapsed - note.timeMs > JUDGE_WINDOWS.bad) {
+            judgeNote(note, 'miss');
+        }
+    });
+
+    const lastNote = onlineMatch.chart[onlineMatch.chart.length - 1];
+    if (elapsed > lastNote.timeMs + JUDGE_WINDOWS.bad + 300) {
+        finishMyRhythmRound();
+        return;
+    }
+    onlineMatch.rafId = requestAnimationFrame(rhythmTick);
+}
+
+function renderNotes(elapsed) {
+    onlineMatch.chart.forEach(note => {
+        const progress = (elapsed - (note.timeMs - RHYTHM_TRAVEL_MS)) / RHYTHM_TRAVEL_MS;
+        const judged = onlineMatch.judged.has(note.id);
+        if (judged || progress < -0.05 || progress > 1.15) {
+            const el = onlineMatch.noteEls.get(note.id);
+            if (el) { el.remove(); onlineMatch.noteEls.delete(note.id); }
+            return;
+        }
+        let el = onlineMatch.noteEls.get(note.id);
+        if (!el) {
+            el = document.createElement('div');
+            el.className = 'rhythm-note';
+            document.getElementById('rhythm-lane-' + note.lane).appendChild(el);
+            onlineMatch.noteEls.set(note.id, el);
+        }
+        el.style.top = (Math.max(0, Math.min(1, progress)) * 85) + '%';
+    });
+}
+
+function pressLane(lane) {
+    if (!onlineMatch || !onlineMatch.chart || onlineMatch.myFinished) return;
+    const elapsed = netNow() - onlineMatch.chartStartMs;
+    let closest = null, closestOffset = Infinity;
+    for (const note of onlineMatch.chart) {
+        if (onlineMatch.judged.has(note.id) || note.lane !== lane) continue;
+        const offset = elapsed - note.timeMs;
+        if (Math.abs(offset) < Math.abs(closestOffset)) { closest = note; closestOffset = offset; }
+    }
+    if (closest && Math.abs(closestOffset) <= JUDGE_WINDOWS.bad) {
+        judgeNote(closest, judgeHit(closestOffset));
+    }
+}
+
+const LANE_KEY_CODES = { ArrowLeft: 0, KeyA: 0, ArrowDown: 1, KeyS: 1, ArrowUp: 2, KeyW: 2, ArrowRight: 3, KeyD: 3 };
+
+function handleRhythmInput(code, e) {
+    const lane = LANE_KEY_CODES[code];
+    if (lane === undefined) return;
+    e.preventDefault();
+    pressLane(lane);
+}
+
+function judgeNote(note, grade) {
+    if (onlineMatch.judged.has(note.id)) return;
+    onlineMatch.judged.add(note.id);
+    onlineMatch.counts[grade]++;
+    if (grade === 'bad' || grade === 'miss') onlineMatch.combo = 0;
+    else { onlineMatch.combo++; onlineMatch.maxCombo = Math.max(onlineMatch.maxCombo, onlineMatch.combo); }
+
+    const judgeEl = document.getElementById('rhythm-judgment');
+    judgeEl.textContent = t(I18N, 'judge_' + grade);
+    judgeEl.className = 'rhythm-judgment rhythm-judgment-' + grade + ' pop';
+    document.getElementById('rhythm-combo').textContent = onlineMatch.combo > 1 ? onlineMatch.combo + 'x' : '';
+    playRhythmHitSound(grade);
+
+    const delta = healthDelta(grade, onlineMatch.mySlot === 'p1');
+    updateRoomState(onlineMatch.roomId, { health: firebase.firestore.FieldValue.increment(delta) }).catch(() => {});
+}
+
+function updateHealthBarDom(health) {
+    const clamped = Math.max(0, Math.min(100, health));
+    document.getElementById('rhythm-health-fill').style.width = clamped + '%';
+}
+
+function finishMyRhythmRound() {
+    onlineMatch.myFinished = true;
+    if (onlineMatch.rafId) cancelAnimationFrame(onlineMatch.rafId);
+    document.getElementById('online-wait-status').style.display = '';
+    document.getElementById('online-wait-status').textContent = t(I18N,'waiting_opponent');
+    updateRoomState(onlineMatch.roomId, {
+        [onlineMatch.mySlot + 'Finished']: true,
+        [onlineMatch.mySlot + 'Counts']: onlineMatch.counts
+    }).catch(() => {});
+}
+
+function showRhythmResult(room) {
     if (onlineMatch.unsubRoom) onlineMatch.unsubRoom();
     if (onlineMatch.stopHeartbeat) onlineMatch.stopHeartbeat();
+    if (onlineMatch.rafId) cancelAnimationFrame(onlineMatch.rafId);
+    document.getElementById('screen-rhythm').classList.remove('on');
+    inputMode = 'idle';
+
     const mySlotKey = onlineMatch.mySlot;
     const oppSlotKey = otherSlot(mySlotKey);
-    const oppScore = room.state[oppSlotKey + 'Score'];
     const isDraw = room.state.winner === null;
     const iWon = room.state.winner === mySlotKey;
+    const myCounts = room.state[mySlotKey + 'Counts'] || onlineMatch.counts;
 
     document.getElementById('online-wait-status').style.display = 'none';
     document.getElementById('r-title').textContent = isDraw ? t(I18N,'online_draw') : (iWon ? t(I18N,'online_you_win') : t(I18N,'online_you_lose'));
@@ -749,8 +1001,17 @@ function showOnlineResult(room) {
     document.getElementById('r-subtitle').textContent = (room.state.disconnect && iWon)
         ? t(I18N,'online_opponent_left')
         : t(I18N,'vs_label') + room.players[oppSlotKey].username;
-    document.getElementById('r-opp-score').textContent = (oppScore != null) ? oppScore : '—';
-    document.getElementById('res-opponent-stat').style.display = '';
+
+    document.getElementById('solo-results').style.display = 'none';
+    document.getElementById('rhythm-results').style.display = '';
+    document.getElementById('rr-sick').textContent = myCounts.sick;
+    document.getElementById('rr-good').textContent = myCounts.good;
+    document.getElementById('rr-bad').textContent = myCounts.bad;
+    document.getElementById('rr-miss').textContent = myCounts.miss;
+    document.getElementById('rr-combo').textContent = onlineMatch.maxCombo;
+
+    document.getElementById('screen-results').classList.add('on');
+    submitScore('timing', computeRhythmScore(myCounts));
     if (iWon) { spawnConfetti(); awardXp(XP_WIN_BONUS); }
     onlineMatch = null;
 }
@@ -759,6 +1020,7 @@ function showOnlineResult(room) {
 function routeInput(code, e) {
     if (inputMode === 'capture') handleCapture(code, e);
     else if (inputMode === 'timing') handleTimingInput(code, e);
+    else if (inputMode === 'rhythm') handleRhythmInput(code, e);
 }
 
 document.addEventListener('keydown', e => {

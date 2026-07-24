@@ -1395,6 +1395,99 @@ input[type="range"] {
 .lb-table tbody tr:last-child td { border-bottom: none; }
 .lb-table tbody tr:first-child td { color: var(--bright); font-weight: 700; }
 
+/* RHYTHM BATTLE (timing.html online mode) */
+#screen-rhythm {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    height: 100dvh;
+    padding: 14px;
+    gap: 10px;
+    overflow: hidden;
+}
+#screen-rhythm.on { display: flex; }
+
+.rhythm-health-wrap { display: flex; align-items: center; gap: 10px; width: min(92vw, 480px); }
+.rhythm-health-label { font-size: 0.78rem; font-weight: 700; color: var(--dim); white-space: nowrap; min-width: 44px; }
+.rhythm-health-label-p1 { text-align: right; color: var(--blue); }
+.rhythm-health-label-p2 { text-align: left; color: var(--red); }
+.rhythm-health-bar {
+    flex: 1;
+    height: 16px;
+    background: var(--red);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border2);
+}
+.rhythm-health-fill {
+    height: 100%;
+    width: 50%;
+    background: var(--blue);
+    transition: width 0.2s ease;
+}
+
+.rhythm-combo { font-size: 1.3rem; font-weight: 800; color: var(--yellow); min-height: 1.6rem; }
+.rhythm-judgment { font-size: 1.1rem; font-weight: 800; min-height: 1.4rem; }
+.rhythm-judgment.pop { animation: rhythmJudgePop 0.3s ease; }
+.rhythm-judgment-sick { color: var(--yellow); }
+.rhythm-judgment-good { color: var(--green); }
+.rhythm-judgment-bad  { color: var(--orange); }
+.rhythm-judgment-miss { color: var(--red); }
+@keyframes rhythmJudgePop {
+    0%   { transform: scale(1.4); opacity: 0; }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+.rhythm-highway {
+    flex: 1;
+    display: flex;
+    gap: 6px;
+    width: min(92vw, 420px);
+    max-height: 100%;
+}
+.rhythm-lane {
+    position: relative;
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--rs);
+    overflow: hidden;
+}
+.rhythm-hitline {
+    position: absolute;
+    top: 85%;
+    left: 0;
+    right: 0;
+    height: 40px;
+    margin-top: -20px;
+    background: var(--surface2);
+    border-top: 2px solid var(--border2);
+    border-bottom: 2px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--dim);
+}
+.rhythm-note {
+    position: absolute;
+    left: 6%;
+    width: 88%;
+    height: 30px;
+    margin-top: -15px;
+    background: var(--blue);
+    border-radius: 6px;
+    box-shadow: 0 0 10px -2px var(--blue);
+}
+.rhythm-lane-0 .rhythm-note { background: var(--green); box-shadow: 0 0 10px -2px var(--green); }
+.rhythm-lane-1 .rhythm-note { background: var(--red); box-shadow: 0 0 10px -2px var(--red); }
+.rhythm-lane-2 .rhythm-note { background: var(--yellow); box-shadow: 0 0 10px -2px var(--yellow); }
+.rhythm-lane-3 .rhythm-note { background: var(--blue); box-shadow: 0 0 10px -2px var(--blue); }
+
+.rhythm-lane-buttons { display: flex; gap: 10px; justify-content: center; }
+
 /* TIMING TRACK */
 .timing-track {
     position: relative;

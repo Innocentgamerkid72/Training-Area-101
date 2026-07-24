@@ -107,6 +107,7 @@ body {
 .category-card.typing    { --card-color: var(--red); }
 .category-card.stroop    { --card-color: var(--yellow); }
 .category-card.chess     { --card-color: var(--silver); }
+.category-card.sudoku    { --card-color: var(--green); }
 .category-card.tag2      { --card-color: var(--red); }
 
 .category-card.disabled { opacity: 0.38; cursor: not-allowed; pointer-events: none; }
@@ -1049,6 +1050,76 @@ input[type="range"] {
 #screen-vote.on { display: flex; }
 #screen-vote .mode-card.sel-locked { opacity: 0.5; pointer-events: none; }
 
+/* SUDOKU */
+.sudoku-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
+    width: min(92vw, 440px);
+    height: min(92vw, 440px);
+    background: var(--surface);
+    border: 3px solid var(--border2);
+    border-radius: var(--rs);
+    overflow: hidden;
+}
+.sudoku-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--blue);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+}
+.sudoku-cell.given { color: var(--bright); font-weight: 800; cursor: default; background: var(--surface2); }
+.sudoku-cell.hinted { color: var(--purple); }
+.sudoku-cell.peer { background: rgba(0, 200, 255, 0.06); }
+.sudoku-cell.same-value { background: rgba(0, 200, 255, 0.14); }
+.sudoku-cell.selected { background: rgba(0, 200, 255, 0.28); }
+.sudoku-cell.wrong { color: var(--red); animation: sudokuShake 0.35s; }
+.sudoku-cell.box-right { border-right: 2px solid var(--border2); }
+.sudoku-cell.box-bottom { border-bottom: 2px solid var(--border2); }
+@keyframes sudokuShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+.sudoku-notes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    width: 100%;
+    height: 100%;
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--dim);
+}
+.sudoku-notes span { display: flex; align-items: center; justify-content: center; }
+.sudoku-toolbar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 14px auto 0; max-width: 440px; }
+.sudoku-numpad {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+    width: min(92vw, 440px);
+    margin: 14px auto 0;
+}
+.sudoku-num-btn {
+    padding: 12px 0;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: var(--rs);
+    color: var(--bright);
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: border-color var(--t);
+}
+
 /* CHESS */
 .chess-vs { text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--dim); padding: 6px 0; background: var(--bg); }
 .chess-wrap {
@@ -1374,6 +1445,12 @@ input[type="range"] {
 
     .duelist { font-size: 34px; bottom: 12%; }
     .duelist-gun { font-size: 18px; }
+
+    .sudoku-cell { font-size: 0.95rem; }
+    .sudoku-notes { font-size: 0.42rem; }
+    .sudoku-numpad { gap: 4px; }
+    .sudoku-num-btn { padding: 9px 0; font-size: 0.9rem; }
+    .sudoku-toolbar { gap: 6px; }
     .tumbleweed { width: 26px; height: 26px; }
 
     .typing-passage {
@@ -1453,4 +1530,6 @@ input[type="range"] {
     .lb-link:hover        { text-decoration: underline; }
     .chess-sq:hover       { filter: brightness(1.25); }
     .dir-btn:hover         { filter: brightness(1.2); transform: translateY(-1px); }
+    .sudoku-num-btn:hover  { border-color: var(--blue); }
+    .sudoku-cell:not(.given):hover { background: var(--surface2); }
 }

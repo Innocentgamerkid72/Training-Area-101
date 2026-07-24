@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku — Training Area 101</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- PAGE NAV (hidden during game/results) -->
+<nav class="page-nav" id="page-nav">
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Sudoku</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
+    <a href="leaderboard.html?cat=sudoku" class="btn btn-ghost btn-sm" data-i18n="leaderboard_link">🏆 Leaderboard</a>
+</nav>
+
+<!-- WIZARD CONTAINER -->
+<div class="wizard" id="wizard">
+
+    <!-- STEP 1: Difficulty -->
+    <div class="step active" id="step-difficulty">
+        <div class="step-head">
+            <h2 data-i18n="diff_h2">Select Difficulty</h2>
+            <p data-i18n="diff_p">Choose how many clues the puzzle starts with</p>
+        </div>
+        <div class="mode-grid">
+            <div class="mode-card" data-difficulty="easy" onclick="pickDifficulty(this)">
+                <h3 data-i18n="easy_h3">Easy</h3>
+                <p data-i18n="easy_p">42 starting clues — a relaxed warm-up</p>
+            </div>
+            <div class="mode-card" data-difficulty="medium" onclick="pickDifficulty(this)">
+                <h3 data-i18n="medium_h3">Medium</h3>
+                <p data-i18n="medium_p">34 starting clues — a fair challenge</p>
+            </div>
+            <div class="mode-card" data-difficulty="hard" onclick="pickDifficulty(this)">
+                <h3 data-i18n="hard_h3">Hard</h3>
+                <p data-i18n="hard_p">28 starting clues — real deduction required</p>
+            </div>
+            <div class="mode-card" data-difficulty="expert" onclick="pickDifficulty(this)">
+                <h3 data-i18n="expert_h3">Expert</h3>
+                <p data-i18n="expert_p">24 starting clues — for veterans only</p>
+            </div>
+        </div>
+        <div class="step-foot">
+            <div></div>
+            <button class="btn btn-primary" id="btn-difficulty-next" disabled onclick="fromDifficulty()" data-i18n="next">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 2: How to Play -->
+    <div class="step" id="step-guide">
+        <div class="step-head">
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
+        </div>
+        <div class="guide-card" style="--guide-color: var(--blue);">
+            <ul class="guide-list">
+                <li data-i18n="guide_1">Fill every row, column, and 3×3 box with the digits 1–9, each appearing exactly once.</li>
+                <li data-i18n="guide_2">Tap a cell, then tap a number (or press a key 1–9) to fill it in — wrong entries flash red and cost a few points, but won't end the game.</li>
+                <li data-i18n="guide_3">Toggle Notes mode to jot down candidate digits in a cell without committing to one yet.</li>
+                <li data-i18n="guide_4">Stuck? Use Hint to reveal a cell's correct digit — it costs more points than a mistake, so use it sparingly.</li>
+            </ul>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('difficulty')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginGame()" data-i18n="lets_go">Let's Go!</button>
+        </div>
+    </div>
+
+</div><!-- /wizard -->
+
+<!-- GAME SCREEN -->
+<div id="screen-game">
+    <div class="game-hud">
+        <div class="hud-stat"><div class="hud-val" id="hud-time">0:00</div><div class="hud-lbl" data-i18n="hud_time">Time</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-mistakes">0</div><div class="hud-lbl" data-i18n="hud_mistakes">Mistakes</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-hints">0</div><div class="hud-lbl" data-i18n="hud_hints">Hints Used</div></div>
+    </div>
+    <div class="game-area game-area-center">
+        <div class="sudoku-board" id="sudoku-board"></div>
+    </div>
+    <div class="sudoku-toolbar">
+        <button class="btn btn-ghost btn-sm" id="btn-notes-toggle" onclick="toggleNotesMode()" data-i18n="notes_off">📝 Notes: Off</button>
+        <button class="btn btn-ghost btn-sm" onclick="useHint()" data-i18n="hint_btn">💡 Hint</button>
+        <button class="btn btn-ghost btn-sm" onclick="eraseCell()" data-i18n="erase_btn">⌫ Erase</button>
+    </div>
+    <div class="sudoku-numpad" id="sudoku-numpad"></div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="screen-results">
+    <div class="res-title" data-i18n="res_title">Puzzle Complete!</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Here's how you did</div>
+    <div class="res-stats">
+        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="r_score">Score</div></div>
+        <div class="res-stat"><div class="res-val" id="r-time">0:00</div><div class="res-lbl" data-i18n="hud_time">Time</div></div>
+        <div class="res-stat"><div class="res-val" id="r-mistakes">0</div><div class="res-lbl" data-i18n="hud_mistakes">Mistakes</div></div>
+        <div class="res-stat"><div class="res-val" id="r-hints">0</div><div class="res-lbl" data-i18n="hud_hints">Hints Used</div></div>
+    </div>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
+<script src="leaderboard.js"></script>
+<script src="confetti.js"></script>
+<script src="i18n.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════
+// SUDOKU ENGINE — pure logic, no DOM. Grid is a flat 81-cell array,
+// row-major (index = row*9 + col, 0 = empty).
+// ══════════════════════════════════════════════════════════════════
+function emptyGrid() { return new Array(81).fill(0); }
+function rowOf(i) { return Math.floor(i / 9); }
+function colOf(i) { return i % 9; }
+
+function isSafe(grid, idx, val) {
+    const r = rowOf(idx), c = colOf(idx);
+    for (let i = 0; i < 9; i++) {
+        if (grid[r * 9 + i] === val) return false;
+        if (grid[i * 9 + c] === val) return false;
+    }
+    const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+    for (let dr = 0; dr < 3; dr++) {
+        for (let dc = 0; dc < 3; dc++) {
+            if (grid[(br + dr) * 9 + (bc + dc)] === val) return false;
+        }
+    }
+    return true;
+}
+
+function shuffled(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+// Most-constrained-cell-first: picks the empty cell with the fewest legal
+// candidates, and bails out immediately once it finds one with <=1 (can't
+// do better). Speeds up both generation and the uniqueness check below.
+function findEmptyMRV(grid) {
+    let best = -1, bestCount = 10;
+    for (let i = 0; i < 81; i++) {
+        if (grid[i] !== 0) continue;
+        let count = 0;
+        for (let v = 1; v <= 9; v++) if (isSafe(grid, i, v)) count++;
+        if (count < bestCount) { bestCount = count; best = i; if (count <= 1) break; }
+    }
+    return best;
+}
+
+function fillRandom(grid) {
+    const idx = findEmptyMRV(grid);
+    if (idx === -1) return true; // fully solved
+    for (const v of shuffled([1,2,3,4,5,6,7,8,9])) {
+        if (isSafe(grid, idx, v)) {
+            grid[idx] = v;
+            if (fillRandom(grid)) return true;
+            grid[idx] = 0;
+        }
+    }
+    return false;
+}
+
+function generateFullGrid() {
+    const grid = emptyGrid();
+    fillRandom(grid);
+    return grid;
+}
+
+// Counts solutions up to `limit`, then stops exploring (we only ever need to
+// know "is this puzzle's solution unique", i.e. does count stay at 1).
+function countSolutions(grid, limit) {
+    const idx = findEmptyMRV(grid);
+    if (idx === -1) return 1;
+    let count = 0;
+    for (let v = 1; v <= 9; v++) {
+        if (isSafe(grid, idx, v)) {
+            grid[idx] = v;
+            count += countSolutions(grid, limit - count);
+            grid[idx] = 0;
+            if (count >= limit) return count;
+        }
+    }
+    return count;
+}
+
+const DIFFICULTY_GIVENS = { easy: 42, medium: 34, hard: 28, expert: 24 };
+const DIFFICULTY_BASE   = { easy: 400, medium: 600, hard: 900, expert: 1300 };
+
+// Carves a unique-solution puzzle out of a full solved grid by removing
+// cells one at a time (in random order), backing out any removal that would
+// make the puzzle solvable more than one way.
+function makePuzzle(difficulty) {
+    const solution = generateFullGrid();
+    const puzzle = solution.slice();
+    const targetGivens = DIFFICULTY_GIVENS[difficulty] || DIFFICULTY_GIVENS.medium;
+    let givens = 81;
+    for (const idx of shuffled(Array.from({ length: 81 }, (_, i) => i))) {
+        if (givens <= targetGivens) break;
+        if (puzzle[idx] === 0) continue;
+        const backup = puzzle[idx];
+        puzzle[idx] = 0;
+        if (countSolutions(puzzle.slice(), 2) === 1) {
+            givens--;
+        } else {
+            puzzle[idx] = backup;
+        }
+    }
+    return { puzzle, solution };
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI
+// ══════════════════════════════════════════════════════════════════
+const I18N = {
+    back:            { en: 'Back', zh: '返回' },
+    page_title:      { en: 'Sudoku', zh: '数独' },
+    leaderboard_link:{ en: '🏆 Leaderboard', zh: '🏆 排行榜' },
+    diff_h2:         { en: 'Select Difficulty', zh: '选择难度' },
+    diff_p:          { en: 'Choose how many clues the puzzle starts with', zh: '选择拼图开局给出的提示数量' },
+    easy_h3:         { en: 'Easy', zh: '简单' },
+    easy_p:          { en: '42 starting clues — a relaxed warm-up', zh: '开局42个提示 — 轻松热身' },
+    medium_h3:       { en: 'Medium', zh: '中等' },
+    medium_p:        { en: '34 starting clues — a fair challenge', zh: '开局34个提示 — 适度挑战' },
+    hard_h3:         { en: 'Hard', zh: '困难' },
+    hard_p:          { en: '28 starting clues — real deduction required', zh: '开局28个提示 — 需要真正的推理' },
+    expert_h3:       { en: 'Expert', zh: '专家' },
+    expert_p:        { en: '24 starting clues — for veterans only', zh: '开局24个提示 — 仅限老手' },
+    next:            { en: 'Next', zh: '下一步' },
+    guide_h2:        { en: 'How to Play', zh: '玩法说明' },
+    guide_p:         { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    guide_1:         { en: 'Fill every row, column, and 3×3 box with the digits 1–9, each appearing exactly once.', zh: '在每一行、每一列和每个3×3宫格中填入数字1–9，每个数字只能出现一次。' },
+    guide_2:         { en: "Tap a cell, then tap a number (or press a key 1–9) to fill it in — wrong entries flash red and cost a few points, but won't end the game.", zh: '点击格子，然后点击数字（或按键1–9）填入 — 错误的输入会闪红并扣少量分数，但不会结束游戏。' },
+    guide_3:         { en: 'Toggle Notes mode to jot down candidate digits in a cell without committing to one yet.', zh: '开启笔记模式，可以在格子中记下候选数字而不必立即确定。' },
+    guide_4:         { en: "Stuck? Use Hint to reveal a cell's correct digit — it costs more points than a mistake, so use it sparingly.", zh: '卡住了？使用提示可以揭示格子的正确数字 — 它比出错扣分更多，请谨慎使用。' },
+    lets_go:         { en: "Let's Go!", zh: '开始吧！' },
+    hud_time:        { en: 'Time', zh: '时间' },
+    hud_mistakes:    { en: 'Mistakes', zh: '错误次数' },
+    hud_hints:       { en: 'Hints Used', zh: '使用提示次数' },
+    notes_off:       { en: '📝 Notes: Off', zh: '📝 笔记：关闭' },
+    notes_on:        { en: '📝 Notes: On', zh: '📝 笔记：开启' },
+    hint_btn:        { en: '💡 Hint', zh: '💡 提示' },
+    erase_btn:       { en: '⌫ Erase', zh: '⌫ 清除' },
+    res_title:       { en: 'Puzzle Complete!', zh: '拼图完成！' },
+    res_subtitle:    { en: "Here's how you did", zh: '以下是你的表现' },
+    r_score:         { en: 'Score', zh: '得分' },
+    back_home:       { en: 'Back to Home', zh: '返回首页' }
+};
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
+
+function onLangChange() {
+    document.getElementById('btn-notes-toggle').textContent = t(I18N, cfg.notesMode ? 'notes_on' : 'notes_off');
+    if (document.getElementById('screen-game').classList.contains('on')) updateHUD();
+}
+
+// ─── SETTINGS STATE ─────────────────────────────────────────────
+const cfg = { difficulty: null, notesMode: false };
+
+// ─── STEP NAVIGATION ────────────────────────────────────────────
+function show(stepId) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + stepId).classList.add('active');
+}
+
+function navBack() {
+    const active = document.querySelector('.step.active');
+    if (!active) { location.href = 'index.html'; return; }
+    const id = active.id.replace('step-', '');
+    if (id === 'difficulty') { location.href = 'index.html'; return; }
+    if (id === 'guide') { show('difficulty'); return; }
+}
+
+function pickDifficulty(card) {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('sel'));
+    card.classList.add('sel');
+    cfg.difficulty = card.dataset.difficulty;
+    document.getElementById('btn-difficulty-next').disabled = false;
+}
+
+function fromDifficulty() {
+    if (!cfg.difficulty) return;
+    show('guide');
+}
+
+// ─── GAME ────────────────────────────────────────────────────────
+let gs = {};
+
+function beginGame() {
+    document.getElementById('page-nav').style.display = 'none';
+    document.getElementById('wizard').style.display = 'none';
+
+    const { puzzle, solution } = makePuzzle(cfg.difficulty);
+    gs = {
+        puzzle, solution,
+        board: puzzle.slice(),
+        notes: Array.from({ length: 81 }, () => new Set()),
+        hinted: new Array(81).fill(false),
+        selected: null,
+        mistakes: 0,
+        hintsUsed: 0,
+        elapsed: 0,
+        timer: null,
+        gameOver: false
+    };
+    cfg.notesMode = false;
+
+    document.getElementById('screen-game').classList.add('on');
+    document.getElementById('btn-notes-toggle').textContent = t(I18N, 'notes_off');
+    buildBoardDom();
+    buildNumpad();
+    renderBoard();
+    updateHUD();
+
+    gs.timer = setInterval(() => {
+        gs.elapsed++;
+        updateHUD();
+    }, 1000);
+}
+
+function buildBoardDom() {
+    const board = document.getElementById('sudoku-board');
+    board.innerHTML = '';
+    for (let i = 0; i < 81; i++) {
+        const r = rowOf(i), c = colOf(i);
+        const cell = document.createElement('div');
+        cell.className = 'sudoku-cell';
+        if (c % 3 === 2 && c !== 8) cell.classList.add('box-right');
+        if (r % 3 === 2 && r !== 8) cell.classList.add('box-bottom');
+        cell.dataset.idx = i;
+        cell.onclick = () => selectCell(i);
+        board.appendChild(cell);
+    }
+}
+
+function buildNumpad() {
+    const pad = document.getElementById('sudoku-numpad');
+    pad.innerHTML = '';
+    for (let v = 1; v <= 9; v++) {
+        const btn = document.createElement('button');
+        btn.className = 'sudoku-num-btn';
+        btn.textContent = v;
+        btn.onclick = () => enterDigit(v);
+        pad.appendChild(btn);
+    }
+}
+
+function fmtTime(s) {
+    const m = Math.floor(s / 60), r = s % 60;
+    return m + ':' + String(r).padStart(2, '0');
+}
+
+function selectCell(i) {
+    if (gs.gameOver) return;
+    gs.selected = i;
+    renderBoard();
+}
+
+function cellPeers(i) {
+    const r = rowOf(i), c = colOf(i);
+    const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
+    const peers = new Set();
+    for (let k = 0; k < 9; k++) { peers.add(r * 9 + k); peers.add(k * 9 + c); }
+    for (let dr = 0; dr < 3; dr++) for (let dc = 0; dc < 3; dc++) peers.add((br + dr) * 9 + (bc + dc));
+    return peers;
+}
+
+function renderBoard() {
+    const peers = gs.selected !== null ? cellPeers(gs.selected) : new Set();
+    const selVal = gs.selected !== null ? gs.board[gs.selected] : 0;
+    for (let i = 0; i < 81; i++) {
+        const cell = document.getElementById('sudoku-board').children[i];
+        cell.classList.toggle('selected', i === gs.selected);
+        cell.classList.toggle('peer', gs.selected !== null && i !== gs.selected && peers.has(i));
+        cell.classList.toggle('given', gs.puzzle[i] !== 0);
+        cell.classList.toggle('hinted', gs.hinted[i]);
+        cell.classList.toggle('same-value', selVal !== 0 && gs.board[i] === selVal && i !== gs.selected);
+
+        if (gs.board[i] !== 0) {
+            cell.textContent = gs.board[i];
+        } else if (gs.notes[i].size > 0) {
+            cell.innerHTML = '';
+            const notesWrap = document.createElement('div');
+            notesWrap.className = 'sudoku-notes';
+            for (let v = 1; v <= 9; v++) {
+                const span = document.createElement('span');
+                span.textContent = gs.notes[i].has(v) ? v : '';
+                notesWrap.appendChild(span);
+            }
+            cell.appendChild(notesWrap);
+        } else {
+            cell.textContent = '';
+        }
+    }
+}
+
+function toggleNotesMode() {
+    cfg.notesMode = !cfg.notesMode;
+    document.getElementById('btn-notes-toggle').textContent = t(I18N, cfg.notesMode ? 'notes_on' : 'notes_off');
+}
+
+function enterDigit(v) {
+    if (gs.gameOver || gs.selected === null) return;
+    const i = gs.selected;
+    if (gs.puzzle[i] !== 0 || gs.hinted[i]) return; // givens and revealed hints are locked
+
+    if (cfg.notesMode) {
+        if (gs.notes[i].has(v)) gs.notes[i].delete(v); else gs.notes[i].add(v);
+        renderBoard();
+        return;
+    }
+
+    gs.notes[i].clear();
+    gs.board[i] = v;
+    const cellEl = document.getElementById('sudoku-board').children[i];
+    if (v !== gs.solution[i]) {
+        gs.mistakes++;
+        cellEl.classList.add('wrong');
+        setTimeout(() => cellEl.classList.remove('wrong'), 350);
+    }
+    renderBoard();
+    updateHUD();
+    checkWin();
+}
+
+function eraseCell() {
+    if (gs.gameOver || gs.selected === null) return;
+    const i = gs.selected;
+    if (gs.puzzle[i] !== 0 || gs.hinted[i]) return;
+    gs.board[i] = 0;
+    gs.notes[i].clear();
+    renderBoard();
+}
+
+function useHint() {
+    if (gs.gameOver) return;
+    let i = gs.selected;
+    if (i === null || gs.puzzle[i] !== 0 || gs.board[i] === gs.solution[i]) {
+        const blanks = [];
+        for (let k = 0; k < 81; k++) if (gs.puzzle[k] === 0 && gs.board[k] !== gs.solution[k]) blanks.push(k);
+        if (!blanks.length) return;
+        i = blanks[Math.floor(Math.random() * blanks.length)];
+        gs.selected = i;
+    }
+    gs.board[i] = gs.solution[i];
+    gs.notes[i].clear();
+    gs.hinted[i] = true;
+    gs.hintsUsed++;
+    renderBoard();
+    updateHUD();
+    checkWin();
+}
+
+function checkWin() {
+    for (let i = 0; i < 81; i++) if (gs.board[i] !== gs.solution[i]) return;
+    endGame();
+}
+
+// ─── GLOBAL KEYBOARD INPUT ──────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (!document.getElementById('screen-game').classList.contains('on')) return;
+    if (e.key >= '1' && e.key <= '9') enterDigit(parseInt(e.key));
+    else if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') eraseCell();
+});
+
+function updateHUD() {
+    document.getElementById('hud-time').textContent = fmtTime(gs.elapsed);
+    document.getElementById('hud-mistakes').textContent = gs.mistakes;
+    document.getElementById('hud-hints').textContent = gs.hintsUsed;
+}
+
+function computeScore() {
+    const base = DIFFICULTY_BASE[cfg.difficulty] || DIFFICULTY_BASE.medium;
+    return Math.max(0, base - gs.mistakes * 15 - gs.hintsUsed * 25 - Math.floor(gs.elapsed / 5));
+}
+
+function endGame() {
+    gs.gameOver = true;
+    clearInterval(gs.timer);
+    document.getElementById('screen-game').classList.remove('on');
+
+    const score = computeScore();
+    document.getElementById('r-score').textContent = score;
+    document.getElementById('r-time').textContent = fmtTime(gs.elapsed);
+    document.getElementById('r-mistakes').textContent = gs.mistakes;
+    document.getElementById('r-hints').textContent = gs.hintsUsed;
+
+    document.getElementById('screen-results').classList.add('on');
+    spawnConfetti();
+    submitScore('sudoku', score);
+}
+</script>
+</body>
+</html>

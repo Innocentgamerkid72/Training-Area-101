@@ -8,7 +8,8 @@ const CATEGORIES = {
     timing:   { en: 'Timing',              zh: '时机训练',             unit: '',      better: 'desc' },
     typing:   { en: 'Typing Accuracy',     zh: '打字精准度',           unit: '',      better: 'desc' },
     stroop:   { en: 'Stroop Rush',         zh: '斯特鲁普冲刺',         unit: '',      better: 'desc' },
-    chess:    { en: 'Chess (vs Bot wins)', zh: '国际象棋（人机对战胜场）', unit: ' wins', better: 'desc' }
+    chess:    { en: 'Chess (vs Bot wins)', zh: '国际象棋（人机对战胜场）', unit: ' wins', better: 'desc' },
+    sudoku:   { en: 'Sudoku',              zh: '数独',                 unit: '',      better: 'desc' }
 };
 
 // Every session's score is written as its own immutable log entry (never

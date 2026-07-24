@@ -64,6 +64,12 @@
                 <p data-i18n="sudoku_desc_locked">Unlocks at Level 5</p>
             </a>
 
+            <a href="#" class="category-card tetris disabled" id="tetris-card">
+                <div class="card-dot"></div>
+                <h2 data-i18n="tetris_name_locked">🔒 Tetris</h2>
+                <p data-i18n="tetris_desc_locked">Unlocks at Level 20</p>
+            </a>
+
             <a href="#" class="category-card tag2 disabled" id="tag2-card" target="_blank" rel="noopener noreferrer">
                 <div class="card-dot"></div>
                 <h2 data-i18n="tag2_name_locked">🔒 Tag Game 2</h2>
@@ -107,6 +113,11 @@ const I18N = {
     sudoku_desc_locked_progress: { en: 'Unlocks at Level 5 (you\'re Lv.', zh: '达到5级后解锁（你目前是 Lv.' },
     sudoku_name_unlocked: { en: '🧩 Sudoku', zh: '🧩 数独' },
     sudoku_desc_unlocked: { en: 'Classic 9×9 logic puzzle, four difficulties', zh: '经典9×9逻辑拼图，四种难度' },
+    tetris_name_locked:   { en: '🔒 Tetris', zh: '🔒 俄罗斯方块' },
+    tetris_desc_locked:   { en: 'Unlocks at Level 20', zh: '达到20级后解锁' },
+    tetris_desc_locked_progress: { en: 'Unlocks at Level 20 (you\'re Lv.', zh: '达到20级后解锁（你目前是 Lv.' },
+    tetris_name_unlocked: { en: '🧱 Tetris', zh: '🧱 俄罗斯方块' },
+    tetris_desc_unlocked: { en: 'Classic falling-block puzzle — clear lines, level up, speed up', zh: '经典掉落方块拼图 — 消行、升级、加速' },
     sign_in_to_track:   { en: 'Sign in to track your level', zh: '登录以追踪你的等级' }
 };
 
@@ -117,6 +128,10 @@ const LEVEL_GATES = [
     { cardId: 'sudoku-card', requiredLevel: 5, href: 'sudoku.html',
       titleLockedKey: 'sudoku_name_locked', titleUnlockedKey: 'sudoku_name_unlocked',
       descLockedKey: 'sudoku_desc_locked_progress', descUnlockedKey: 'sudoku_desc_unlocked',
+      level: 0, signedIn: false },
+    { cardId: 'tetris-card', requiredLevel: 20, href: 'tetris.html',
+      titleLockedKey: 'tetris_name_locked', titleUnlockedKey: 'tetris_name_unlocked',
+      descLockedKey: 'tetris_desc_locked_progress', descUnlockedKey: 'tetris_desc_unlocked',
       level: 0, signedIn: false },
     { cardId: 'tag2-card', requiredLevel: 100, href: 'https://tag-game-2.vercel.app',
       titleLockedKey: 'tag2_name_locked', titleUnlockedKey: 'tag2_name_unlocked',

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris — Training Area 101</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- PAGE NAV (hidden during game/results) -->
+<nav class="page-nav" id="page-nav">
+    <button class="back-btn" onclick="navBack()" data-i18n="back">Back</button>
+    <span class="page-title" data-i18n="page_title">Tetris</span>
+    <button class="lang-toggle" id="lang-toggle-page">中文</button>
+    <a href="leaderboard.html?cat=tetris" class="btn btn-ghost btn-sm" data-i18n="leaderboard_link">🏆 Leaderboard</a>
+</nav>
+
+<!-- WIZARD CONTAINER -->
+<div class="wizard" id="wizard">
+
+    <!-- STEP 1: Starting Level -->
+    <div class="step active" id="step-level">
+        <div class="step-head">
+            <h2 data-i18n="level_h2">Starting Level</h2>
+            <p data-i18n="level_p">Higher starting levels drop faster right from the start, for a bigger score multiplier</p>
+        </div>
+        <div class="form-group">
+            <label><span data-i18n="start_level">Starting Level:</span> <span class="val-label" id="level-val">1</span></label>
+            <input type="range" id="inp-level" min="1" max="10" step="1" value="1" oninput="onStartLevelChange(this.value)">
+        </div>
+        <div class="step-foot">
+            <div></div>
+            <button class="btn btn-primary" onclick="fromLevel()" data-i18n="next">Next</button>
+        </div>
+    </div>
+
+    <!-- STEP 2: How to Play -->
+    <div class="step" id="step-guide">
+        <div class="step-head">
+            <h2 data-i18n="guide_h2">How to Play</h2>
+            <p data-i18n="guide_p">Quick rundown before you start</p>
+        </div>
+        <div class="guide-card" style="--guide-color: var(--orange);">
+            <ul class="guide-list">
+                <li data-i18n="guide_1">Pieces fall automatically — arrange them to fill a complete horizontal row, which clears it and scores points.</li>
+                <li data-i18n="guide_2">Move with ← → (or A/D), rotate with ↑ (or W), soft-drop with ↓ (or S), and hard-drop instantly with Space.</li>
+                <li data-i18n="guide_3">Clearing multiple rows at once (up to 4, a "Tetris") scores far more than clearing them one at a time.</li>
+                <li data-i18n="guide_4">Every 10 lines cleared raises your level, which speeds up the drop rate. The game ends when the stack reaches the top.</li>
+            </ul>
+        </div>
+        <div class="step-foot">
+            <button class="btn btn-ghost" onclick="show('level')" data-i18n="back">Back</button>
+            <button class="btn btn-primary btn-lg" onclick="beginGame()" data-i18n="lets_go">Let's Go!</button>
+        </div>
+    </div>
+
+</div><!-- /wizard -->
+
+<!-- GAME SCREEN -->
+<div id="screen-game">
+    <div class="game-hud">
+        <div class="hud-stat"><div class="hud-val" id="hud-score">0</div><div class="hud-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-level">1</div><div class="hud-lbl" data-i18n="hud_level">Level</div></div>
+        <div class="hud-stat"><div class="hud-val" id="hud-lines">0</div><div class="hud-lbl" data-i18n="hud_lines">Lines</div></div>
+    </div>
+    <div class="tetris-layout">
+        <div class="tetris-board-wrap">
+            <div class="tetris-board" id="tetris-board"></div>
+        </div>
+        <div class="tetris-next-wrap">
+            <div class="tetris-next-lbl" data-i18n="next_lbl">Next</div>
+            <div class="tetris-next" id="tetris-next"></div>
+        </div>
+    </div>
+    <div class="tetris-controls">
+        <button class="dir-btn dir-left"  onclick="tMove(-1)">←</button>
+        <button class="dir-btn dir-up"    onclick="tRotate()">↻</button>
+        <button class="dir-btn dir-right" onclick="tMove(1)">→</button>
+        <button class="dir-btn dir-down"  onclick="tSoftDrop()">↓</button>
+        <button class="btn btn-ghost btn-sm tetris-harddrop-btn" onclick="tHardDrop()" data-i18n="hard_drop_btn">⤓ Hard Drop</button>
+    </div>
+</div>
+
+<!-- RESULTS SCREEN -->
+<div id="screen-results">
+    <div class="res-title" data-i18n="res_title">Game Over!</div>
+    <div class="res-subtitle" data-i18n="res_subtitle">Here's how you did</div>
+    <div class="res-stats">
+        <div class="res-stat"><div class="res-val" id="r-score">0</div><div class="res-lbl" data-i18n="hud_score">Score</div></div>
+        <div class="res-stat"><div class="res-val" id="r-level">1</div><div class="res-lbl" data-i18n="hud_level">Level</div></div>
+        <div class="res-stat"><div class="res-val" id="r-lines">0</div><div class="res-lbl" data-i18n="hud_lines">Lines</div></div>
+    </div>
+    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" data-i18n="back_home">Back to Home</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="account.js"></script>
+<script src="leaderboard.js"></script>
+<script src="confetti.js"></script>
+<script src="i18n.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════════
+// TETRIS ENGINE — pure logic, no DOM. Board is a 2D array [row][col],
+// row 0 = top. Rotation is computed geometrically (not hand-typed per
+// state) to avoid transcription bugs: each piece has one base shape in
+// an NxN box, and rotateCW() derives every other state from it.
+// ══════════════════════════════════════════════════════════════════
+const COLS = 10, ROWS = 20;
+
+const PIECES = {
+    I: { cells: [[0,1],[1,1],[2,1],[3,1]], box: 4, color: 'var(--blue)' },
+    O: { cells: [[0,0],[1,0],[0,1],[1,1]], box: 2, color: 'var(--yellow)' },
+    T: { cells: [[1,0],[0,1],[1,1],[2,1]], box: 3, color: 'var(--purple)' },
+    S: { cells: [[1,0],[2,0],[0,1],[1,1]], box: 3, color: 'var(--green)' },
+    Z: { cells: [[0,0],[1,0],[1,1],[2,1]], box: 3, color: 'var(--red)' },
+    J: { cells: [[0,0],[0,1],[1,1],[2,1]], box: 3, color: 'var(--silver)' },
+    L: { cells: [[2,0],[0,1],[1,1],[2,1]], box: 3, color: 'var(--orange)' }
+};
+const PIECE_KEYS = Object.keys(PIECES);
+
+// Rotates a cell set 90° clockwise about the center of its box*box bounding
+// box. O is a full 2x2 box so this is a no-op set-wise (self-consistent);
+// every other piece cycles back to its original shape after 4 calls.
+function rotateCW(cells, box) {
+    return cells.map(([x, y]) => [box - 1 - y, x]);
+}
+
+function rotationState(pieceKey, rotIndex) {
+    let cells = PIECES[pieceKey].cells;
+    const box = PIECES[pieceKey].box;
+    for (let i = 0; i < ((rotIndex % 4) + 4) % 4; i++) cells = rotateCW(cells, box);
+    return cells;
+}
+
+function newEmptyBoard() {
+    return Array.from({ length: ROWS }, () => new Array(COLS).fill(null));
+}
+
+function randomBag() {
+    const bag = PIECE_KEYS.slice();
+    for (let i = bag.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    return bag;
+}
+
+function spawnPosition(pieceKey) {
+    return { key: pieceKey, rot: 0, x: Math.floor((COLS - PIECES[pieceKey].box) / 2), y: -1 };
+}
+
+function pieceCellsAbs(piece) {
+    return rotationState(piece.key, piece.rot).map(([cx, cy]) => [piece.x + cx, piece.y + cy]);
+}
+
+function collides(board, piece) {
+    for (const [x, y] of pieceCellsAbs(piece)) {
+        if (x < 0 || x >= COLS || y >= ROWS) return true;
+        if (y >= 0 && board[y][x]) return true;
+    }
+    return false;
+}
+
+// Naive wall-kick: if a rotation collides in place, try nudging left/right
+// by 1-2 cells before giving up (not full SRS, but keeps rotation usable
+// near walls, which is the case that matters most for playability).
+function tryRotate(board, piece) {
+    const candidate = { ...piece, rot: piece.rot + 1 };
+    for (const dx of [0, -1, 1, -2, 2]) {
+        const attempt = { ...candidate, x: candidate.x + dx };
+        if (!collides(board, attempt)) return attempt;
+    }
+    return null;
+}
+
+function lockPiece(board, piece) {
+    const next = board.map(row => row.slice());
+    for (const [x, y] of pieceCellsAbs(piece)) {
+        if (y >= 0) next[y][x] = PIECES[piece.key].color;
+    }
+    return next;
+}
+
+function clearLines(board) {
+    const remaining = board.filter(row => row.some(cell => !cell));
+    const cleared = ROWS - remaining.length;
+    const fresh = Array.from({ length: cleared }, () => new Array(COLS).fill(null));
+    return { board: fresh.concat(remaining), cleared };
+}
+
+const LINE_SCORE = { 1: 100, 2: 300, 3: 500, 4: 800 };
+
+function levelForLines(startLevel, totalLines) {
+    return startLevel + Math.floor(totalLines / 10);
+}
+
+function dropIntervalMs(level) {
+    return Math.max(100, 1000 - (level - 1) * 80);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// UI
+// ══════════════════════════════════════════════════════════════════
+const I18N = {
+    back:            { en: 'Back', zh: '返回' },
+    page_title:      { en: 'Tetris', zh: '俄罗斯方块' },
+    leaderboard_link:{ en: '🏆 Leaderboard', zh: '🏆 排行榜' },
+    level_h2:        { en: 'Starting Level', zh: '起始等级' },
+    level_p:         { en: 'Higher starting levels drop faster right from the start, for a bigger score multiplier', zh: '更高的起始等级会让方块从一开始就下落得更快，得分倍率也更高' },
+    start_level:     { en: 'Starting Level:', zh: '起始等级：' },
+    next:            { en: 'Next', zh: '下一步' },
+    guide_h2:        { en: 'How to Play', zh: '玩法说明' },
+    guide_p:         { en: 'Quick rundown before you start', zh: '开始前的简要说明' },
+    guide_1:         { en: 'Pieces fall automatically — arrange them to fill a complete horizontal row, which clears it and scores points.', zh: '方块会自动下落 — 将它们排列填满一整行，即可消除并得分。' },
+    guide_2:         { en: 'Move with ← → (or A/D), rotate with ↑ (or W), soft-drop with ↓ (or S), and hard-drop instantly with Space.', zh: '使用← →（或A/D）移动，↑（或W）旋转，↓（或S）加速下落，空格键瞬间落地。' },
+    guide_3:         { en: 'Clearing multiple rows at once (up to 4, a "Tetris") scores far more than clearing them one at a time.', zh: '一次消除多行（最多4行，即"Tetris"）比逐行消除得分高得多。' },
+    guide_4:         { en: 'Every 10 lines cleared raises your level, which speeds up the drop rate. The game ends when the stack reaches the top.', zh: '每消除10行等级提升一次，下落速度随之加快。当方块堆到顶部时游戏结束。' },
+    lets_go:         { en: "Let's Go!", zh: '开始吧！' },
+    hud_score:       { en: 'Score', zh: '得分' },
+    hud_level:       { en: 'Level', zh: '等级' },
+    hud_lines:       { en: 'Lines', zh: '消除行数' },
+    next_lbl:        { en: 'Next', zh: '下一个' },
+    hard_drop_btn:   { en: '⤓ Hard Drop', zh: '⤓ 瞬间落地' },
+    res_title:       { en: 'Game Over!', zh: '游戏结束！' },
+    res_subtitle:    { en: "Here's how you did", zh: '以下是你的表现' },
+    back_home:       { en: 'Back to Home', zh: '返回首页' }
+};
+
+document.addEventListener('DOMContentLoaded', () => initI18n(I18N));
+
+function onLangChange() {
+    if (document.getElementById('screen-game').classList.contains('on')) updateHUD();
+}
+
+// ─── SETTINGS STATE ─────────────────────────────────────────────
+const cfg = { startLevel: 1 };
+
+function show(stepId) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + stepId).classList.add('active');
+}
+
+function navBack() {
+    const active = document.querySelector('.step.active');
+    if (!active) { location.href = 'index.html'; return; }
+    const id = active.id.replace('step-', '');
+    if (id === 'level') { location.href = 'index.html'; return; }
+    if (id === 'guide') { show('level'); return; }
+}
+
+function onStartLevelChange(val) {
+    cfg.startLevel = parseInt(val);
+    document.getElementById('level-val').textContent = val;
+}
+
+function fromLevel() {
+    show('guide');
+}
+
+// ─── GAME ────────────────────────────────────────────────────────
+let gs = {};
+
+function beginGame() {
+    document.getElementById('page-nav').style.display = 'none';
+    document.getElementById('wizard').style.display = 'none';
+
+    const bag = randomBag();
+    gs = {
+        board: newEmptyBoard(),
+        bag,
+        bagIdx: 0,
+        current: spawnPosition(bag[0]),
+        score: 0,
+        totalLines: 0,
+        level: cfg.startLevel,
+        dropTimer: null,
+        gameOver: false
+    };
+
+    document.getElementById('screen-game').classList.add('on');
+    buildBoardDom();
+    renderBoard();
+    renderNext();
+    updateHUD();
+    armDropTimer();
+}
+
+function buildBoardDom() {
+    const board = document.getElementById('tetris-board');
+    board.innerHTML = '';
+    for (let i = 0; i < ROWS * COLS; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'tetris-cell';
+        board.appendChild(cell);
+    }
+}
+
+function armDropTimer() {
+    clearInterval(gs.dropTimer);
+    gs.dropTimer = setInterval(() => softDropTick(false), dropIntervalMs(gs.level));
+}
+
+function nextPieceKey() {
+    gs.bagIdx++;
+    if (gs.bagIdx >= gs.bag.length) { gs.bag = randomBag(); gs.bagIdx = 0; }
+    return gs.bag[gs.bagIdx];
+}
+
+function spawnNext() {
+    const key = nextPieceKey();
+    gs.current = spawnPosition(key);
+    if (collides(gs.board, gs.current)) { endGame(); return; }
+    renderBoard();
+    renderNext();
+}
+
+function softDropTick(isPlayerInput) {
+    if (gs.gameOver) return;
+    const attempt = { ...gs.current, y: gs.current.y + 1 };
+    if (!collides(gs.board, attempt)) {
+        gs.current = attempt;
+        if (isPlayerInput) gs.score += 1;
+        renderBoard();
+    } else {
+        settlePiece();
+    }
+}
+
+function settlePiece() {
+    gs.board = lockPiece(gs.board, gs.current);
+    const { board, cleared } = clearLines(gs.board);
+    gs.board = board;
+    if (cleared > 0) {
+        gs.score += (LINE_SCORE[cleared] || 0) * gs.level;
+        gs.totalLines += cleared;
+        const newLevel = levelForLines(cfg.startLevel, gs.totalLines);
+        if (newLevel !== gs.level) { gs.level = newLevel; armDropTimer(); }
+    }
+    updateHUD();
+    spawnNext();
+}
+
+function tMove(dx) {
+    if (gs.gameOver) return;
+    const attempt = { ...gs.current, x: gs.current.x + dx };
+    if (!collides(gs.board, attempt)) { gs.current = attempt; renderBoard(); }
+}
+
+function tRotate() {
+    if (gs.gameOver) return;
+    const rotated = tryRotate(gs.board, gs.current);
+    if (rotated) { gs.current = rotated; renderBoard(); }
+}
+
+function tSoftDrop() {
+    softDropTick(true);
+    updateHUD();
+}
+
+function tHardDrop() {
+    if (gs.gameOver) return;
+    let dist = 0;
+    while (!collides(gs.board, { ...gs.current, y: gs.current.y + 1 })) {
+        gs.current = { ...gs.current, y: gs.current.y + 1 };
+        dist++;
+    }
+    gs.score += dist * 2;
+    settlePiece();
+}
+
+function renderBoard() {
+    const cellsEl = document.getElementById('tetris-board').children;
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            const el = cellsEl[r * COLS + c];
+            const val = gs.board[r][c];
+            el.style.background = val || '';
+            el.classList.toggle('filled', !!val);
+            el.classList.remove('active');
+        }
+    }
+    for (const [x, y] of pieceCellsAbs(gs.current)) {
+        if (y < 0 || y >= ROWS || x < 0 || x >= COLS) continue;
+        const el = cellsEl[y * COLS + x];
+        el.style.background = PIECES[gs.current.key].color;
+        el.classList.add('active', 'filled');
+    }
+}
+
+function renderNext() {
+    const wrap = document.getElementById('tetris-next');
+    wrap.innerHTML = '';
+    const key = gs.bag[(gs.bagIdx + 1) % gs.bag.length] || gs.bag[0];
+    const info = PIECES[key];
+    const grid = document.createElement('div');
+    grid.className = 'tetris-next-grid';
+    grid.style.gridTemplateColumns = `repeat(${info.box}, 1fr)`;
+    grid.style.gridTemplateRows = `repeat(${info.box}, 1fr)`;
+    const filled = new Set(info.cells.map(([x, y]) => x + ',' + y));
+    for (let y = 0; y < info.box; y++) {
+        for (let x = 0; x < info.box; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'tetris-next-cell';
+            if (filled.has(x + ',' + y)) cell.style.background = info.color;
+            grid.appendChild(cell);
+        }
+    }
+    wrap.appendChild(grid);
+}
+
+function updateHUD() {
+    document.getElementById('hud-score').textContent = gs.score;
+    document.getElementById('hud-level').textContent = gs.level;
+    document.getElementById('hud-lines').textContent = gs.totalLines;
+}
+
+function endGame() {
+    gs.gameOver = true;
+    clearInterval(gs.dropTimer);
+    document.getElementById('screen-game').classList.remove('on');
+
+    document.getElementById('r-score').textContent = gs.score;
+    document.getElementById('r-level').textContent = gs.level;
+    document.getElementById('r-lines').textContent = gs.totalLines;
+
+    document.getElementById('screen-results').classList.add('on');
+    spawnConfetti();
+    submitScore('tetris', gs.score);
+}
+
+// ─── KEYBOARD INPUT ─────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+    if (!document.getElementById('screen-game').classList.contains('on') || gs.gameOver) return;
+    const key = e.key.toLowerCase();
+    if (key === 'arrowleft' || key === 'a') { tMove(-1); e.preventDefault(); }
+    else if (key === 'arrowright' || key === 'd') { tMove(1); e.preventDefault(); }
+    else if (key === 'arrowdown' || key === 's') { if (!e.repeat) tSoftDrop(); e.preventDefault(); }
+    else if (key === 'arrowup' || key === 'w') { if (!e.repeat) tRotate(); e.preventDefault(); }
+    else if (key === ' ') { if (!e.repeat) tHardDrop(); e.preventDefault(); }
+});
+</script>
+</body>
+</html>

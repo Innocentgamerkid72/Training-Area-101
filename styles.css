@@ -108,6 +108,7 @@ body {
 .category-card.stroop    { --card-color: var(--yellow); }
 .category-card.chess     { --card-color: var(--silver); }
 .category-card.sudoku    { --card-color: var(--green); }
+.category-card.tetris    { --card-color: var(--yellow); }
 .category-card.tag2      { --card-color: var(--red); }
 
 .category-card.disabled { opacity: 0.38; cursor: not-allowed; pointer-events: none; }
@@ -1050,6 +1051,43 @@ input[type="range"] {
 #screen-vote.on { display: flex; }
 #screen-vote .mode-card.sel-locked { opacity: 0.5; pointer-events: none; }
 
+/* TETRIS */
+.tetris-layout { display: flex; gap: 18px; justify-content: center; align-items: flex-start; padding: 16px; }
+.tetris-board-wrap { display: flex; justify-content: center; }
+.tetris-board {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+    width: min(45vw, 260px);
+    height: min(90vw, 520px);
+    background: #090912;
+    border: 3px solid var(--border2);
+    border-radius: var(--rs);
+    overflow: hidden;
+}
+.tetris-cell { border: 1px solid rgba(255, 255, 255, 0.03); }
+.tetris-cell.filled { border-color: rgba(0, 0, 0, 0.35); }
+.tetris-cell.active { filter: brightness(1.15); }
+
+.tetris-next-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.tetris-next-lbl { font-size: 0.78rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.tetris-next {
+    width: 88px;
+    height: 88px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--rs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+}
+.tetris-next-grid { display: grid; width: 100%; height: 100%; gap: 2px; }
+.tetris-next-cell { background: transparent; border-radius: 2px; }
+
+.tetris-controls { display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+.tetris-harddrop-btn { margin-left: 6px; }
+
 /* SUDOKU */
 .sudoku-board {
     display: grid;
@@ -1451,6 +1489,10 @@ input[type="range"] {
     .sudoku-numpad { gap: 4px; }
     .sudoku-num-btn { padding: 9px 0; font-size: 0.9rem; }
     .sudoku-toolbar { gap: 6px; }
+
+    .tetris-layout { gap: 10px; padding: 10px; }
+    .tetris-board { width: min(55vw, 220px); height: min(110vw, 440px); }
+    .tetris-next { width: 64px; height: 64px; }
     .tumbleweed { width: 26px; height: 26px; }
 
     .typing-passage {
